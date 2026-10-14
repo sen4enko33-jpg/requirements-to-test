@@ -1,9 +1,77 @@
 {
-  "doc_title": null,
-  "domain": null,
-  "language": null,
-  "actors": [],
-  "requirements": [],
-  "has_acceptance_criteria": null,
+  "doc_title": "Software Requirements Engineering for Grid 3D Application",
+  "domain": "other",
+  "language": "mixed",
+  "actors": [
+    "Identifier",
+    "Investigator",
+    "Demonstrator"
+  ],
+  "requirements": [
+    {
+      "id": null,
+      "section": "The Scope of the Product > Work Partitioning",
+      "text": "Identifier supplies data",
+      "type": "interface",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "The Scope of the Product > Work Partitioning",
+      "text": "Application returns view/info to identifier",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "The Scope of the Product > Work Partitioning",
+      "text": "Investigator supplies data",
+      "type": "interface",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "The Scope of the Product > Work Partitioning",
+      "text": "Application returns details to investigator",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "The Scope of the Product > Work Partitioning",
+      "text": "Demonstrator supplies data",
+      "type": "interface",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "The Scope of the Product > Work Partitioning",
+      "text": "Application provides 3D view",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "The Scope of the Product > Work Partitioning",
+      "text": "User requests change of grid orientation",
+      "type": "functional",
+      "testable": "partial"
+    },
+    {
+      "id": null,
+      "section": "The Scope of the Product > Work Partitioning",
+      "text": "User selects multiple points",
+      "type": "functional",
+      "testable": "partial"
+    },
+    {
+      "id": null,
+      "section": "The Scope of the Product > Product Boundary",
+      "text": "Доступ до особистих даних мають лише авторизовані користувачі.",
+      "type": "functional",
+      "testable": "yes"
+    }
+  ],
+  "has_acceptance_criteria": false,
   "open_questions": []
 }

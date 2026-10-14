@@ -1,9 +1,139 @@
 {
-  "doc_title": null,
-  "domain": null,
-  "language": null,
-  "actors": [],
-  "requirements": [],
-  "has_acceptance_criteria": null,
+  "doc_title": "x-ray",
+  "domain": "other",
+  "language": "en",
+  "actors": [
+    "general user",
+    "system developers"
+  ],
+  "requirements": [
+    {
+      "id": null,
+      "section": "User Classes and Characteristics",
+      "text": "The general user will only see the front end of the system.",
+      "type": "constraint",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "User Classes and Characteristics",
+      "text": "The system developers will be able to edit whih sites the system will search.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Operating Environment",
+      "text": "The system will be portable: it will work across different operating systems including Microsoft XP and Vista, Mac OS X and a range of Linux platforsm.",
+      "type": "constraint",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Operating Environment",
+      "text": "The system will work with different web browsers, for example Internet Explorer, Firefox, and Safari.",
+      "type": "constraint",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Operating Environment",
+      "text": "The hardware needed for the system will be a reasonably up-to-date computer that is connected to the internet via a modem.",
+      "type": "constraint",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Torrent Search > Description and Priority",
+      "text": "The user will give a search-term that will search through a database of compatible torrent websites that are added by the development team.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Torrent Search > Description and Priority",
+      "text": "The ressults of the search will be displayed as web links in a tab on the program’s main window.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Torrent Search > Stimulus/Response Sequences",
+      "text": "User ticks torrent tick box – system will now query the torrent websites in its database when a search is started.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Torrent Search > Stimulus/Response Sequences",
+      "text": "User enters search term and starts search – sysetm sends queries to the torrent websites in its database based on the search term. Results for this query will then be sent to the torrent tab in the program where they will display information such as website, seeds, peers, size, date posted and a link for the webpage.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Torrent Search > Stimulus/Response Sequences",
+      "text": "User sorts the search results by clicking once on a column header – system sorts all results by descending/ascending order.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Torrent Search > Stimulus/Response Sequences",
+      "text": "User clicks on next page button – system displays the next set of results for the search.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": "REQ-1",
+      "section": "Torrent Search > Functional Requirements",
+      "text": "Torrent search will share the same search bar with the streaming search.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": "REQ-2",
+      "section": "Torrent Search > Functional Requirements",
+      "text": "Database of torrent sites can be updated via the internet.",
+      "type": "functional",
+      "testable": "partial"
+    },
+    {
+      "id": "REQ-3",
+      "section": "Torrent Search > Functional Requirements",
+      "text": "There will be a tick box to allow the user to choose to include torrent searching in the search.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": "REQ-4",
+      "section": "Torrent Search > Functional Requirements",
+      "text": "Query will retrieve the no. of seed and peers, size of the file, date posted and a link to the webpage itself.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": "REQ-5",
+      "section": "Torrent Search > Functional Requirements",
+      "text": "If no results are found on a search it will display a message “No results were found for this search.”",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": "REQ-6",
+      "section": "Torrent Search > Functional Requirements",
+      "text": "Results will be arranged in size/date/alphabetical order by clicking on the column headers.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": "REQ-7",
+      "section": "Torrent Search > Functional Requirements",
+      "text": "There will be page button for the user to navigate the results.",
+      "type": "functional",
+      "testable": "yes"
+    }
+  ],
+  "has_acceptance_criteria": false,
   "open_questions": []
 }

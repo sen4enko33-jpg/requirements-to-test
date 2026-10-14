@@ -89,6 +89,6 @@
   ],
   "has_acceptance_criteria": false,
   "open_questions": [
-    "Who should the occurrence counts of a goal be displayed to (the text notes this is important for ACP)?"
+    "For ACP, it is important to know who the system will display this information to."
   ]
 }

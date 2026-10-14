@@ -1,9 +1,125 @@
 {
   "doc_title": null,
-  "domain": null,
-  "language": null,
-  "actors": [],
-  "requirements": [],
-  "has_acceptance_criteria": null,
-  "open_questions": []
+  "domain": "finance",
+  "language": "en",
+  "actors": [
+    "Security Account Management",
+    "Trading System Management",
+    "customer"
+  ],
+  "requirements": [
+    {
+      "id": null,
+      "section": null,
+      "text": "transaction user interface: give the buy instruction",
+      "type": "interface",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": null,
+      "text": "central trading system: save the buy instruction",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": null,
+      "text": "central trading system: match the instructions with the same stock id",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": null,
+      "text": "central trading system: make a trade by matching",
+      "type": "functional",
+      "testable": "partial"
+    },
+    {
+      "id": null,
+      "section": null,
+      "text": "central trading system: modify the information of matched instructions",
+      "type": "functional",
+      "testable": "partial"
+    },
+    {
+      "id": null,
+      "section": "Sell stock",
+      "text": "transaction user interface: give the sell instruction",
+      "type": "interface",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Sell stock",
+      "text": "central trading system: save the sell instruction",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Sell stock",
+      "text": "central trading system: match the instructions with the same stock id",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Sell stock",
+      "text": "central trading system: make a trade by matching",
+      "type": "functional",
+      "testable": "partial"
+    },
+    {
+      "id": null,
+      "section": "Sell stock",
+      "text": "central trading system: modify the information of matched instructions",
+      "type": "functional",
+      "testable": "partial"
+    },
+    {
+      "id": null,
+      "section": "Cancel trading instruction",
+      "text": "transaction user interface: give the cancel instruction",
+      "type": "interface",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Cancel trading instruction",
+      "text": "central trading system: save the cancel instruction",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Cancel trading instruction",
+      "text": "central trading system: cancel the correlative instruction",
+      "type": "functional",
+      "testable": "partial"
+    },
+    {
+      "id": null,
+      "section": "Save trade information",
+      "text": "central trading system: give out the successful trade information",
+      "type": "interface",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Save trade information",
+      "text": "security account management: save the trade information",
+      "type": "functional",
+      "testable": "yes"
+    }
+  ],
+  "has_acceptance_criteria": false,
+  "open_questions": [
+    "Should the trade information return to Transaction User Interface immediately when the deal is done?",
+    "Should the failure of trade return to Transaction User Interface the next day?",
+    "If exception happens, is exception log needed?",
+    "Is it necessary to return the status of cancel transaction?",
+    "security issue"
+  ]
 }

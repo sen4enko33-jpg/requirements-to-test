@@ -1,12 +1,13 @@
 timeout_s: 60
 max_retries: 3
+max_tokens: 8192
 
 models:
   cloud:
     provider: anthropic
-    model: ""              # fill in the model you choose
-    price_in_per_1m: null  # price per 1M input tokens, from the provider's price list
-    price_out_per_1m: null
+    model: claude-haiku-5-5
+    price_in_per_1m: 0.10    # USD per 1M input tokens (prompts <= 100k tokens)
+    price_out_per_1m: 0.50   # USD per 1M output tokens
   local:
     provider: ollama
     model: ""              # model name from your Ollama

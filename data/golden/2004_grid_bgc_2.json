@@ -131,7 +131,7 @@
       "section": "Projection Object > Delete",
       "text": "If the project is in a locked state, the user shall be prompted to delete all projects that reference this project following the candidate project deletion rules.",
       "type": "functional",
-      "testable": "partial"
+      "testable": "yes"
     },
     {
       "id": null,
@@ -145,7 +145,7 @@
       "section": "Grid Registration Object > Collaboration",
       "text": "Projection Objects can be templates.",
       "type": "functional",
-      "testable": "partial"
+      "testable": "yes"
     },
     {
       "id": null,
@@ -201,21 +201,21 @@
       "section": "Surface Observation Object > Collaboration",
       "text": "Projection Objects can be shared.",
       "type": "functional",
-      "testable": "partial"
+      "testable": "yes"
     },
     {
       "id": null,
       "section": "Surface Observation Object > Supported Object Types",
       "text": "Supported object types: List.",
       "type": "functional",
-      "testable": "partial"
+      "testable": "yes"
     },
     {
       "id": null,
       "section": "Surface Observation Object > Creation",
       "text": "User must upload data files to the system.",
       "type": "functional",
-      "testable": "partial"
+      "testable": "yes"
     },
     {
       "id": null,
@@ -250,7 +250,7 @@
       "section": "Surface Observation Object > Update",
       "text": "Delete the project and start over.",
       "type": "functional",
-      "testable": "partial"
+      "testable": "no"
     },
     {
       "id": null,

@@ -39,7 +39,7 @@ class Requirement(BaseModel):
             "(e.g. 'Projection Object > Update'); null if the excerpt has no headings"
         ),
     )
-    text: str = Field(description="The requirement statement, copied or minimally cleaned from the source")
+    text: str = Field(description="The requirement statement, copied from the source exactly as written; only layout artifacts (numbering, page headers, line breaks) are removed")
     type: ReqType = Field(
         description=(
             "functional: what the system does; non_functional: quality attribute (performance, security, usability); "
@@ -57,4 +57,10 @@ class Extraction(BaseModel):
     actors: list[str] = Field(description="Users, roles or external systems that interact with the system")
     requirements: list[Requirement] = Field(description="All requirements found in the excerpt")  # nested list of objects
     has_acceptance_criteria: bool = Field(description="True if the excerpt contains explicit acceptance criteria")
-    open_questions: list[str] = Field(description="Ambiguities or missing details that block writing tests")
+    open_questions: list[str] = Field(
+        description=(
+            "Items the text itself marks as unresolved: explicit questions, TODO or placeholder notes "
+            "(e.g. 'Specify required archive structure', 'How is X specified?'), copied or minimally rephrased; "
+            "do not add your own analysis; empty list if the text marks none"
+        )
+    )

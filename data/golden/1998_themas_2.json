@@ -1,9 +1,139 @@
 {
-  "doc_title": null,
-  "domain": null,
-  "language": null,
-  "actors": [],
-  "requirements": [],
-  "has_acceptance_criteria": null,
+  "doc_title": "D_THEMAS_SRS_001",
+  "domain": "utilities",
+  "language": "en",
+  "actors": [
+    "supervisor",
+    "operator"
+  ],
+  "requirements": [
+    {
+      "id": null,
+      "section": null,
+      "text": "If the system detects a temperature limit has been exceeded, this process shall outpput a continuous series of alternating 1000 Hz and 1500 Hz beeps on the supervisor’s computer.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": null,
+      "text": "Each beep shall have a one-half second duration.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": null,
+      "text": "This series of beeps shall continue until the supervisor manually resets the alarm through the supervisor’s interface window.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": null,
+      "text": "Each time an alarm is requested, an alarm event shall be recorded.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": null,
+      "text": "This event shall be used to provide operational and statistical reports about the system.",
+      "type": "functional",
+      "testable": "partial"
+    },
+    {
+      "id": "SRS-016",
+      "section": "Generate Event Data > Introduction",
+      "text": "For each event that is generated, the THEMAS system shall identify each event and generate the appropriate event data.",
+      "type": "functional",
+      "testable": "partial"
+    },
+    {
+      "id": "SRS-016",
+      "section": "Generate Event Data > Processing",
+      "text": "When an event occurs, the THEMAS system shall identify the event type and format an appropriate event message.",
+      "type": "functional",
+      "testable": "partial"
+    },
+    {
+      "id": "SRS-016",
+      "section": "Generate Event Data > Processing",
+      "text": "The THEMAS system shall record each event by a description and the c urrent sysem time for that event.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": "SRS-016",
+      "section": "Generate Event Data > Processing",
+      "text": "This information shall be recorded in a Microsoft ® Access ® database that shall reside on the supervisor’s computer.",
+      "type": "constraint",
+      "testable": "yes"
+    },
+    {
+      "id": "SRS-017",
+      "section": "Change Thermostat Setting > Introduction",
+      "text": "The THEMAS system shall provide the supervisor a mechanism to change the temperature setting of any of the thermostats in the system.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": "SRS-017",
+      "section": "Change Thermostat Setting > Processing",
+      "text": "The supervisor’s interface shall display the available thermostats and their individual current temperature settings.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": "SRS-017",
+      "section": "Change Thermostat Setting > Processing",
+      "text": "The supervisor shall be able to select one of the thermostats and select a value for the current temperature from a list of valid temperatures.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": "SRS-018",
+      "section": "Generate Reports > Introduction",
+      "text": "The THEMAS shall provide the ability for the supervisor to select between two different types of reports: 1) the operational history of the THEMAS system for the past twelve months and 2) a statistical summary for any selected mont h.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": "SRS-018",
+      "section": "Generate Reports > Processing",
+      "text": "The supervisor’s interface to the THEMAS system shall provide a mechanism to select between an operational history report or a statistial summary report.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": "SRS-018",
+      "section": "Generate Reports > Processing",
+      "text": "Either report shall consist of an ASCII file whose location and name shall be selectable by the operator.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": "SRS-018",
+      "section": "Generate Reports > Processing",
+      "text": "If the statistical report is selected, the THEMAS system shall present the operator with a list of available months from which to make a selection.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": "SRS-018",
+      "section": "Generate Reports > Processing",
+      "text": "After selecting one of the months, the system shall generate the ASCII report file.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": "SRS-018",
+      "section": "Generate Reports > Processing",
+      "text": "The statistical reports shall consist of the following statistics: 1. The percentage of time each heating and cooling unit was on for each day of that month. 2. For each thermometer, the ratio of the number of requests for a heating and cooling unit that was granted to the number of requests for a heating or cooling unit that was denied.",
+      "type": "functional",
+      "testable": "yes"
+    }
+  ],
+  "has_acceptance_criteria": false,
   "open_questions": []
 }

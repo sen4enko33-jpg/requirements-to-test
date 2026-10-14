@@ -1,0 +1,111 @@
+{
+  "doc_title": "ERTMS/ETCS FRS v 5.00",
+  "domain": "transport",
+  "language": "en",
+  "actors": [
+    "driver",
+    "national train control system"
+  ],
+  "requirements": [
+    {
+      "id": null,
+      "section": null,
+      "text": "When the traction unit has come to a standstill, the driver shall be able to release the emergency brake.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": "4.3.9.3",
+      "section": null,
+      "text": "After releasing the emergency brake ETCS will provide the supervision appertaining when roll away protection was initiated.",
+      "type": "functional",
+      "testable": "partial"
+    },
+    {
+      "id": "4.3.9.4",
+      "section": null,
+      "text": "When usign more than one traction unit this function shall be disabled in all but the leading traction unit.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": "4.3.10.2",
+      "section": "Recording the ETCS information",
+      "text": "All data entered, received or indicated to the driver shall be recorded onboard.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": "4.3.10.2",
+      "section": "Recording the ETCS information",
+      "text": "All data shall be related to UTC (Universal Time Corrected) and a reference point.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": "4.3.10.3",
+      "section": "Recording the ETCS information",
+      "text": "Information shall be recorded to an accuracy which enables a clear view of the functioning of ETCS and way the traction unit has been driven.",
+      "type": "non_functional",
+      "testable": "partial"
+    },
+    {
+      "id": "4.3.10.4a",
+      "section": "Recording the ETCS information",
+      "text": "Standardised output interfaces shall enable transmission of information recorded to other media for investigation.",
+      "type": "interface",
+      "testable": "partial"
+    },
+    {
+      "id": "4.3.10.5",
+      "section": "Recording the ETCS information",
+      "text": "Data to enable investigation of accidents need only be stored for at least 24 hours, and shall be very detailed.",
+      "type": "functional",
+      "testable": "partial"
+    },
+    {
+      "id": "4.3.10.7",
+      "section": "Recording the ETCS information",
+      "text": "The following information shall be recorded: any transition of Level and of operational status; the driver’s confirmation of transition to shunting; train supervision data and information received from national train control systems; actual speed; full service brake intervention; emergency brake intervention; applying the train trip function; selection of the override control; override of the route suitability function; isolation of on board ETCS equipment; data entered, recieved or indicaed to the driver.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": "4.4.1.1",
+      "section": "Special Operations > Using multiple traction units",
+      "text": "It shall be possible to use multiple traction units without isolating the ETCS trainborne equipment on traciton unit(s) with an in-operative cab.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": "4.4.1.2",
+      "section": "Special Operations > Using multiple traction units",
+      "text": "Information received shall not influence the traction unit(s) with in-operative cabs.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": "4.4.1.3",
+      "section": "Special Operations > Using multiple traction units",
+      "text": "The train trip function (4.6.12.) shall be suppressed in traction unit(s) with in-operative cabs.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": "4.4.2.1",
+      "section": "Special Operations > Using tandem traction units",
+      "text": "It shall be possible to use tandem traction units without isolating the ETCS trainborne equipment on the tandem traction unit.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": "4.4.2.2",
+      "section": "Special Operations > Using tandem traction units",
+      "text": "The train trip function (4.6.12.) shall be suppressed on the tandem traction unit.",
+      "type": "functional",
+      "testable": "yes"
+    }
+  ],
+  "has_acceptance_criteria": false,
+  "open_questions": []
+}

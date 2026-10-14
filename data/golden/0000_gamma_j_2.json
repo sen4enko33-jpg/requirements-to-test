@@ -1,9 +1,62 @@
 {
-  "doc_title": null,
-  "domain": null,
-  "language": null,
-  "actors": [],
-  "requirements": [],
-  "has_acceptance_criteria": null,
+  "doc_title": "GAMMA-J Web Store",
+  "domain": "other",
+  "language": "mixed",
+  "actors": [
+    "sales person",
+    "customer"
+  ],
+  "requirements": [
+    {
+      "id": null,
+      "section": null,
+      "text": "Logout the Sales Person account on the system.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Add Product",
+      "text": "Add a product to the system.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Remove Product",
+      "text": "Remove a product from the system.",
+      "type": "functional",
+      "testable": "partial"
+    },
+    {
+      "id": null,
+      "section": "Update Product Attributes",
+      "text": "Update Product attributes within the system.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Update Product Attributes",
+      "text": "Доступ до особистих даних мають лише авторизовані користувачі.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Register Customer",
+      "text": "Register a new customer account with the system.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Login Customer",
+      "text": "Login to a customer account with the system.",
+      "type": "functional",
+      "testable": "partial"
+    }
+  ],
+  "has_acceptance_criteria": false,
   "open_questions": []
 }
