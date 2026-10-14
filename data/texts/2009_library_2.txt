@@ -1,0 +1,267 @@
+Related Process
+
+Req ID:
+
+6513
+
+Name:
+
+record lock management
+
+Description:
+
+Priority: 3
+
+The system provides real-time processing. For example: pull lists are up to date at time of viewing or printing; system supports live shelf reading and weeding. Related Reqs:
+
+Description:
+
+Priority: 3
+
+Source:
+
+ITS
+
+Priority: 3
+
+For any patron record or item record, staff can identify where it is in use (location, user, date and time placed). Related Reqs: 6501 7302
+
+Related Process
+
+Software Requirements Specification, System Administration of an Integrated Library System
+
+Req ID:
+
+2492
+
+Name:
+
+individual and shared staff login accounts
+
+Description:
+
+Source:
+
+ACQ
+
+Req ID:
+
+2428
+
+Name:
+
+system documentation
+
+Source:
+
+Related Process
+
+System documentation is library-specific and follows standard formats for technical documentation. Documentation is specific to the particular version of the software in use at library. Documentation is web-based, indexed, organized by function, and easily searchable. Related Process
+
+Req ID:
+
+2431
+
+Name:
+
+system upgrade guidelines
+
+Source:
+
+ITS
+
+Related Process
+
+Req ID:
+
+2479
+
+Name:
+
+configuration file access
+
+Source:
+
+Priority: 3
+
+ITS
+
+System provides access to all configuration files. Related Reqs:
+
+Req ID:
+
+2474
+
+Name:
+
+log file access
+
+Description:
+
+Priority: 3
+
+System upgrades and updates include written guidelines for updating servers and clients. Includes list of new, changed, and removed features. Related Reqs:
+
+Description:
+
+Priority: 3
+
+ITS
+
+Related Reqs:
+
+Description:
+
+Priority: 2
+
+Support for individual and shared staff login accounts; access to modules is granted by use of "roles" or "privileges" that allow each account to access as many (or as few) modules as needed. Individual logins allow user-level preferences and audit trail. Related Reqs: 5514
+
+Description:
+
+Page 5
+
+Related Process Source:
+
+ITS
+
+Priority: 3
+
+System provides full access to all log files. Log files can be reviewed without stopping system. Logs can be enabled, disabled, and set to a specific retention threshold. Related Reqs:
+
+Related Process
+
+Software Requirements Specification, System Administration of an Integrated Library System
+
+Req ID:
+
+2470
+
+Name:
+
+root shell access
+
+Description:
+
+Source:
+
+ITS
+
+Page 6
+
+Priority: 3
+
+System provides access to root shell. Related Reqs:
+
+Related Process
+
+Category: Systems: Consoles and Dashboards Req ID:
+
+6520
+
+Name:
+
+dashboard configuration
+
+Description:
+
+Source:
+
+ITS
+
+System supports creation of custom dashboards that display current and historical data about system performance, record creation and modification, circulation transactions, etc. Administrators can create dashboards and give access to selected users and groups. Related Reqs:
+
+Req ID:
+
+6501
+
+Name:
+
+system monitoring
+
+Description:
+
+Related Process Source:
+
+ITS
+
+Priority: 3
+
+System provides full support for SNMP and supports monitoring of system resources, including disk space, CPU load, memory load, system processes, system interfaces and ports. Alert thresholds are configurable. Alerts can be sent via administrative dashboards, email messages, and text messages. Alerts can be sent to unlimited number of recipients via any or all alert methods. Related Reqs:
+
+Related Process
+
+Req ID:
+
+7302
+
+Name:
+
+record lock administration
+
+Description:
+
+Priority: 3
+
+Source:
+
+ITS
+
+Priority: 3
+
+Ability to set thresholds on the length of time records are locked and provide, for all record types, a list of records in sustained use/locked condition. Ability from the same console to unlock one or more records. Related Reqs: 6513
+
+Related Process
+
+Software Requirements Specification, System Administration of an Integrated Library System
+
+Req ID:
+
+2467
+
+Name:
+
+system performance dashboard
+
+Description:
+
+Source:
+
+ITS
+
+Req ID:
+
+2466
+
+Name:
+
+server console
+
+Related Process Source:
+
+System provides a server management console including: software shutdown utility, software startup utility, server shutdown utility, server restart utility. Related Process
+
+Req ID:
+
+2464
+
+Name:
+
+application dashboard
+
+Source:
+
+ITS
+
+Priority: 3
+
+System provides an administrative dashboard displaying: last full and incremental backup; last planned and unplanned system reboot; last software upgrade; current software version; transactions waiting to be processed; size of log-files; current count of records by record type (item, bibliographic, patron etc), database utilization (size, processes running). Related Reqs:
+
+Related Process
+
+Req ID:
+
+2430
+
+Name:
+
+client management console

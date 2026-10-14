@@ -1,0 +1,27 @@
+Page 4 of 11
+
+Version: Date:
+
+2.1 6/13/2008 Black Start Capability Plan
+
+3. Generator Unit Testing Warning: Do NOT perform any actions while following this plan that could endanger the safety of any person, damage equipment, harms the environment, or violates any applicable law, regulation, or operating limit. Black Start Testing Minimal Requirements
+
+The following requirements apply to: • Voluntary Black Start units that desire a CAISO Black-Start status, • Interim Black Start units, • RMR Black Start Units:
+
+Step Description The owner or operator of any Voluntary Black Start unit that desires a Black 1
+
+2 3 4 5 6 7
+
+Start generating unit status with the CAISO Balancing Authority shall: • Demonstrate at least every five years, through simulation or testing, that the unit can perform its intended functions as required by the WECC BCP (if any) and of this testing section. • Submit documentation of the test results and analysis to the CAISO, WECC, or NERC upon any request. • Submit any past reports for Black Start tests with the CAISO and WECC. o Those Participants who do not currently test their Black Start capability, will be required to test their Black Start capability. • Within 24 hours of conducting a Black Start test, all Participants will notify the CAISO RT Dispatcher by phone indicating the success or failure of the test. • Within 14 days of performing a Black Start test, all Participants will file a letter with the CAISO regarding the success or failure of the test. Testing records shall include the dates of the tests, the duration of the tests, and an indication of whether the tests met the requirements of this Black Start Testing section. The Black Start unit must have the ability to maintain voltage within emergency voltage limits over a range of loading from no external load to full external load in accordance with NERC reliability standards. The Black Start unit must be equipped with governors that are capable of operating in an isochronous mode. Adequate transmission capacity shall be available to connect the Black Start facility to the source providing station services to other specified generating stations. The Black Start unit must be capable of starting and energizing the applicable transmission path without assistance from the electrical system. The Black Start Test should include key operating aids used in Black Starts such as telephone communications and SCADA, if applicable.
+
+Page 5 of 11
+
+Version: Date:
+
+8
+
+9 10
+
+2.1 6/13/2008 Black Start Capability Plan
+
+The following start-up/synchronizing time limits shall apply to the Black Start testing units: • Hydroelectric generating units or combustion gas turbines - within 30 minutes of the initiation of the Black Start process, • Industrial gas turbines - within 60 minutes of the initiation of the Black Start process, • Hot, steam-driven turbines, within 2.5 hours of the initiation of the Black Start process. • If the certified Black Start facility is in another reliability coordinator area or is comprised of an unspecified technology then specific start time limits are negotiated. These times include ICU start-up, normal start-up of the unit, plus switching time for the actual synchronizing of the unit. The minimum run time duration (the generation time after being synchronized to the grid) of a Black Start test is 10 minutes. Submit a CAISO market schedule for any test energy.

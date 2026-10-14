@@ -1,0 +1,137 @@
+Access Control
+
+1. Any user of the system shall be able to use a template. 3.5.4
+
+Submission
+
+1. Only users with template submission privileges can submit new templates. 3.5.5
+
+Editing
+
+1. Once a template has been submitted it can no longer be edited. 3.5.6
+
+Deletion
+
+1. The system shall allow the following users to delete templates from the system: 1.1. Portal Admin(s) 1.2. The user who originally created the template 3.5.7
+
+Display
+
+1. The system shall provide portal admin(s) with a list of all system templates by project type. 2. The system shall provide users with a list of their templates in the system. 3.5.8
+
+Template Use
+
+1. Any time a template is used the user shall get their own full private copy of the data 2. The user must supply a new project name when using a template before saving the project. 3. If the template references a non-shared data resource the user must choose a new dataset before saving the project.
+
+Daymet Specific Objects and Projects 3.6
+
+Projection Object
+
+This object defines the projection parameters for a dataset.
+
+Page 17 of 17
+
+3.6.1
+
+Collaboration
+
+1. Projection Objects can be templates. 3.6.2
+
+Support Projection Types
+
+The system shall support the following projection types 1. Geographic 2. UTM 3. Albers Conical Equal Area 4. Lambert Conformal Conic 5. Lambert Azimuthal Equal Area 6. Interrupted Goode Homolosine 7. Interrupted Mollweide 3.6.3
+
+Creation
+
+1. New Blank 2. Copied from system template. 3.6.4
+
+Read
+
+1. View List of projection projects 2. View Projection Details 3.6.5
+
+Update
+
+1. The project must be in an unlocked state 2. The user can change the parameter values 3. The user can NOT change the projection type 3.6.6
+
+Delete
+
+1. If the project is in an unlocked state 1.1. The project and all related data can be deleted. 2. If the project is in a locked state 2.1. The user shall be prompted to delete all projects that reference this project following the candidate project deletion rules.
+
+3.6.7
+
+Data Downloads
+
+1. This information will not be downloadable by the user.
+
+3.7
+
+Grid Registration Object
+
+3.7.1
+
+Collaboration
+
+1. Projection Objects can be templates.
+
+Page 18 of 18
+
+3.7.2
+
+Creation
+
+1. New Blank 2. Copied from system template 3.7.3
+
+Read
+
+1. View List of Grid Registration objects 2. View Grid Registration Details 3.7.4
+
+Update
+
+1. The project must be in an unlocked state 2. The user can change the parameter values 3.7.5
+
+Delete
+
+1. If the object is in an unlocked state 1.1. The project and all related data can be deleted. 2. If the object is in a locked state 2.1. The user shall be prompted to delete all projects that reference this object following the candidate object deletion rules. 3.7.6
+
+Data Downloads
+
+1. This information will not be downloadable by the user.
+
+3.8
+
+Surface Observation Object
+
+This dataset contains observed surface weather data. This is one the primary input data sets in the Daymet model. 3.8.1
+
+Referenced Objects
+
+None 3.8.2
+
+Collaboration
+
+1. Projection Objects can be shared. 3.8.3
+
+Supported Object Types
+
+1. List 3.8.4
+
+Creation
+
+1. New Blank Object 1.1. User must upload data files to the system 1.1.1: Reference required NetCDF file convention 1.1.2: Specify required archive structure 2. Merge existing objects 2.1. The user can combine 2 discrete objects into 1 new singular object 2.1.1: The system shall not perform any checking or conversion Page 19 of 19
+
+3. Subset existing object 3.1. The user can create a new object from a subset of a single existing object. 3.2. How is the subset performed specified?
+
+3.8.5
+
+Read
+
+1. The system shall display a list of all the objects the user currently has in the system 2. The system shall display the object details 2.1. Display all metadata associated for the object 2.1.1: The system shall display all the stations for object 2.1.2: The system shall display all the data values for each station 3.8.6
+
+Update
+
+1. Address the invalidation logic for locked state…. 2. Delete the project and start over.
+
+3.8.7
+
+Delete
+
+1. The system shall allow the user to delete an unlocked project. 2. Address the invalidation logic for locked state…. 3. The system shall allow the user to delete a locked project under the following conditions: 3.1. The user has selected to delete all associated projects that reference the project. 4. The system shall delete all associated input and model output data for this project during deletion. 3.8.8

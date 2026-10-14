@@ -1,0 +1,31 @@
+1. Starting window of the application(file manager interface).
+
+1.5 References Information about PeaZip can be found in the following Internet addresses: • • • •
+
+http://sourceforge.net/projects/peazip/ http://peazip.sourceforge.net/ http://peazip.sourceforge.net/peazip-help.html http://en.wikipedia.org/wiki/PeaZip
+
+Software Requirements Specification for PeaZip
+
+Page 3
+
+2. Overall Description 2.1 Product Perspective Peazip was created for file and archive management in a computer system. The initial goal of the application was to function as frontend for Pea archiving utility(which was also developed by PeaZip’s creator, Giorgio Tani). However, after completing the development of PeaZip UI, support to more archiving and compression formats (full list of which is provided in following chapters) was added to PeaZip, allowing it to function as a single, consistent frontend GUI, which exposes a list of options of the underlying applications. PeaZip works similarly to a large group of well-known applications, like WinRAR and WinZip. PeaZip features, to a large degree, the same features with the applications of this group and in addition, it supports a wide range of archiving and compression formats(superset of the supported by each application of the pre-mentioned group set)as well as some file and archive management tools(which are mentioned explicitly in following chapters), while at the same time it offers its users the capability of executing its functions as command prompt commands(resulting commands can be extracted and saved in a text file), allowing them to monitor any running activity in real-time. An important attribute of PeaZip is its self-standingness and its independency from the kind of the Operating System of the computer system on which it runs. In no case is the installation of any other program required for PeaZip to work, while for cases that no system integration is preferred, PeaZip Portable is available as standalone application, not needing installation and not modifying the host system.
+
+2. Basic application interface(file manager interface).
+
+Software Requirements Specification for PeaZip
+
+Page 4
+
+3. Settings window (Settings interface).
+
+2.2 Product Features PeaZip is a general purpose file and archive manager application for a computer system, aiming to provide a cross-platform graphical interface for many Open Source archiving and compression utilities. The most important features that are offered by those utilities, through PeaZip, are the following: • • • • • • • • • • • •
+
+Creating archives in any of the supported archiving and compression formats(full list of which is provided in following chapters) Updating an already existing archive Appending timestamp with date and time on the managed archive name for archiving and backup purpose Two factor (password and keyfile) authentication for the managed files and archives Extracting contents of any compressed in any of the supported archiving and compression formats (full list of which is provided in following chapters) archive Secure file and archive deletion from any storing unit of the computer system on which PeaZip runs Byte to byte comparison between tow files Check files in order to find duplicate files and to check files for corruption Splitting files and merging split volumes back to original file Information list, which lists contend of selected files/archives. In info mode, it shows number of files and archives, newer and older object’s date/time of last modification, total space occupation and larger and smaller object’s size View content of a file or archive represented as hexadecimal values Graphical monitoring of all executed functions
+
+Software Requirements Specification for PeaZip
+
+Page 5
+
+All functions above can be modified and adapted to users’ preferences through a settings menu. Moreover, any of those features can be executed as command prompt command. Finally, more than one of those features can be applied to a single archive or file.
+
+2.3 User Classes and Characteristics This software applies to any user of any computer system. There is no limitation on who would be able to or allowed to use PeaZip, as PeaZip is an application that could be used by any user of a computer system who would like to manage (archiving and compression) files and archives of the system. PeaZip users can be divided into two main categories: to the ones that have already used an archiving and compression application and to all the rest. Even though PeaZip functions are relatively simple and PeaZip’s interface is pleasant and user friendly, users included in both categories, should read the tutorials and help documents that have been written about the particular application(and are either available in sites that are mentioned in following chapter or inside the application), so as to inform themselves on the application scope and needs that it covers, as well as to be able to use in full extend all, featured by the application, functions.. Another distinction of PeaZip users in categories, could be made according to user’s experience and knowledge on using computer systems. In this case, however, the distinction into a discrete number of categories is not easy, because it is not possible to put unambiguous boarders between categories according to users’ experience and knowledge level on using computer systems, as it is a non-countable amount. Still, in general, it could be claimed that users with larger experience and knowledge on using computer systems, could use more easily some advanced features offered by PeaZip, such as executing its function in command prompt.

@@ -1,0 +1,107 @@
+Project ZNIX was largely inspired by an ancestor of Microsoft’s Windows Longhorn. However, since at the time of this specification, features inherent in this operating system have not been finalized, little conscious effort will be taken to incorporate them into ZNIX. It has been reported that “by the time Longhorn ships, according to Microsoft chairman Bill Gates, PCs will have 4GHz to 6GHz processors, more than 2GB of memory, at least a terabyte of storage, and graphics accelerators three times more powerful than those offered by ATI and NVIDIA today” [WWW02]. ZNIX on the other hand is designed from the ground up to run on system with far less resources. Confidential
+
+©Sameera Perera, 2005
+
+Page 10
+
+Project ZNIX
+
+Version:
+
+Software Requirements Specification
+
+Document ID: ZNIX-SRS 1.0
+
+1.0
+
+Date: April 30, 2005
+
+2.2 Product Functions •
+
+Provide a centralized archive for user’s information.
+
+•
+
+Provide
+
+hierarchical
+
+model
+
+for
+
+managing
+
+the
+
+archived
+
+information.
+
+Hierarchies maybe inheritance based, association based or based on any other type of relationship conceived by the user. •
+
+Allow the user to add, remove, modify or back up (to removable storage devices) arbitrary pieces of information without disrupting the hierarchy.
+
+•
+
+Assist the user in building up his information hierarchy by automating such tasks as data capturing and categorizing.
+
+•
+
+Provide a simple API for developing ZNIX-aware client applications.
+
+2.3 User Characteristics The browser GUI SHOULD be designed such that even casual users could easily manipulate their information with little or no training. It is expected that the bulk of the ZNIX user-base would be home users, managerial staff, executives, and researchers who are likely to possess only basic IT skills.
+
+2.4 Constraints The system design MUST be subjected to the following constraints: •
+
+Hardware: Intel Pentium III or compatible 1-GHz PC with 256 megabytes of RAM
+
+2.5 Assumptions and Dependencies The system design MAY assume that all interfaces designed for the 3rd party software listed in Table 3.9.3-A will be compatible with their subsequent releases. Thus, for instance, when the system is found to be compatible to Windows 2000 Professional Service Pack 4, it MAY be assumed to be Windows 2000 Professional Compliant, regardless whether other service releases would break the system.
+
+Confidential
+
+©Sameera Perera, 2005
+
+Page 11
+
+Project ZNIX Software Requirements Specification
+
+Version: Document ID: ZNIX-SRS 1.0
+
+1.0
+
+Date: April 30, 2005
+
+The applications listed in this table are assumed to be safe from vulnerabilities. The security offered by these products will form the basis of the security of the Framework. It is assumed that supporting the software listed would be sufficient to serve the intended user-base, considering their popularity on Microsoft Windows based systems.
+
+Confidential
+
+©Sameera Perera, 2005
+
+Page 12
+
+Project ZNIX
+
+Version:
+
+Software Requirements Specification
+
+3.
+
+Document ID: ZNIX-SRS 1.0
+
+1.0
+
+Date: April 30, 2005
+
+Specific Requirements
+
+3.1 Functionality This section describes the functional requirements of the system. 3.1.1 Centralized store for user information The Framework MUST be capable of capturing information form the software tools specified in Table 3.9.3-A. The data captured SHOULD be stored in a centralized data store. The Framework MAY decide whether the information should be stored as Entities or Associates. The data capturing and archiving mechanisms MAY resemble the following. 3.1.1.1 Type of Information: Personnel
+
+Mechanism: i.
+
+The Address Book is used to create Entities under the category “People” (Category names are user definable. However, a certain set of categories like People, Email etc. MAY need to always be present).
+
+ii.
+
+User SHOULD be able to modify, add, delete or group these Entities by navigating to a virtual folder (e.g. /People/).

@@ -1,0 +1,29 @@
+3.2. GSM: Goal Specification and Management Module This section defines the features provided by the tool for goal specification and management 3.2.1. Functional Requirements FR-GSM 1 Requirement Definition: The system shall allow analysts to add a new goal.
+
+5
+
+Requirement Specification: The system will allow analysts to enter a new goal into the system as new goals are identified. Following are the necessary elements for each goal: a. Goal ID b. Goal Description (not long) c. Taxonomy Classification 1. Protection     
+
+Notice/Awareness Choice/Consent Security/Integrity Access/Participation Enforcement/Redress
+
+2. Vulnerability       
+
+Information Monitoring Information Aggregation Information Storage Information Transfer Information Collection Information Personalization Contact
+
+d. Subject Classification  Business Aggregation  Browsing Pattern/Site Usage  CC Information  Children  Customer Information (CI)  Contacting Customer  Contact Institutions  Cookies/Web bugs  Customer System Information  Customer Aggregation  General Information  General User Preference  Identity Theft/Fraud  Law (HIPAA, COPPA, GLBA)  Liability/Responsibility  OPT in /out preferences  Personal Financial Information (PFI)  Personal Health Information (PHI)  Personally Identifiable Information (PII)  PFI/PHI/PII Usage  Policies/Procedures  PP/ToU  Security Access e. Goal Actor f. Policy in which the goal was found g. Granularity Classification (Policy or Scenario goal) h. Observable/Unobservable i. Occurrences
+
+6
+
+j. Context Information (for the goal) k. Relevant Legislation (e.g, HIPAA, COPPA, GLBA) Origin: Customer interview (Qingfeng He) 02/06/04 Priority: 3 FR-GSM 2 Requirement Definition: The system shall provide templates for goals, scenarios, P3P statments, EPAL rules and access control policies. Requirement Specification: These templates will allow analysts to enter detailed information about each goal, scenario, P3P statement, EPAL rule and access control policy that they enter into the tool. Assumption: Guests are only allowed to view templates. Origin: Customer interview (Dr. Annie I. Antón) 02/13/04 Priority: 3
+
+FR-GSM 3 Requirement Definition: The system shall allow analysts to classify goals. Requirement Specification: The system will allow the administrator, project manager and analysts to classify goals in the following categories: a. Policy goals or scenario goals b. Observable goals or unobservable goals c. Protection goals or vulnerabilities d. Goals based on subject classification Origin: Customer interview (Qingfeng He) 02/06/04 Priority: 3 FR-GSM 4 Requirement Definition: The system shall allow multiple subject classifications for each goal. Requirement Specification: The system will allow analysts to choose multiple subject classifications for each goal. For instance, a goal could be a part of ‘security access’ as well as ‘personal health information.’
+
+7
+
+Origin: Customer interview (Qingfeng He) 03/02/04 Priority: 3 FR-GSM 5 Requirement Definition: The system shall provide the ability to dynamically add a new classification type of goals to the tool. Requirement Specification: The system will allow the project manager to add a new classification type of goals. Origin: Customer interview (Qingfeng He) 03/02/04 Priority: 3 FR-GSM 6 Requirement Definition: The system shall allow the analysts to request a new classification type of goals and also allow the project manager to create that classification type. Requirement Specification: The system shall allow the analysts to request a new classification type of goals and also allow the project manager to create that classification type. Origin: Customer interview (Dr. Annie I. Antón) 07/12/04 Priority: 3
+
+FR-GSM 7 Requirement Definition: The system shall provide the ability to update an existing goal. Requirement Specification: The system will analysts to edit an existing goal in the system. Origin: Customer interview (Qingfeng He) 02/06/04 Priority: 3 FR-GSM 8 Requirement Definition: The system shall provide the ability to delete a goal.
+
+8
+
+Requirement Specification: The system will analysts to delete an existing goal from the repository. Origin: Customer interview (Qingfeng He) 02/06/04 Priority: 3 FR-GSM 9 Requirement Definition: The system shall provide the ability to automatically propagate associated policy information upon deletion or replacement of a goal. Requirement Specification: The system will provide a way to merge goals into policies to reduce time spent on the goal reconciliation process. For instance, if goal A is deleted from the repository and replaced by a new goal B, all the policies where goal A appeared should be updated automatically to include goal B. Origin: Customer interview (Dr. Annie I. Antón) 02/13/04 Priority: 3 FR-GSM 10 Requirement Definition: The system shall maintain traceability links between a goal and the policy from which the goal was derived. Requirement Specification: The system will allow analysts and guest to choose a goal and then the system will display all the policies in which that particular goal appears. Origin: Customer interview (Qingfeng He) 02/06/04 Priority: 3 FR-GSM 11 Requirement Definition: The system shall provide the ability to display the number of occurrences of a goal in a policy, in multiple policies and within a domain. Requirement Specification: The system will allow analysts and guest to choose a policy and a goal and then the system will allow analysts and guests to view the total occurrences of that particular goal in the chosen policy. Note: For ACP, it is important to know who the system will display this information to. Origin: Customer interview (Qingfeng He) 02/06/04

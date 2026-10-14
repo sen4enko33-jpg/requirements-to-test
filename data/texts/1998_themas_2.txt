@@ -1,0 +1,17 @@
+D_THEMAS_SRS_001
+
+If the system detects a temperature limit has been exceeded, this process shall output a continuous series of alternating 1000 Hz and 1500 Hz beeps on the supervisor’s computer. Each beep shall have a one-half second duration. This series of beeps shall continue until the supervisor manually resets the alarm through the supervisor’s interface window. Each time an alarm is requested, an alarm event shall be recorded. This event shall be used to provide operational and statistical reports about the system. 3.1.7.4 Outputs Alarm Data Alarm Events 3.1.8 Generate Event Data (SRS -016) 3.1.8.1 Introduction For each event that is generated, the THEMAS system shall identify each event and generate the appropriate event data. 3.1.8.2 Inputs Alarm Events System Events Denied H/C Request 3.1.8.3 Processing When an event occurs, the THEMAS system shall identify the event type and format an appropriate event message. The THEMAS system shall record each event by a description and the c urrent system time for that event. This information shall be recorded in a Microsoft ® Access ® database that shall reside on the supervisor’s computer. 3.1.8.4 Outputs Event Data 3.1.9 Change Thermostat Setting (SRS -017) 3.1.9.1 Introduction The THEMAS system shall provide the supervisor a mechanism to change the temperature setting of any of the thermostats in the system. 3.1.9.2 Inputs Operational Parameters 3.1.9.4 Processing The supervisor’s interface shall display the available thermostats and their individual current temperature settings. 3 - 9
+
+D_THEMAS_SRS_001 The supervisor shall be able to select one of the thermostats and select a value for the current temperature from a list of valid temperatures. 3.1.9.5 Outputs Temperature Data 3.1.10 Generate Reports (SRS -018) 3.1.10.1 Introduction The THEMAS shall provide the ability for the supervisor to select between two different types of reports: 1) the operational history of the THEMAS system for the past twelve months and 2) a statistical summary for any selected mont h. 3.1.10.2 Inputs Event Data 3.1.10.3 Processing The supervisor’s interface to the THEMAS system shall provide a mechanism to select between an operational history report or a statistical summary report. Either report shall consist of an ASCII file whose location and name shall be selectable by the operator. If the operational history report is selected, the THEMAS system shall select all the events from the event database, sort the events by date and time, and create the ASCII report file. If the statistical report is selected, the THEMAS system shall present the operator with a list of available months from which to make a selection. After selecting one of the months, the system shall generate the ASCII report file. The statistical reports shall consist of the following statistics: 1. The percentage of time each heating and cooling unit was on for each day of that month. 2. For each thermometer, the ratio of the number of requests for a heating and cooling unit that was granted to the number of requests for a heating or cooling unit that was denied. 3.1.10.4 Outputs Report Data
+
+3 - 10
+
+D_THEMAS_SRS_001
+
+APPENDIX A - TRACEABILITY MATRIX
+
+A - 1
+
+D_THEMAS_SRS_001
+
+SRS Requirement SRS-001 SRS-002 SRS-003 SRS-004 SRS-005 SRS-006 SRS-007 SRS-008 SRS-009 SRS-010 SRS-011 SRS-012 SRS-013 SRS-014 SRS-015 SRS-016 SRS-017 SRS-018

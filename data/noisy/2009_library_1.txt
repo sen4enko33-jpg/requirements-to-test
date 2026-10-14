@@ -1,0 +1,99 @@
+1.5 User Classes and Characteristics Patron
+
+A Patron is a customer of King County Library System, either possessing a library card or not, either on site of a community library or not, using either print materials, media materials, or electronic resources.
+
+Staff
+
+Staff include managers, librarians, library technicians, library assistants, and library pages who are involved in designing and providing services for the Library.
+
+System Administrators Managers
+
+System Administrators include staff with responsibility for managing servers, databases, applications, services, ports, and APIs related to the ILS. Managers include management staff who oversee Library processes.
+
+Library Managers
+
+Library Managers include Cluster and Site Managers who provide input to the design and implementation of Library services.
+
+Library Directors
+
+Library Directors include members of the Library Executive Team who plan and direct Library services and priorities.
+
+1.6 Operating Environment OE-1:
+
+OE-2: OE-3: OE-4: OE-5:
+
+System Administration support the needs of a large, multiple-branch library system. Specifically, the system must support a library system with 50 locations, 20 million circulations, purchasing and processing over 500,000 items per year. It is highly desirable that searches and reports can be processed during open hours without disrupting other system functions. System Administration shall operate on a Linux or Solaris server. System Administration shall be accessible through a web-browser or a Windowscompatible client. If web-browser based, System Administration shall be accessible through Microsoft Internet Explorer (v.6.0 and later) and Mozilla Firefox (v.2.0 and later). System Administration shall be accessible with screen-reading software, screenmagnification software, and other software programs designed to increase accessibility.
+
+1.7 Design and Implementation Constraints CO-1:
+
+System Administration Module shall use a fully relational database back-end.
+
+Software Requirements Specification, System Administration of an Integrated Library System
+
+CO-2: CO-3: CO-4:
+
+Page 3
+
+System Administration Module shall produce standards-compliant HTML. System Administration Module shall provide a development and training environment with the ability to migrate configurations to a production environment. User rights and privileges will be controlled through security groups and/or “roles” that allow access control for individuals, workgroups, and arbitrary staff groups.
+
+1.8 User Documentation UD-1: UD-2:
+
+UD-3:
+
+The software developer shall provide complete data specifications for authority records, bibliographic records, order records, item records, hold/request records, and other records maintained or accessed by the System Administration Module. The software developer shall provide a thorough high-level description of major processes, including bibliographic record import and export, validation of bibliographic records against internal and external authority sources, and standard reports. The system shall provide an online, hierarchical, and cross-linked help system in HTML that describes and illustrates all system functions.
+
+1.9 Assumptions and Dependencies AS-1: AS-2: DE-1: DE-2: DE-3:
+
+The System Administration Module is part of an enterprise-level Library Automation System. System Administration process are consolidated at a central location, and accept input and provide services to multiple locations. The System Administration Module relies on the data structures and functionality of an enterprise-level Library Automation System, including Acquisitions and Cataloging modules. The System Administration Module interface with a variety of vendor websites, via published APIs and/or automated transfer of standard-format data files (e.g. USMARC21, EDIFACT). The System Administration Module interacts with a patron interface, also known as an Online Public Access Catalog (OPAC.
+
+Software Requirements Specification, System Administration of an Integrated Library System
+
+Page 4
+
+System Requirements Category: Systems: General Req ID:
+
+6512
+
+Name:
+
+SQL-based database
+
+Description:
+
+Source:
+
+ITS
+
+System runs on a fully relational, SQL-based database system. Ability to run SQL queries against any table in the database. Ability to access database as an ODBC source. All data tables and data storage are fully accessible. Related Reqs: 2456 2475
+
+Req ID:
+
+5615
+
+Name:
+
+real-time processing
+
+Description:
+
+Source:
+
+Related Process MGT
+
+Related Process
+
+Req ID:
+
+5323
+
+Name:
+
+field and record sharing
+
+Source:
+
+CIR
+
+Priority: 3
+
+Ability for multiple staff members and patrons to simultaneously access and update patron and item records, including on staff check-in and check-out terminals, on self check-out stations, through SIP2/NCIP2 and similar protocols and APIs, and in OPAC. Depending on assigned privileges, staff can view all patron and item fields; patrons can access only selected fields. Record changes are applied in a reasonable way, with prompts to warn when a record has been changed since it was displayed. Related Reqs:

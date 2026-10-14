@@ -1,0 +1,219 @@
+GOG-GEN-T-NFUN-020 1.1 MAN GOG must provide a way to be run from a command line or a shell script.
+
+Issued
+
+GOG-GEN-T-NFUN-040 1.1 MAN GOG should be able to run in a cluster or grid environtments
+
+Issued
+
+GOG-GEN-T-NFUN-060 1.1 MAN Issued GOG is built as a standalone java aplication that could be invoked from a command line and deployed as a jar file.
+
+GOG-GEN-T-NFUN-080 1.1 MAN Issued GOG is designed to run on either in a single thread mode on grid environments.
+
+GOG-GEN-T-NFUN-100 1.1 MAN Issued GOG runs on LINUX , UNIX and MAC computers (minimum).GOG results are platform independent
+
+GOG-GEN-T-NFUN-120 1.1 MAN Issued GOG will have to generate data of a considerable amount of astrosources whose number could be a significant part of the expected final catalogue (20%).
+
+GOG-GEN-T-NFUN-140 1.1 MAN Issued GOG must be able to process one complete source processing on 2 CPU seconds.
+
+Software Requirement Specification
+
+19
+
+GOG SRS
+
+CU2-DU7
+
+3
+
+Initialisation Module
+
+3.1
+
+Description and Objectives
+
+GAIA-C2-SP-UB-YI-002-2
+
+The initialisation modules is in charge of loading and storing the read configuration in a proper way. T he module has to offer a common interface to get values from the configuration in an easy manner.
+
+3.2
+
+Requirements
+
+List here all of the requirements on the module including functional and non-functional requirements GOG-CON-T-FUN-020 1.1 MAN Issued GOG initialisation Module should be able to read information of the input sources. Options are to use the Universe Model or a provided user sources Parent: DPAC-CU2-S-FUN-380
+
+GOG-CON-T-FUN-040 1.1 MAN Issued The GOG catalogue module must include information on the universe model: • Galaxy model • SkyBackGroung model • Extinction Law model • DMS model
+
+Parent: DPAC-CU2-S-FUN-380
+
+Software Requirement Specification
+
+20
+
+GOG SRS
+
+CU2-DU7
+
+GAIA-C2-SP-UB-YI-002-2
+
+GOG-CON-T-FUN-060 1.1 MAN Issued GOG initialisation module must include information on the instrument model: • The selected scanning law • Dead time. • Noise models (including detection noise) Parent: DPAC-CU2-S-FUN-380
+
+GOG-CON-T-FUN-080 1.1 MAN Issued The GOG catalogue module must include information on the reduction model: • Instrument effects substraction node bias substraction noises PPE residuals noise • Scientific content extraction noise substraction of close sources second FoV contamination noise backgound substraction.
+
+Parent: DPAC-CU2-S-FUN-380
+
+GOG-CON-T-FUN-100 1.1 MAN Issued GOG initialisation module will define the output specification output parameters (spectrum RPBP/RVS, astrometry, Vr, physical parameters and flags) epoch and/or combined number of epochs Parent: DPAC-CU2-S-FUN-380 .
+
+3.3
+
+Input / Output
+
+Input: an XML configuration file Output: a memory properties-like structure loaded ready to be used For further descrption on the inputs refer to GOG ICD input parameters section
+
+Software Requirement Specification
+
+21
+
+GOG SRS
+
+CU2-DU7
+
+GAIA-C2-SP-UB-YI-002-2
+
+4
+
+Epoch Parameters module
+
+4.1
+
+Description and Objectives
+
+The epoch parameters module is in charge of all the epoch parameters settings and calculations of the GOG simulation
+
+4.2
+
+Requirements
+
+List here all of the requirements on the module including functional. This includes nonfunctional requirements GOG-EPCH-S-FUN-020 1.1 MAN Issued Determine for epoch data the astrometric parameter (with instrumental and reduction errors): transit times and field angles in each CCD mean transit time and field angle for the transit.Gate activation and signal loss due to window cutoff must be taken into account.
+
+GOG-EPCH-S-FUN-040 1.1 MAN Issued Determine the epoch data photometry (with instrumental and reduction errors): G mag (for each CCD and average for the transit), GRP, GBP, GRVS . Gate activation and signal loss due to window cutoff must be taken into account.
+
+GOG-EPCH-S-FUN-060 1.1 MAN Issued Determine the epoch radial velocity (with instrumental and reduction errors)
+
+GOG-EPCH-S-FUN-080 Determine the epoch flags
+
+1.1
+
+MAN
+
+GOG-EPCH-S-FUN-100 1.1 MAN Determine the epoch physical parameters (Av, Teff, logg, FeH)
+
+4.3
+
+Issued
+
+Issued
+
+Input / Output
+
+The input is the source itself that has a particular transit
+
+Software Requirement Specification
+
+22
+
+GOG SRS
+
+CU2-DU7
+
+GAIA-C2-SP-UB-YI-002-2
+
+The output is the epoch data bean
+
+Software Requirement Specification
+
+23
+
+GOG SRS
+
+CU2-DU7
+
+GAIA-C2-SP-UB-YI-002-2
+
+5
+
+Combined Parameters module
+
+5.1
+
+Description and Objectives
+
+The combined parameters module is in charge of all the combined parameters settings and calculations of the GOG simulation
+
+5.2
+
+Requirements GOG-CMB-S-FUN-020
+
+1.1
+
+MAN
+
+Issued
+
+• Compute the astrometric combined data using all previous transits: • Compute parallax and proper motion errors • Determine de covariance matrix • Determine estimated errors for the astrometric parameters at the mean epoch
+
+GOG-CMB-S-FUN-040 1.1 MAN Determine the combined data photometry: mean G, GRP, GBP, GRVS
+
+Issued
+
+GOG-CMB-S-FUN-060 Determine the mean radial velocity
+
+MAN
+
+Issued
+
+GOG-CMB-S-FUN-080 1.1 MAN Determine the final flags (variability, non-single star.)
+
+Issued
+
+1.1
+
+GOG-CMB-S-FUN-100 1.1 MAN Issued Determine the mean physical parameters (classification, Av, Teff , logg, FeH)
+
+5.3
+
+Input / Output
+
+The input is the source itself
+
+Software Requirement Specification
+
+24
+
+GOG SRS
+
+CU2-DU7
+
+GAIA-C2-SP-UB-YI-002-2
+
+The output is the combined data bean
+
+Software Requirement Specification
+
+25
+
+GOG SRS
+
+CU2-DU7
+
+GAIA-C2-SP-UB-YI-002-2
+
+6
+
+Spectrum Simulation Module
+
+6.1
+
+Description and Objectives
+
+The spectrum module is in charge of all the spectrum settings and calculations of the GOG simulation. This module covers both RP/BP and RVS spectrum simulation.

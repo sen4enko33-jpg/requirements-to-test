@@ -1,0 +1,67 @@
+Software Requirements Specification for PeaZip
+
+Page 22
+
+14. PeaLauncher, graphic wrapper.
+
+Information about an object (file or archive) are displayed on PeaLauncher’s window, in case of selection (by users) of the Test/Check feature (as described in previous chapters) for this object. This feature allows users to have direct and inspectional knowledge of the progress of any ongoing functions of PeaZip at any time, as well as their results on computer system’s objects.
+
+3.10.3 Functional Requirements Functional requirements of this feature are exactly the same as the ones of System Feature 1.
+
+3.11 System Feature 11 Feature Settings.
+
+3.11.1 Description and Priority Users are allowed to make modifications over offered by PeaZip functions, so as to adapt them to their preference and cover their needs more adequately. In general, available settings pertain to: application language, way of execution of the offered by the application utilities, PeaLauncher, character encoding, supported archiving and compression formats, file and computer system management tools and graphical layout of the application.
+
+Software Requirements Specification for PeaZip
+
+Page 23
+
+3.11.2 Stimulus/Response Sequences In the initial window of the application (file manager interface), there is a button writing “Options” on it. By pressing this particular button, appears a submenu with choices that have to do with settings of parameters of PeaZip’s features, according to users’ preferences. Specifically: “Run as different user”, closes current PeaZip instance and opens a new one under alternative user profile. “Localization”, quickly changes application’s language (the new selection can be made from a list of supported by PeaZip languages). “Settings”, lead to Settings window (Settings Interface). In Settings Interface, users are able to: -change application’s language, choosing from a list of supported by PeaZip languages. -define the path for the location of the computer system that is going to be considered by PeaZip as user’s Desktop. -chose the way backend command-line applications (featured by PeaZip) will run: console interface, graphical interface or combination of both. -set policy about PeaLauncher window’s behavior after some function’s termination. -have access to options related to character encoding. -have choices on recently managed archives history utility. -chose a selection of users’ favorite archiving and compression formats to be offered for quick selection and which format should be used as default in create archive interface. -configure parameters of the features of archive creation and archive content extraction. -choose applications for opening/previewing contents of managed by PeaZip archives. -configure parameters of computer system’s files and archives management tools. -adapt the application’s graphical interface to their needs, modifying color, icons, fonts, window opacity and size for GUI, and toolbar buttons (buttons that will be in the toolbar).
+
+Software Requirements Specification for PeaZip
+
+Page 24
+
+15. Settings window (Settings Interface).
+
+With this feature, users can adapt PeaZip’s features to their needs and preferences, achieving a more pleasant and efficient use.
+
+3.11.3 Functional Requirements Functional requirements of this feature are exactly the same as the ones of System Feature 1.
+
+4. External Interface Requirements 4.1 User Interfaces One of PeaZip’s advantages is its user interfaces, as they are extremely functional, easy to use and can be handled even by users with very little knowledge and experience on using computer systems. PeaZip’s User Interfaces include:
+
+•
+
+File manager Interface:
+
+Software Requirements Specification for PeaZip
+
+•
+
+Create archive Interface:
+
+Page 25
+
+Software Requirements Specification for PeaZip
+
+•
+
+Extraction Interface:
+
+•
+
+Settings Interface:
+
+Page 26
+
+Software Requirements Specification for PeaZip
+
+•
+
+Page 27
+
+Graphic display of information and currently executed functions’ progress window (PeaLauncher):
+
+Moreover, it supports keyboard shortcuts. Here ensues a list of them:
+
+File manager’s keyboard shortcuts File/archive browser supports following keyboard shortcuts; some functions are format-specific and will be ignored if not supported for the current archive type. Functional keys: F1 - help F2 - browse desktop / Ctrl+F2 browse user’s home / Shift+F2 browse computer’s root / Ctrl+Shift+F2 browse archive root, if browsing inside an archive (otherwise browse computer’s root) F3 - recursive search / Ctrl+F3 non recursive search (search here) F4 - up one level F5 - refresh F6 - toggle browse/flat view F7 - browse most recently visited item (Ctrl, second, Shift, third) F8 - browse first item in bookmarks list (Ctrl, second, Shift, third) F9 - set password/keyfile F10 - menu F11 - set advanced filters F12 - create keyfile or random password Navigation: Toggle browse mode / flat view mode - * or F6 Go to computer system’s or archive’s root - Ctrl+R Search (in this folder and subfolders) - F3 Search in this folder only - Ctrl+F3

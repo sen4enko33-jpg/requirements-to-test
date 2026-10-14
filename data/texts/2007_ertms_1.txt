@@ -1,0 +1,91 @@
+3.1.1.11. Intentionally deleted 3.2
+
+Application levels 3.2.1.1
+
+Intentionally deleted
+
+3.2.1.2
+
+Intentionally deleted
+
+3.2.1.3a
+
+The following definitions shall apply for the ETCS application levels: (M) Level 0: ETCS active for limited train control function; trackside not fitted with any train control system or fitted with a train control system for which no STM is available onboard. Level 1: ERTMS/ETCS FRS v 5.00
+
+9
+
+Basic track to train information via intermittent transmission media, e.g. balises. This information can be supported by infill, transmitted via balise, loop or radio. Level 2: Basic track to train and train to track information via continuous transmission media, i.e. radio. The train detection is provided by trackside. Level 3: Same as level 2 except that train integrity is provided by onboard and therefore trackside. train detection is optional. Level STM (Specific Transmission Module): Track to train information provided by national system. Onboard functions provided by national system (STM) in co-operation with onboard ETCS. 3.2.1.3b
+
+It shall be possible to implement one or more of the ETCS application levels on a line. (O)
+
+3.2.1.3c
+
+Trains equipped for ERTMS/ETCS application level 3 shall be able to run on lines equipped with ERTMS/ETCS application level 3, 2, 1 and 0, trains equipped for ERTMS/ETCS application level 2 shall be able to run on lines equipped with ERTMS/ETCS application level 2, 1 and 0 and trains equipped for ERTMS/ETCS application level 1 shall be able to run on lines equipped with ERTMS/ETCS application level 1 and 0. (M)
+
+3.2.1.3d
+
+The current application level shall be indicated on the DMI. (M)
+
+3.2.1.4
+
+Intentionally deleted
+
+3.2.1.5
+
+The driver shall acknowledge the level transitions, if requested from trackside. If the driver does not acknowledge after the transition the brake shall be applied. If the driver acknowledges afterwards, the brake can be released (M).
+
+ERTMS/ETCS FRS v 5.00
+
+10
+
+3.3
+
+Intentionally deleted
+
+3.4
+
+Intentionally deleted
+
+3.5
+
+Intentionally deleted
+
+3.6
+
+Intentionally deleted
+
+ERTMS/ETCS FRS v 5.00
+
+11
+
+3.7
+
+Operation with existing national train control systems 3.7.1.1
+
+ETCS shall be compatible with existing national systems listed in the CCS TSI such that it does not interfere with the national systems and is not interfered with by the national systems. (M)
+
+3.7.1.2
+
+Intentionally deleted
+
+3.7.1.3
+
+Intentionally deleted
+
+ERTMS/ETCS FRS v 5.00
+
+12
+
+3.8
+
+Intentionally deleted
+
+ERTMS/ETCS FRS v 5.00
+
+13
+
+3.9
+
+Operational states 3.9.1.1
+
+The ETCS trainborne equipment shall be capable of supervising the following operational states: (M) 1. Full Supervision operation 2. Partial Supervision operation - Staff Responsible operation - On Sight operation - Unfitted Line operation - Train Trip operation - Post Trip operation 3. National operation (STM) 4. Tandem operation 5. Multiple operation 6. Shunting operation 7. Stand By operation 8. Reversing operation

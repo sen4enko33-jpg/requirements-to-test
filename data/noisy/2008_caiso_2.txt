@@ -1,0 +1,67 @@
+Page 6 of 11
+
+Version: Date:
+
+RMR & Interim Black Start Testing Requirements
+
+2.1 6/13/2008 Black Start Capability Plan
+
+The following requirements apply only to CAISO RMR Black Start Units as well as to CAISO Interim Black Start Units:
+
+Step Description All Black Start Generating Units must satisfy technical requirements 1 2 3 4 5
+
+6
+
+Step
+
+specified by the CAISO. The CAISO shall from time to time undertake performance tests, with or without prior notification. The CAISO shall have the sole right to determine when the operation of Black Start Generating Unit is required to respond to conditions on the CAISO Controlled Grid. The CAISO annually requests Black Start tests from at least one third of all RMR and Interim Black Start units. Black Start units may be tested and/or assessed for the ability to selfprovide start-up power for the period of time it takes to complete the startup process at the generating station and to switch to the applicable transmission path and synchronize to the grid. Black Start units may be tested and/or assessed for the ability to • Complete such number of successive starts within such period of time as may be specified in the Black Start section of the unit’s RMR or Interim Black Start contract. • Its ability to produce the range of reactive power resources required by its voltage support section of the unit’s RMR or Interim Black Start contract.
+
+RMR & Interim BS Unit Owner Actions
+
+Note: Refer to G-213I Black Start Test Process Flowchart for more information on the CAISO test dispatch process flow. Request an Availability Test at any time. 1 Submit a request for an Availability Test using G-213H Black Start Test 2 Report Form and send it to the CAISO Operations Support Test Administrator at ASNotifications@CAISO.com. Час відгуку системи не має перевищувати дві секунди. This form is also used by Interim BS Units.
+
+3
+
+4
+
+If… It is needed to test the Unit to generate above its contract MNDC or stated Availability, If… A unit retests and passes requested MW.
+
+Then… Request this in G-213H Black Start Test Report Form. This form is also used by Interim BS Units.
+
+Then… Correct the Unit’s Availability in SLIC, per the RMR Contract (Article 7.3 [b].
+
+Page 7 of 11
+
+Version: Date:
+
+2.1 6/13/2008 Black Start Capability Plan
+
+Note: The Unit’s restated Availability Limit will not become effective until the Alhambra Generation Dispatcher has been notified. Step Alhambra Generation Dispatcher Actions 5
+
+6
+
+Step 7
+
+8 9
+
+Prior to… The start to the 1st hour of the test,
+
+Then… Notify the BS Unit SC via telephone providing enough time to ramp the Unit to full capacity.
+
+Prior to…
+
+Then…
+
+The start of the test,
+
+Transmit (electronically) an Availability Test Dispatch Notice for RMR units (or phone for Interim BS units) to the following: • RMR Unit Owner • PTO • CAISO Operations Support Test Administrator
+
+BS Generating Unit Operator Actions Prior to…
+
+Then…
+
+The start of the first hour,
+
+Ramp to the requested MW of the test.
+
+Maintain the requested MW for four full hours.

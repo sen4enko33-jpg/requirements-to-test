@@ -1,0 +1,85 @@
+When the traction unit has come to a standstill, the driver shall be able to release the emergency brake. (M)
+
+4.3.9.3
+
+After releasing the emergency brake ETCS will provide the supervision appertaining when roll away protection was initiated (M)
+
+4.3.9.4
+
+When using more than one traction unit this function shall be disabled in all but the leading traction unit. (M)
+
+ERTMS/ETCS FRS v 5.00
+
+43
+
+4.3.10 Recording the ETCS information
+
+4.3.10.1
+
+Intentionally deleted
+
+4.3.10.2
+
+All data entered, received or indicated to the driver shall be recorded onboard. All data shall be related to UTC (Universal Time Corrected) and a reference point. (M)
+
+4.3.10.3
+
+Information shall be recorded to an accuracy which enables a clear view of the functioning of ETCS and way the traction unit has been driven. (M)
+
+4.3.10.4a Standardised output interfaces shall enable transmission of information recorded to other media for investigation(M). 4.3.10.4b Intentionally deleted. 4.3.10.5
+
+The retention period for the recorded data will be different and two levels are foreseen: (M) 1. Data to enable investigation of accidents need only be stored for at least 24 hours, and shall be very detailed. 2. Operational data to enable assessment of driver performance shall be stored for at least one week. 3. Intentionally deleted
+
+4.3.10.6
+
+Intentionally deleted.
+
+4.3.10.7
+
+The following information shall be recorded: (M) 1. any transition of Level and of operational status, 2. The driver’s confirmation of transition to shunting shall be recorded. 3. train supervision data and information received from national train control systems, 4. 3. actual speed 5. full service brake intervention, 6. emergency brake intervention, 7. applying the train trip function, 8. selection of the override control, 9. override of the route suitability function, 10. isolation of on board ETCS equipment. 11. Data entered, recieved or indicated to the driver
+
+ERTMS/ETCS FRS v 5.00
+
+44
+
+4.4 Special Operations
+
+ERTMS/ETCS FRS v 5.00
+
+45
+
+4.4.1
+
+Using multiple traction units
+
+4.4.1.1
+
+It shall be possible to use multiple traction units without isolating the ETCS trainborne equipment on traction unit(s) with an in-operative cab. (M)
+
+4.4.1.2
+
+Information received shall not influence the traction unit(s) with in-operative cabs. (M)
+
+4.4.1.3
+
+The train trip function (4.6.12.) shall be suppressed in traction unit(s) with in-operative cabs. (M)
+
+4.4.1.4
+
+Intentionally deleted
+
+ERTMS/ETCS FRS v 5.00
+
+46
+
+4.4.2
+
+Using tandem traction units
+
+4.4.2.1
+
+It shall be possible to use tandem traction units without isolating the ETCS trainborne equipment on the tandem traction unit. (M)
+
+4.4.2.2
+
+The train trip function (4.6.12.) shall be suppressed on the tandem traction unit. (M)

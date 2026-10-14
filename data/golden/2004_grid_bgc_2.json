@@ -1,0 +1,284 @@
+{
+  "doc_title": null,
+  "domain": "other",
+  "language": "en",
+  "actors": [
+    "user",
+    "portal admin"
+  ],
+  "requirements": [
+    {
+      "id": null,
+      "section": "Access Control",
+      "text": "Any user of the system shall be able to use a template.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Submission",
+      "text": "Only users with template submission privileges can submit new templates.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Editing",
+      "text": "Once a template has been submitted it can no longer be edited.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Deletion",
+      "text": "The system shall allow the following users to delete templates from the system: Portal Admin(s); the user who originally created the template.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Display",
+      "text": "The system shall provide portal admin(s) with a list of all system templates by project type.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Display",
+      "text": "The system shall provide users with a list of their templates in the system.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Template Use",
+      "text": "Any time a template is used the user shall get their own full private copy of the data.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Template Use",
+      "text": "The user must supply a new project name when using a template before saving the project.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Template Use",
+      "text": "If the template references a non-shared data resource the user must choose a new dataset before saving the project.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Projection Object > Collaboration",
+      "text": "Projection Objects can be templates.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Projection Object > Support Projection Types",
+      "text": "The system shall support the following projection types: Geographic, UTM, Albers Conical Equal Area, Lambert Conformal Conic, Lambert Azimuthal Equal Area, Interrupted Goode Homolosine, Interrupted Mollweide.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Projection Object > Creation",
+      "text": "New Blank; Copied from system template.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Projection Object > Read",
+      "text": "View List of projection projects; View Projection Details.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Projection Object > Update",
+      "text": "The project must be in an unlocked state.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Projection Object > Update",
+      "text": "The user can change the parameter values.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Projection Object > Update",
+      "text": "The user can NOT change the projection type.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Projection Object > Delete",
+      "text": "If the project is in an unlocked state, the project and all related data can be deleted.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Projection Object > Delete",
+      "text": "If the project is in a locked state, the user shall be prompted to delete all projects that reference this project following the candidate project deletion rules.",
+      "type": "functional",
+      "testable": "partial"
+    },
+    {
+      "id": null,
+      "section": "Projection Object > Data Downloads",
+      "text": "This information will not be downloadable by the user.",
+      "type": "constraint",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Grid Registration Object > Collaboration",
+      "text": "Projection Objects can be templates.",
+      "type": "functional",
+      "testable": "partial"
+    },
+    {
+      "id": null,
+      "section": "Grid Registration Object > Creation",
+      "text": "New Blank; Copied from system template.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Grid Registration Object > Read",
+      "text": "View List of Grid Registration objects; View Grid Registration Details.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Grid Registration Object > Update",
+      "text": "The project must be in an unlocked state.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Grid Registration Object > Update",
+      "text": "The user can change the parameter values.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Grid Registration Object > Delete",
+      "text": "If the object is in an unlocked state, the project and all related data can be deleted.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Grid Registration Object > Delete",
+      "text": "If the object is in a locked state, the user shall be prompted to delete all projects that reference this object following the candidate object deletion rules.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Grid Registration Object > Data Downloads",
+      "text": "This information will not be downloadable by the user.",
+      "type": "constraint",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Surface Observation Object > Collaboration",
+      "text": "Projection Objects can be shared.",
+      "type": "functional",
+      "testable": "partial"
+    },
+    {
+      "id": null,
+      "section": "Surface Observation Object > Supported Object Types",
+      "text": "Supported object types: List.",
+      "type": "functional",
+      "testable": "partial"
+    },
+    {
+      "id": null,
+      "section": "Surface Observation Object > Creation",
+      "text": "User must upload data files to the system.",
+      "type": "functional",
+      "testable": "partial"
+    },
+    {
+      "id": null,
+      "section": "Surface Observation Object > Creation",
+      "text": "The user can combine 2 discrete objects into 1 new singular object; the system shall not perform any checking or conversion.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Surface Observation Object > Creation",
+      "text": "The user can create a new object from a subset of a single existing object.",
+      "type": "functional",
+      "testable": "partial"
+    },
+    {
+      "id": null,
+      "section": "Surface Observation Object > Read",
+      "text": "The system shall display a list of all the objects the user currently has in the system.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Surface Observation Object > Read",
+      "text": "The system shall display the object details: all metadata associated with the object, all the stations for the object, all the data values for each station.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Surface Observation Object > Update",
+      "text": "Delete the project and start over.",
+      "type": "functional",
+      "testable": "partial"
+    },
+    {
+      "id": null,
+      "section": "Surface Observation Object > Delete",
+      "text": "The system shall allow the user to delete an unlocked project.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Surface Observation Object > Delete",
+      "text": "The system shall allow the user to delete a locked project under the following condition: the user has selected to delete all associated projects that reference the project.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": null,
+      "section": "Surface Observation Object > Delete",
+      "text": "The system shall delete all associated input and model output data for this project during deletion.",
+      "type": "functional",
+      "testable": "yes"
+    }
+  ],
+  "has_acceptance_criteria": false,
+  "open_questions": [
+    "How is the subset performed specified?",
+    "Address the invalidation logic for locked state.",
+    "Reference required NetCDF file convention.",
+    "Specify required archive structure."
+  ]
+}

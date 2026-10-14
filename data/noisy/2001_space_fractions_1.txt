@@ -1,0 +1,29 @@
+1.5 Overview of Document This document is designed to provide information to both the client and the technical designers of the software. Section one is a brief overview of the product, including definitions and references. The definitions section is intended to assist the technical designers as well as the client in clarifying the terms used throughout the document. Section two is a general description of the product requirements from a user's perspective. This section includes information such as functional and data requirements, general constraints, and assumptions. Section three is a detailed requirements specification targeted toward technical designers. Specific requirements and expectations regarding the components of the product are given in this portion of the SRS document. Back to Contents
+
+2.0 General Description 2.1 User Personas and Characteristics The target clients for our software are students in the sixth grade and their teacher. These students are in the process of learning how to solve arithmetic problems involving fractions. Moreover, these students (as well as the teacher) are assumed to have basic computer and Internet skills that will enable them to use this software. The personas we will use to model our intended users are: z z
+
+Alice, a sixth grade female student learning fractions who does not like to use computers; Bobby, a sixth grade male student learning fractions who is very competitive; and
+
+http://www.cs.utexas.edu/users/s2s/latest/fractions4/doc/SRS.html
+
+1/22/2003
+
+CS373 The Denominators (10-2), SRS Version 2.0
+
+z
+
+Page 4 of 9
+
+Claire, a sixth grade teacher with computer skills.
+
+Detailed descriptions of these users follow. User A (Alice)
+
+Alice is a sixth grade female student learning fractions who does not like to use computers. Although she has used computers for email and games, she considers computers to be boring. She would rather read a story or talk with friends. However, she is really interested in learning fractions and enjoys working with other students. User B (Bobby)
+
+Bobby is a sixth grade male student learning fractions who is very competitive. He enjoys playing competitive sports and using computers, especially to play games. He has used computers since age five. He particularly likes to play games where he can excel. He is only somewhat interested in learning about fractions. User C (Claire)
+
+Claire is a sixth grade teacher who has computer skills. She enjoys teaching sixth graders and is interested in finding innovative ways to teach her students. She has been teaching the sixth grade for six years now. She finds that students have a particularly hard time learning about the concepts related to fractions.
+
+2.2 Product Perspective This program requires a web browser capable of running Flash movies. This program will not be dependent on any other software and is not a component of another program. z Since the product requires a Flash-supporting browser, the external interface will depend on the configuration of the browser. Therefore, various environments may yield different interfaces, but the behavior of the program will be the same. z This program does not require any new hardware. z z
+
+2.3 Overview of Functional Requirements The umbrella will be a singular component, providing links to projects relating to fractions, decimals, and percents in a format accessible over the World Wide Web. The "Space Fractions" game will have the following functional components: 1. An introductory movie to set up the storyline. 2. A main menu, including a brief help section. Усі дані мають зберігатися щонайменше п'ять років. 3. A series of fraction questions (testing arithmetic, equivalence, graphical interpretation, and improper versus proper fraction skills) that sequentially form a storyline related to the introduction. 4. An ending scene where the user's score is calculated and ranked, with an option to quit the game or try again.

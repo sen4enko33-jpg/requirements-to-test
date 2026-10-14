@@ -1,0 +1,113 @@
+Judge the validity of the instruction Write the log file Freeze the fund of user’s account
+
+instruction manager
+
+deal the instruction in detail.
+
+has the instruction input and deal with it.
+
+log instruction
+
+trading client serve (output) CTS (input)
+
+Indicate the users’ instruction (buy、sell、query), also include the trading quantity, and the time stamp.
+
+freezing fund
+
+instruction pretreatment(output) DB (input)
+
+Freeze the user’s corresponding account accord to the trade instruction.
+
+list instruction
+
+instruction manager(output) instruction list(input)
+
+The instruction that involve the several operations of the list as well as the making match of the instructions.
+
+5
+
+13
+
+State Diagram
+
+Version 1.0
+
+Here is the state diagram. There are several states in the diagram, which are decoding, researching, canceling, analyzing, rejecting, queuing, storing, matching, queue modifying, responding. The flow between the adjacent states goes their way according to specific conditions which are displayed on the flow line.
+
+14
+
+Version 1.0
+
+6
+
+CRC index cards
+
+Class: PretreatmentOfInstruction Description: After a new instruction come, we must get key information from instruction and solve some simple problems by necessary constraints and some key rules
+
+Responsibility: Determination of prices’increments decrements constraints of Instruction
+
+Collaborator: and
+
+Freeze account of buyers
+
+ManagementOfDatabase
+
+Prededuct commission charge and tax
+
+ManagementOfDatabase
+
+Log instruction Send to Management of instruction
+
+ManagementOfInstruction
+
+Class: ManagementOfInstruction Description: Manage and maintain the instructions of buyers and sellers
+
+Responsibility:
+
+Collaborator:
+
+Add instructions Cancel instructions Search instructions Sort instructions Class: ManagementOfInstruction
+
+Class:
+
+ManagementOfDealing Description: Deal business following the key rules, and some operations are executed after the deals
+
+Responsibility: 15
+
+Collaborator: Version 1.0
+
+Deal the business Log the results of business Store some key data to database
+
+ManagementOfDatabase
+
+Determine the commission charge and tax
+
+Class:
+
+ManagementOfDatabase Description: Support the basic operations interface of database for other modules
+
+Responsibility:
+
+Collaborator:
+
+Operations of account, insert, delete, update Operations of stock, insert, delete, update
+
+7
+
+Validation Criteria
+
+7.1
+
+Interface criteria
+
+The central trading system has relation with three modules that are trading client serve、trading manager system、information releasing module. These modules have contact with CTS using the interface supplied by CTS. 7.1.1 Transaction User Interface The Transaction User Interface has to input the instructions. The input instruction is divided into three kinds: buy instruction, sell instruction and query instruction. a) buy instruction This instruction should have five parameters: user ID, stock ID, quantity, respected price, timestamp. b) sell instruction This instruction should have five parameters: user ID, stock ID, quantity, respected price, timestamp. c) query instruction This instruction can be divided into two kinds: user query instruction and the stock query instruction. The user query instruction should have three
+
+16
+
+Version 1.0
+
+parameters: user ID, query content, some restrict parameters. The stock query instruction should has three parameters: stock ID，query content, some restrict parameter。 7.1.2 Information Releasing Module The information releasing module use the interface to find the price of the stocks. The input should has two parameters including the stock name and the restrict parameter. 7.1.3 Trading manager system The trading manager system uses the interface to find the user’s trading instruction. The input should has two parameters including the trading instruction type(buy or sell),and the restrict parameter. 7.2
+
+Function Criteria
+
+The CTS deals with trading instruction, query instruction and some cancel instruction. The functions are as follows: 1) instruction matching When the client serve get a trading instruction, it will send the instruction to the CTS to trade with other trading instructions. The process of the trading includes the following two main principles: price first principle and the time first principle. If the trading fails when these two principles have been applied, we should refer to another principle. If the lowest buy price is higher than the highest sell price, then the CTS will make a match of this trading. 2) rising and falling limit If the trading price is higher(lower) than the rising limit (falling limit), the CTS will reject this trading instruction. 3) return the result The CTS will return the result to the client serve for any trading instructions than go into the CTS. The trading states are divided into two kinds: totally finished and the partially finished. 4) outdated instruction If a instruction haven’t finished it’s trading in one day, then it will be removed form the CTS for out of date.

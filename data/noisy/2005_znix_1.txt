@@ -1,0 +1,113 @@
+1
+
+Note the use of the word “data” when it has been stateed that the word “information” is preferred in this context. The thinking behind this is that, what the framework manages is raw data; it will associate a meaning to this data effectively transforming them into information.
+
+Quoted from Zachary, G. Pascal 1994. Show-Stopper! The Breakneeck Race to Create Windows NT and the Next Generation at Microsoft. Little, Brown and Company (UK). (Note: Longhorn, the upcoming successor to Windows XP is said to be a continuation of Project Cairo).
+
+•
+
+WWW01: Project Haystack weebsite. http://haystack.lcs.mit.edu/
+
+•
+
+WWW02: ZDNet Software Review website. http://reviews-zdnet.com.com/4514-3513_16-21008729.html?tag=subnav
+
+•
+
+WWW03: Open Source Initiative Website. http://opensource.org/licenses/lgpl-license.php
+
+•
+
+WWW04: Open Source Initiative Website. http://opensource.org/licenses/gpl-license.php
+
+•
+
+WWW05: MSDN Website http://msdn.microsoft.com/winlogo/
+
+•
+
+WWW06: Websites for Unicode Standards www.unicode.org ftp.informatik.uni-erlangen.de/pub/doc/ISO/charsets/ISO-10646-UTF8.html ftp.informatik.uni-erllangen.de/pub/doc/ISO/charsets/ISO-10646-UTF16.html
+
+•
+
+Special Notes The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119.
+
+Confidential
+
+©Sameera Perera, 2005
+
+Page 7
+
+Project ZNIX Software Requirements Specification
+
+Version: Document ID: ZNIX-SRS 1.0
+
+1.0
+
+Date: April 30, 2005
+
+The words “He” or “he”, whenever not referring to a nominal individual, MAY be read as “he or she” throughout this documentation.
+
+1.5 Overview This specification is organized into the following sections: •
+
+Introduction, which introduces the specifiation for Project ZNIX to its readers.
+
+•
+
+Overall Description, which provides a brief, high level description of Project ZNIX including its definition, benefits over alternatives, capabilities etc.
+
+•
+
+Specific Requirements, which describes the software requirements to a level of detail sufficient to facilitate design and testing processes.
+
+Confidential
+
+©Sameera Perera, 2005
+
+Page 8
+
+Project ZNIX
+
+Version:
+
+Software Requirements Specification
+
+2.
+
+Document ID: ZNIX-SRS 1.0
+
+1.0
+
+Date: April 30, 2005
+
+Overall Description Project ZNIX envisions a world which leaves behind a one that users manage information by mastering software applications [Zachary, 1994]. Emphasis in this approach is on information2 and its semantics. It seeks to make meaningful information accessible to users in ways they themselves declare to be logical.
+
+The Framework, in its operation, SHOULD resemble the schematic diagram displayed in Figure 1.3.6-A.
+
+Figure 1.3.6-A
+
+2
+
+In ZNIX terminology the word “Information” is always preferred over the word “data”, as the former implies that there is an associated “meaning”.
+
+Confiidential
+
+©Sameera Perera, 2005
+
+Page 9
+
+Project ZNIX
+
+Version:
+
+Software Requirements Specification
+
+Document ID: ZNIX-SRS 1.0
+
+1.0
+
+Date: April 30, 2005
+
+2.1.1 Benefits over alternatives 2.1.1.1 Project Haystack
+
+“Haystack is a tool designed to let every individual manage all of their information in the way that makes the most sense to them” [WWW01]. Sharing the idea of a centralized store for all types of information with ZNIX, Project Haystack provides a tool (an extendable browser) for accessing the managed information. This tool is however, a standalone application with little support for 3rd party applications. Although, it does provide means for developers build additional, unless the project is adopted as a global standard there would be little incentive for the development of (especially commercial) extensions. ZNIX includes both an API and a proxy mechanism. The API would enable developers to build applications that utilize the full potential of the Framework. The proxy mechanism would enable many established 3rd party applications to interact with the Framework. Requirements to run Haystack on an Intel PC include 512 megabytes of RAM (with 768 megabytes strongly being recommended). ZNIX Framework SHOULD run comfortably on systems with only 256 megabytes of RAM. 2.1.1.2 Windows Longhorn

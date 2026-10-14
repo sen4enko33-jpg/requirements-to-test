@@ -1,0 +1,205 @@
+To fulfill the buy transaction
+
+Preconditions
+
+Customer has successfully logged into UI and submit the buy information
+
+Trigger
+
+The ‘buy’ button on UI been clicked
+
+Scenario
+
+1. transaction user interface: give the buy instruction 2. central trading system: save the buy instruction 3. central trading system: match the instructions with the same stock id 4. central trading system: make a trade by matching 5. central trading system: modify the information of matched instructions
+
+Exception
+
+1. 2. 3.
+
+Priority
+
+Essential, must be implemented
+
+When available
+
+First increment
+
+Frequency of use
+
+Frequent
+
+Channel to actor
+
+Via transaction user interface
+
+Secondary actors
+
+Trading System Management
+
+Channels to secondary actors
+
+Via central trading system interface
+
+all the operations have been suspended some trade exceptions come up no matched stock with the buy instruction
+
+Version 1.0
+
+1. Open issues
+
+2. 3. 4.
+
+5
+
+Should the trade information return to Transaction User Interface immediately when the deal is done? Should the failure of trade return to Transaction User Interface the next day? If exception happens, is exception log needed? security issue
+
+Use-case
+
+Sell stock
+
+Primary actor
+
+Transaction User Interface
+
+Goal in context
+
+To fulfill the sell transaction
+
+Preconditions
+
+Customer has successfully logged into UI and submit the sell information
+
+Trigger
+
+The ‘sell’ button on UI been clicked
+
+Scenario
+
+1. transaction user interface: give the sell instruction 2. central trading system: save the sell instruction 3. central trading system: match the instructions with the same stock id 4. central trading system: make a trade by matching 5. central trading system: modify the information of matched instructions
+
+Exception
+
+1. all the operations have been suspended 2. some deal exceptions come up 3. no matched stock with the buy instruction
+
+Priority
+
+Essential, must be implemented
+
+When available
+
+First increment
+
+Frequency of use
+
+Frequent
+
+Channel to actor
+
+Via transaction user interface
+
+Secondary actors
+
+Trading System Management
+
+Channels to secondary actors
+
+Via central trading system interface
+
+Open issues
+
+1. Should the trade information return to Transaction User Interface immediately when the deal is done? 2. Should the failure of trade return to Transaction User Interface the next day? 3. If exception happens, is exception log needed? 4. security issue
+
+Version 1.0
+
+6
+
+Use-case
+
+Cancel trading instruction
+
+Primary actor
+
+Transaction User Interface
+
+Goal in context
+
+To fulfill the cancel transaction
+
+Preconditions
+
+Customer has successfully logged into UI and submit the cancel information
+
+Trigger
+
+The ‘cancel’ button on UI been clicked
+
+Scenario
+
+1. transaction user interface: give the cancel instruction 2. central trading system: save the cancel instruction 3. central trading system: cancel the correlative instruction
+
+Exception
+
+1. all the operations have been suspended 2. the instruction concerned has been implemented 3. no matched instruction to be cancelled
+
+Priority
+
+Moderate, to be implemented after basic functions
+
+When available
+
+Second increment
+
+Frequency of use
+
+Many times per day
+
+Channel to actor
+
+Via transaction user interface
+
+Secondary actors
+
+Trading System Management
+
+Channels to secondary actors
+
+Via central trading system interface
+
+Open issues
+
+1. Is it necessary to return the status of cancel transaction? 2. If exception happens, is exception log needed? 3. security issue
+
+Use-case
+
+Save trade information
+
+Primary actor
+
+Security Account Management
+
+Goal in context
+
+To save all successful trade information
+
+Preconditions
+
+The correlative trade transactions have been successfully conducted
+
+Trigger
+
+Any trade transaction been conducted
+
+Scenario
+
+1. central trading system: give out the successful trade information 2. security account management: save the trade information
+
+Version 1.0
+
+7
+
+Exception
+
+1. all the operations have been suspended 2. no matched stock with the buy instruction
+
+Priority
+
+Essential, must be implemented

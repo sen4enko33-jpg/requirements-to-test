@@ -1,0 +1,141 @@
+1.6 Assumptions This section contains a list of assumptions that are to be made by the developers. 
+
+
+
+The users have the computing skill for basic operation of one of the operating systems documented in 1.4.3. Basic operation entails: •
+
+starting and terminating an operating system session
+
+•
+
+use of a Java-enabled internet browser
+
+•
+
+competent use of keyboard and mouse
+
+•
+
+basic file handling
+
+•
+
+command line input skills
+
+The users have access to a minimum specification work station on which to run the product. See 3.3 for minimum requirements for the work station.
+
+Page 8 of 15
+
+Software Requirements Engineering for Grid 3D Application
+
+FUNCTIONAL REQUIREMENTS 2.1 The Scope of the Product 2.1.1 The Context of the Work The following diagram represents a context diagram for the Grid 3D application. For a description of any of the below-mentioned names, please refer to 1.5.
+
+2.1.1.1 Initialisation
+
+The following diagram refers to the initiation phase of the Grid 3D application.
+
+Various Processes/Products
+
+Biological Data
+
+Gets Data Identifier
+
+Supplies data
+
+Gets Data
+
+Gets Data
+
+Investigator
+
+Demonstrator
+
+Returns information Returns 3D view
+
+Returns point view/info
+
+Supplies data
+
+Supplies data Grid 3D Application
+
+Page 9 of 15
+
+Software Requirements Engineering for Grid 3D Application 2.1.1.2 Running
+
+The context diagram above represents the Grid 3D application during the initialisation stages. It is important to differentiate this with the work context for the application in a state of running. The following diagram aims to describe the work context for the application when it is being run by the users (identified above). In the following diagram, the users are grouped as one entity. This is for convenience only and should be thought of as separate entities. However, the work context applies to each of them in the same manner and, therefore, have been grouped to further the simplicity and understandability of the diagram.
+
+Return desired Graphical Representation
+
+- Identifier - Investigator - Demonstrator
+
+Grid 3D Application
+
+Rotate Grid Move Grid Zoom Grid Select Point(s) Retrieve Point Info
+
+Page 10 of 15
+
+Software Requirements Engineering for Grid 3D Application
+
+2.1.2 Work Partitioning The purpose of this section is to identify all the business events to which the product responds. This is to identify the logical parts of work that can be used as the basis for discovering the detailed requirements. Event List: #
+
+Event Name
+
+Input and Output Flows
+
+1 Identifier supplies data
+
+Data (in)
+
+2 Application returns view/info to identifier
+
+Graphical view (out)
+
+3 Investigator supplies data
+
+Data (in)
+
+4 Application returns details to investigator
+
+Textual info (out)
+
+5 Demonstrator supplies data
+
+Data (in)
+
+6 Application provides 3D view
+
+Graphical view (out)
+
+7 User requests change of grid orientation
+
+Mouse movement (in)
+
+8 User selects multiple points
+
+Mouse and Keyboard (in)
+
+Page 11 of 15
+
+Software Requirements Engineering for Grid 3D Application
+
+2.1.3 Product Boundary This section aims to generate some use cases for the Grid 3D application. These shall be generated from the events list contained in 2.1.2. It is hoped that use cases can be given that cover all the events listed in 2.1.2. With this in mind, the use cases will cover more than one event as more than one event can be captured with a single use-case. Доступ до особистих даних мають лише авторизовані користувачі. Use case 1,2,6,7.
+
+for events
+
+Supplies data Identifier Grid 3D Application
+
+Returns initial view
+
+Request change of orientation Reflect change of orientation
+
+Use case 3,4,6,7
+
+Supplies data Investigator Returns point details
+
+Grid 3D Application
+
+Request change of orientation Reflect change of orientation
+
+Page 12 of 15
+
+Software Requirements Engineering for Grid 3D Application Use case 5,6,7 Supplies data Demonstrator Returns point details

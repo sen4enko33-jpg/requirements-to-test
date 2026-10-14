@@ -1,0 +1,94 @@
+{
+  "doc_title": null,
+  "domain": "other",
+  "language": "en",
+  "actors": [
+    "analyst",
+    "administrator",
+    "project manager",
+    "guest"
+  ],
+  "requirements": [
+    {
+      "id": "FR-GSM 1",
+      "section": "GSM: Goal Specification and Management Module > Functional Requirements",
+      "text": "The system shall allow analysts to add a new goal.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": "FR-GSM 2",
+      "section": "GSM: Goal Specification and Management Module > Functional Requirements",
+      "text": "The system shall provide templates for goals, scenarios, P3P statments, EPAL rules and access control policies.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": "FR-GSM 3",
+      "section": "GSM: Goal Specification and Management Module > Functional Requirements",
+      "text": "The system shall allow analysts to classify goals.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": "FR-GSM 4",
+      "section": "GSM: Goal Specification and Management Module > Functional Requirements",
+      "text": "The system shall allow multiple subject classifications for each goal.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": "FR-GSM 5",
+      "section": "GSM: Goal Specification and Management Module > Functional Requirements",
+      "text": "The system shall provide the ability to dynamically add a new classification type of goals to the tool.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": "FR-GSM 6",
+      "section": "GSM: Goal Specification and Management Module > Functional Requirements",
+      "text": "The system shall allow the analysts to request a new classification type of goals and also allow the project manager to create that classification type.",
+      "type": "functional",
+      "testable": "partial"
+    },
+    {
+      "id": "FR-GSM 7",
+      "section": "GSM: Goal Specification and Management Module > Functional Requirements",
+      "text": "The system shall provide the ability to update an existing goal.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": "FR-GSM 8",
+      "section": "GSM: Goal Specification and Management Module > Functional Requirements",
+      "text": "The system shall provide the ability to delete a goal.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": "FR-GSM 9",
+      "section": "GSM: Goal Specification and Management Module > Functional Requirements",
+      "text": "The system shall provide the ability to automatically propagate associated policy information upon deletion or replacement of a goal.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": "FR-GSM 10",
+      "section": "GSM: Goal Specification and Management Module > Functional Requirements",
+      "text": "The system shall maintain traceability links between a goal and the policy from which the goal was derived.",
+      "type": "functional",
+      "testable": "yes"
+    },
+    {
+      "id": "FR-GSM 11",
+      "section": "GSM: Goal Specification and Management Module > Functional Requirements",
+      "text": "The system shall provide the ability to display the number of occurrences of a goal in a policy, in multiple policies and within a domain.",
+      "type": "functional",
+      "testable": "yes"
+    }
+  ],
+  "has_acceptance_criteria": false,
+  "open_questions": [
+    "Who should the occurrence counts of a goal be displayed to (the text notes this is important for ACP)?"
+  ]
+}
