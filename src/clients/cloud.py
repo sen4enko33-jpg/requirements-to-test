@@ -1,7 +1,7 @@
-import json
 import time
 
 import anthropic
+from pydantic import BaseModel
 from tenacity import Retrying, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 from .base import GenResult, ModelClient
@@ -11,7 +11,6 @@ RETRYABLE = (
     anthropic.RateLimitError,
     anthropic.InternalServerError,
 )
-TOOL_NAME = "record_extraction"
 
 
 class AnthropicClient(ModelClient):
@@ -25,7 +24,7 @@ class AnthropicClient(ModelClient):
         # our own retry loop (tenacity) is the only one: SDK retries are switched off
         self._client = anthropic.Anthropic(timeout=timeout_s, max_retries=0)
 
-    def generate(self, prompt: str, schema: dict, sampling: dict) -> GenResult:
+    def generate(self, prompt: str, response_model: type[BaseModel], sampling: dict) -> GenResult:
         params = {"temperature": sampling["temperature"]}
         if self.use_top_p:
             params["top_p"] = sampling["top_p"]
@@ -35,14 +34,11 @@ class AnthropicClient(ModelClient):
         def call():
             nonlocal attempts
             attempts += 1
-            return self._client.messages.create(
+            return self._client.messages.parse(
                 model=self.model,
                 max_tokens=self.max_tokens,
                 messages=[{"role": "user", "content": prompt}],
-                tools=[{"name": TOOL_NAME,
-                        "description": "Record the extracted requirements",
-                        "input_schema": schema}],
-                tool_choice={"type": "tool", "name": TOOL_NAME},
+                output_format=response_model,   # schema goes in output_config, not in the prompt
                 **params,
             )
 
@@ -63,7 +59,7 @@ class AnthropicClient(ModelClient):
         usage = (resp.usage.input_tokens, resp.usage.output_tokens)
         if resp.stop_reason == "max_tokens":
             return GenResult(None, latency, *usage, attempts, "truncated: max_tokens reached")
-        block = next((b for b in resp.content if b.type == "tool_use"), None)
-        if block is None:
-            return GenResult(None, latency, *usage, attempts, "no tool_use block in response")
-        return GenResult(json.dumps(block.input, ensure_ascii=False), latency, *usage, attempts)
+        if resp.parsed_output is None:
+            return GenResult(None, latency, *usage, attempts,
+                             f"no parsed output (stop_reason={resp.stop_reason})")
+        return GenResult(resp.parsed_output.model_dump_json(), latency, *usage, attempts)

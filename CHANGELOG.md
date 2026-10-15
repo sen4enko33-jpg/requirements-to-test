@@ -5,10 +5,10 @@ Each entry records what changed and why; results are added after the evaluation 
 
 ## v1 (2026-10-14) — baseline
 
-**What it is.** Minimal instruction prompt: role, task, description of every output field (copied from the field descriptions in `src/schema.py`), six general rules, the document placeholder. No examples, no edge-case handling.
+**What it is.** Minimal instruction prompt: role, task, seven general rules, the document placeholder. Field descriptions are not repeated here (they live in the schema). No examples, no edge-case handling.
 
 **Design decisions.**
-- Field descriptions are written in the prompt text itself, not only in the schema, so the cloud and the local model see the same information regardless of how each provider handles structured output.
+- Field descriptions live only in `Field(description=...)` in `src/schema.py`; the schema reaches the model through structured output (Anthropic `messages.parse(output_format=...)`, Ollama `format`). The prompt holds only what the schema cannot say: when to use null, what not to extract, copy-as-is rules.
 - `text` of a requirement is copied from the source exactly as written, including typos; only layout artifacts (numbering, page headers, line breaks) are removed. The golden set keeps source typos in requirement text for the same reason.
 - `open_questions` accepts only items the text itself marks as unresolved; `has_acceptance_criteria` is true only for explicit acceptance criteria.
 - One requirement per complete statement; a list under a single "shall" stays one requirement.

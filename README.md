@@ -34,8 +34,8 @@ set `SRC_DIR` in `pdf_to_raw_data.py` to the folder with them.
 ## Schema
 `Extraction` (`src/schema.py`): `doc_title`, `domain` (enum), `language` (enum), `actors` (list),
 `requirements` (list of `Requirement`: `id`, `section`, `text`, `type`, `testable`),
-`has_acceptance_criteria`, `open_questions`. Field descriptions are repeated in the prompt text
-so the cloud and the local model see the same information.
+`has_acceptance_criteria`, `open_questions`. Field descriptions live only in the schema and reach
+the model through structured output; the prompt holds only rules the schema cannot express.
 
 ## Prompts
 Build a prompt for a document:
