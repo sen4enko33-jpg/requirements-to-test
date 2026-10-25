@@ -224,3 +224,4 @@ __marimo__/
 
 # one-text smoke runs
 results/adhoc_*
+.idea/
