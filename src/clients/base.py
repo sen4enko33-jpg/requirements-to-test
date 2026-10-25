@@ -12,6 +12,7 @@ class GenResult:
     tokens_out: int | None
     attempts: int           # how many API attempts were needed
     error: str | None = None
+    cost_usd: float | None = None   # cost of the successful attempt as reported by the provider
 
 
 class ModelClient(ABC):

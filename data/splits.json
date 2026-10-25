@@ -1,0 +1,39 @@
+{
+  "golden": [
+    "2004_sprat_1",
+    "2004_grid_bgc_2",
+    "2007_central_trading_system_1",
+    "2008_caiso_1",
+    "2007_ertms_2",
+    "2009_video_search_1",
+    "2005_grid_3d_2",
+    "2001_space_fractions_1",
+    "1998_themas_2",
+    "0000_gamma_j_2"
+  ],
+  "dev": [
+    "2010_home_1_3_1",
+    "2010_home_1_3_2",
+    "2003_agentmom_1",
+    "2009_library_1",
+    "2009_library_2",
+    "2005_znix_1",
+    "2005_znix_2",
+    "2009_gaia_1",
+    "2009_gaia_2",
+    "2009_peazip_1",
+    "2009_peazip_2"
+  ],
+  "excluded": [
+    "2004_grid_bgc_1",
+    "1998_themas_1",
+    "2004_sprat_2",
+    "2007_ertms_1",
+    "0000_gamma_j_1",
+    "2008_caiso_2",
+    "2005_grid_3d_1",
+    "2001_space_fractions_2",
+    "2009_video_search_2",
+    "2007_central_trading_system_2"
+  ]
+}

@@ -4,13 +4,21 @@ max_tokens: 8192
 
 models:
   cloud:
-    provider: anthropic
-    model: claude-haiku-5-5
-    price_in_per_1m: 0.10    # USD per 1M input tokens (prompts <= 100k tokens)
-    price_out_per_1m: 0.50   # USD per 1M output tokens
+    provider: openrouter
+    base_url: https://openrouter.ai/api/v1
+    api_key_env: OPENROUTER_API_KEY
+    model: openai/gpt-4o-mini
+    extra_body: {provider: {require_parameters: true}}   # route only to endpoints that support every request parameter
+    price_in_per_1m: 0.15    # USD per 1M input tokens (OpenRouter page, check before the final table)
+    price_out_per_1m: 0.60   # USD per 1M output tokens
   local:
     provider: ollama
-    model: ""              # model name from your Ollama
+    base_url: http://localhost:11434/v1
+    api_key: ollama        # Ollama ignores the key, the SDK just needs a non-empty value
+    model: llama3.2:3b
+    timeout_s: 120         # local models are slower than the global default
+    max_retries: 1         # at temperature 0 a retry repeats the same runaway generation
+    max_tokens: 4096       # cuts a runaway generation early (a legitimate answer needs ~2500 at most)
 
 sampling:
   A: {temperature: 0.0, top_p: 1.0}
