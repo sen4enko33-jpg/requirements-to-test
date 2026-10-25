@@ -15,7 +15,7 @@ Each entry records what changed and why; results are added after the evaluation 
 
 **Known gaps (expected, not yet measured).** Granularity of use-case steps and event lists, handling of "Intentionally deleted" items and assumptions, `section` building when headings are partly cut off, ids given at section level, and sentences inserted in another language. These are the candidates for v2.
 
-**Results.** Golden set: 10 excerpts, 158 requirements; every configuration ran on all 31 excerpts. Full table: `report/table.md`, all metrics: `results/summary.csv`.
+**Results.** Golden set: 10 excerpts, 158 requirements; every configuration ran on all 31 excerpts. Full run report: `report/report_v1.md`; table: `report/table.md`; all metrics: `results/summary.csv`.
 
 | model | sampling | valid | req. P / R / F1 | domain | actors F1 | type | testable | section | latency p50 / p95 | $ per 1000 docs |
 |---|---|---|---|---|---|---|---|---|---|---|
