@@ -97,10 +97,10 @@ made with different settings and `src.run` refuses to mix them:
     python main.py --redo-failed                    # re-run only the failed documents (e.g. after a timeout)
 
 `--redo-failed` re-runs only the documents that failed (timeout, truncated or invalid answer) and keeps all
-successful rows, so it is much cheaper than `--force`. Use it after a transient error or after changing limits such
+successful rows (documents with status `partial_failed` have an answer and are kept too), so it is much cheaper than `--force`. Use it after a transient error or after changing limits such
 as `max_retries` or `max_tokens` in `config.yaml`. At `temperature: 0` a deterministic failure (for example a runaway
 generation of a small local model) usually repeats, so a failed document may simply stay failed: that is a result,
-it is counted in `% valid` and in the metrics.
+it is counted as not valid in `% valid` and in the metrics.
 
 If the local Ollama server is not running, the local model is skipped with a message. Output: `results/*.jsonl`
 (raw answers), `results/metrics_*.json` (all metrics), `results/summary.csv`, `report/table.md`.
@@ -110,3 +110,42 @@ Single steps:
     python -m src.run --model cloud --sampling A --prompt v1   # --ids ID for one excerpt, --split dev for tuning
     python -m src.metrics results/<run>.jsonl                  # metrics on the golden split
     python -m src.eval                                         # results/summary.csv and report/table.md
+
+## Validation and repair
+Every model answer is checked twice (`src/validate.py`):
+
+1. **Schema.** The answer must be valid JSON that matches the `Extraction` schema.
+2. **Copy check.** Every requirement `text` must be copied from the excerpt, as the prompt demands. Layout that the
+   prompt allows to remove (bullets, list numbers, case, line-break hyphens, and page headers and footers) is
+   ignored. A requirement passes if its words occur in the excerpt as one run, or if at least 95% of them are found
+   and the found pieces lie within 15 excerpt words of each other (`COPY_MIN_COVERAGE`, `COPY_MAX_GAP`). The check
+   does not see two neighbouring statements merged into one, because every word of such a text is real.
+
+If either check fails, the model gets **one repair attempt**: the same prompt plus its previous answer and the list of
+errors (for a copy error: which requirement and which words are not in the text), with the same sampling parameters.
+A repaired answer that fixes a schema error is accepted if it is valid. A repaired answer of an already valid answer
+is accepted only if it has no more copy violations and no fewer correctly copied requirements than the first one, so
+"fixing" an answer by dropping good requirements (or returning an empty list) does not count. There is never a third
+call. Answers that never arrived (timeout, `max_tokens` reached, refusal) are not repaired: there is nothing
+to fix, and for a runaway generation a repeat would only cost another minute and a half.
+
+Status of a document:
+
+- `ok`: a valid answer, every requirement copied.
+- `partial_failed`: a valid answer, but some requirements are still not copied after the repair. The document keeps
+  its answer and is scored normally; the number of such requirements is in `copy_violations`.
+- `failed`: no valid answer.
+
+Each row of `results/*.jsonl` logs the model, the prompt version, the sampling name and values, `repair_attempted`,
+`repaired` (the repaired answer was accepted), `repair_reason` (`schema` or `copy`), `validation_errors` and
+`copy_errors_first` (the errors of the first answer), `copy_violations` and `copy_total` (not copied requirements and
+all requirements in the accepted answer). The metrics report `valid_pct` (a valid answer exists: `ok` +
+`partial_failed`), `partial_failed_pct`, `valid_first_try_pct`, `n_repair_attempted`, `n_repaired`,
+`copy_violation_pct` (share of requirements that are not copied) and `copy_violation_pct_first_try` (the same before
+the repair, which shows what the repair gives). Copy metrics are recomputed from the answers, so they also work on old
+run logs. With strict structured output invalid JSON is rare, so the repair paths are covered by a test with a fake
+client: `python tests/test_repair.py` (validation, copy check, repair), `python tests/test_limits.py` (array limits, repeats, capped flag).
+
+### Loops of the local model
+
+The local model sometimes loops inside a JSON array until `max_tokens`. For it, `config.yaml` sets `schema_limits` (`maxItems` in the request schema: actors 10, open_questions 10, requirements 40); validation uses the unchanged Pydantic schema. Exact repeats inside one answer are dropped (`n_duplicates_removed`), and an answer that reaches the requirements limit is marked `requirements_capped` (`capped_pct` in the metrics). A log file does not mix rows made with different limits (`--force`). Evidence and rejected alternatives (repetition penalty, chunking) are in `CHANGELOG.md`.

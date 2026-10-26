@@ -35,6 +35,10 @@ def num(x, fmt):
     return "n/a" if x is None else format(x, fmt)
 
 
+def pct(x, fmt):
+    return "n/a" if x is None else format(x, fmt) + "%"
+
+
 def main():
     flats = [flatten(json.loads(p.read_text(encoding="utf-8")))
              for p in sorted(Path("results").glob("metrics_*.json"))]
@@ -48,12 +52,14 @@ def main():
         w.writerows(flats)
 
     cols = (["model", "sampling", "prompt"] + [c for c, _ in ACC_COLS]
-            + ["valid %", "p50 s", "p95 s", "$ / 1000 docs"])
+            + ["valid %", "partial %", "copy viol. %", "p50 s", "p95 s", "$ / 1000 docs"])
     lines = ["| " + " | ".join(cols) + " |", "|" + "---|" * len(cols)]
     for f in flats:
         row = [f["meta.model"], f["meta.sampling_name"], f["meta.prompt_version"]]
         row += [num(100 * f[k], ".0f") + "%" for _, k in ACC_COLS]
         row += [num(f["operational.valid_pct"], ".0f") + "%",
+                pct(f.get("operational.partial_failed_pct"), ".0f"),   # n/a until the metrics are recomputed
+                pct(f.get("operational.copy_violation_pct"), ".1f"),
                 num(f["operational.latency_p50_s"], ".1f"),
                 num(f["operational.latency_p95_s"], ".1f"),
                 "$" + num(f["operational.cost_per_1000_docs_usd"], ".2f")]

@@ -12,12 +12,22 @@
     "match_threshold": 0.75,
     "cover_threshold": 0.8,
     "actor_match_threshold": 0.8,
-    "computed_at": "2026-10-25T08:50:22+00:00"
+    "computed_at": "2026-10-26T16:04:24+00:00"
   },
   "operational": {
     "n_rows": 31,
     "n_failed": 0,
     "valid_pct": 100.0,
+    "n_partial_failed": 0,
+    "partial_failed_pct": 0.0,
+    "valid_first_try_pct": 100.0,
+    "n_repair_attempted": 0,
+    "n_repaired": 0,
+    "n_requirements_checked": 486,
+    "n_copy_violations": 5,
+    "copy_violation_pct": 1.02880658436214,
+    "copy_violation_pct_first_try": 1.02880658436214,
+    "n_docs_with_copy_violations": 5,
     "n_empty": 0,
     "empty_pct": 0.0,
     "latency_p50_s": 7.677,

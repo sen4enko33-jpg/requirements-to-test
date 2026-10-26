@@ -19,6 +19,9 @@ models:
     timeout_s: 120         # local models are slower than the global default
     max_retries: 1         # at temperature 0 a retry repeats the same runaway generation
     max_tokens: 4096       # cuts a runaway generation early; tight for long documents (largest successful answer: 4040 tokens)
+    # array limits (maxItems) added to the request schema only: the model loops inside lists (actors, then requirements)
+    # and the strict JSON grammar will not let it close the array; 40 requirements fit the token budget (~60 tokens each)
+    schema_limits: {actors: 10, open_questions: 10, requirements: 40}
 
 sampling:
   A: {temperature: 0.0, top_p: 1.0}

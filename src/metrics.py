@@ -6,7 +6,7 @@ latency percentiles are taken over successful responses (the *_all_* keys includ
 Everything is recomputed from the raw log, so changing a threshold needs no new API calls.
 
 Run-log row: doc_id, model, prompt_version, sampling_name, sampling,
-status ("ok" | "failed"), extraction (dict | None), error, latency_s,
+status ("ok" | "partial_failed" | "failed"), extraction (dict | None), error, latency_s,
 tokens_in, tokens_out, attempts.
 """
 import argparse
@@ -16,6 +16,8 @@ from collections import Counter
 from datetime import datetime, timezone
 from difflib import SequenceMatcher
 from pathlib import Path
+
+from .validate import check_copy
 
 MATCH_THRESHOLD = 0.75  # min similarity to pair a predicted requirement with a golden one
 COVER_THRESHOLD = 0.80  # min token coverage to call an unmatched requirement merged/split
@@ -42,6 +44,10 @@ def cover(a, b):
     ta, tb = tokens(a), tokens(b)
     total = sum(ta.values())
     return sum((ta & tb).values()) / total if total else 0.0
+
+
+VALID_STATUSES = ("ok", "partial_failed")   # a valid answer exists (partial_failed: some requirements not copied)
+TEXTS_DIR = Path(__file__).resolve().parent.parent / "data" / "noisy"
 
 
 def div(a, b):
@@ -138,7 +144,7 @@ def diagnose(gold, pred, pairs):
 
 
 def score_doc(gold, row, threshold=MATCH_THRESHOLD):
-    pred = row.get("extraction") if row["status"] == "ok" else None
+    pred = row.get("extraction") if row["status"] in VALID_STATUSES else None
     failed = pred is None
     pred = pred or {}
 
@@ -198,16 +204,51 @@ def aggregate(docs):
     }
 
 
-def operational(rows, price_in, price_out):
+def copy_stats(rows, texts_dir):
+    """How many requirements are not copied from the excerpt (check_copy), in the final answers and,
+    where the log has it, in the first answers before the repair attempt."""
+    viol = total = first_viol = first_total = docs_with = 0
+    for r in rows:
+        ext = r.get("extraction")
+        if not ext or texts_dir is None:
+            continue
+        n_bad = len(check_copy(ext, (Path(texts_dir) / f"{r['doc_id']}.txt").read_text(encoding="utf-8")))
+        n_req = len(ext["requirements"])
+        viol, total, docs_with = viol + n_bad, total + n_req, docs_with + bool(n_bad)
+        if r.get("copy_first_total") is not None:      # new log: the first answer is stored
+            first_viol += len(r.get("copy_errors_first") or [])
+            first_total += r["copy_first_total"]
+        elif "repair_attempted" not in r:               # old log: there was no repair, first = final
+            first_viol, first_total = first_viol + n_bad, first_total + n_req
+    return {"n_requirements_checked": total, "n_copy_violations": viol,
+            "copy_violation_pct": 100 * div(viol, total),
+            "copy_violation_pct_first_try": 100 * div(first_viol, first_total),
+            "n_docs_with_copy_violations": docs_with}
+
+
+def operational(rows, price_in, price_out, texts_dir=None):
     n = len(rows)
-    ok = [r for r in rows if r["status"] == "ok"]
-    lat_ok = [r["latency_s"] for r in ok if r.get("latency_s") is not None]
+    valid = [r for r in rows if r["status"] in VALID_STATUSES]
+    n_partial = sum(1 for r in rows if r["status"] == "partial_failed")
+    lat_ok = [r["latency_s"] for r in valid if r.get("latency_s") is not None]
     lat_all = [r["latency_s"] for r in rows if r.get("latency_s") is not None]
     tin = sum(r.get("tokens_in") or 0 for r in rows)
     tout = sum(r.get("tokens_out") or 0 for r in rows)
-    n_empty = sum(1 for r in ok if not (r.get("extraction") or {}).get("requirements"))
+    n_empty = sum(1 for r in valid if not (r.get("extraction") or {}).get("requirements"))
+    n_repaired = sum(1 for r in valid if r.get("repaired"))
+    n_repair_attempted = sum(1 for r in rows if r.get("repair_attempted"))
+    n_capped = sum(1 for r in rows if r.get("requirements_capped"))
+    n_dups = sum(r.get("n_duplicates_removed") or 0 for r in rows)
+    n_schema_repaired = sum(1 for r in valid if r.get("repaired") and r.get("repair_reason") in (None, "schema"))
     return {
-        "n_rows": n, "n_failed": n - len(ok), "valid_pct": 100 * div(len(ok), n),
+        # valid = a schema-valid answer exists (ok + partial_failed); failed = no valid answer
+        "n_rows": n, "n_failed": n - len(valid), "valid_pct": 100 * div(len(valid), n),
+        "n_partial_failed": n_partial, "partial_failed_pct": 100 * div(n_partial, n),
+        # share of answers that were schema-valid on the first try (valid_pct also counts those fixed by the repair)
+        "valid_first_try_pct": 100 * div(len(valid) - n_schema_repaired, n),
+        "n_capped": n_capped, "capped_pct": 100 * div(n_capped, n), "n_duplicates_removed": n_dups,
+        "n_repair_attempted": n_repair_attempted, "n_repaired": n_repaired,
+        **copy_stats(valid, texts_dir),
         # valid JSON but no requirements at all: a silent failure that valid_pct does not see
         "n_empty": n_empty, "empty_pct": 100 * div(n_empty, n),
         # latency of successful responses; failed calls (timeouts) would distort the percentiles
@@ -230,7 +271,7 @@ def evaluate(rows, golden_dir, golden_ids, prices, threshold):
         docs.append(score_doc(gold, by_id[g], threshold))
     price_in, price_out = prices.get(rows[0]["model"], (0.0, 0.0))
     return {
-        "operational": operational(rows, price_in, price_out),
+        "operational": operational(rows, price_in, price_out, TEXTS_DIR),
         "quality_all_docs": aggregate(docs),  # failed documents count as zeros
         "quality_valid_only": aggregate([d for d in docs if not d["failed"]]),
         "per_doc": docs,

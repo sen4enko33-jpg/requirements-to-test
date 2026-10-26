@@ -50,20 +50,26 @@ class OpenAICompatClient(ModelClient):
     """Any model behind an OpenAI-compatible chat API (OpenRouter, Ollama, ...)."""
 
     def __init__(self, model: str, base_url: str, api_key: str, timeout_s: float,
-                 max_retries: int, max_tokens: int = 8192, extra_body: dict | None = None):
+                 max_retries: int, max_tokens: int = 8192, extra_body: dict | None = None,
+                 schema_limits: dict | None = None):
         self.name = model
         self.model = model
         self.max_tokens = max_tokens
         self.max_retries = max_retries
         self.extra_body = extra_body  # provider-specific request options from config.yaml
+        # {field: max number of items} for array fields; added as maxItems to the schema of the REQUEST only
+        # (stops runaway lists of a local model), the Pydantic schema and the validation stay as they are
+        self.schema_limits = schema_limits
         # our own retry loop (tenacity) is the only one: SDK retries are switched off
         self._client = OpenAI(base_url=base_url, api_key=api_key, timeout=timeout_s, max_retries=0)
 
     def generate(self, prompt: str, response_model: type[BaseModel], sampling: dict) -> GenResult:
+        schema = strict_schema(response_model)
+        for field, limit in (self.schema_limits or {}).items():
+            schema["properties"][field]["maxItems"] = limit
         response_format = {
             "type": "json_schema",
-            "json_schema": {"name": response_model.__name__, "strict": True,
-                            "schema": strict_schema(response_model)},
+            "json_schema": {"name": response_model.__name__, "strict": True, "schema": schema},
         }
         attempts = 0
 
