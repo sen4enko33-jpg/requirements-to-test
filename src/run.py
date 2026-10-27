@@ -190,8 +190,9 @@ def main():
         stem = "adhoc_" + stem
     elif args.split != "all":
         stem += f"_{args.split}"
-    out = ROOT / "results" / f"{stem}.jsonl"
-    out.parent.mkdir(exist_ok=True)
+    # the full run (all 31 excerpts) is the main result; partial runs are experiments
+    out = ROOT / "results" / ("experiments" if args.split != "all" or args.ids else "") / f"{stem}.jsonl"
+    out.parent.mkdir(parents=True, exist_ok=True)
 
     rows = {}
     if out.exists() and not args.force:

@@ -1,3 +1,4 @@
+prompts: [v1, v2]   # versions that `python main.py` runs; v3 was tried and rejected (prompts/CHANGELOG.md)
 timeout_s: 60
 max_retries: 3
 max_tokens: 8192

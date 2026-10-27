@@ -24,11 +24,18 @@ COVER_THRESHOLD = 0.80  # min token coverage to call an unmatched requirement me
 ACTOR_MATCH_THRESHOLD = 0.80  # actors are paired by similarity too, so "analyst" and "analysts" match
 MATCH_MIN_COVER = 0.70  # both texts must share this token share to be paired (rejects shared-boilerplate matches)
 SCALARS = ["doc_title", "domain", "language", "has_acceptance_criteria"]
-REQ_FIELDS = ["type", "testable", "id", "section"]
+REQ_FIELDS = ["type", "testable", "id", "section", "section_leaf"]   # section_leaf: only the last heading of the path
 
 
 def norm(s):
     return re.sub(r"\s+", " ", (s or "").lower()).strip(" .;:-")
+
+
+def field_value(req, field):
+    """Value of a requirement field to compare; section_leaf is the last heading of the section path."""
+    if field == "section_leaf":
+        return (req.get("section") or "").split(">")[-1]
+    return req.get(field)
 
 
 def tokens(s):
@@ -155,7 +162,7 @@ def score_doc(gold, row, threshold=MATCH_THRESHOLD):
 
     greq, preq = gold["requirements"], pred.get("requirements", [])
     pairs = match(greq, preq, threshold)
-    field_correct = {f: sum(norm(greq[i].get(f)) == norm(preq[j].get(f)) for i, j, _ in pairs)
+    field_correct = {f: sum(norm(field_value(greq[i], f)) == norm(field_value(preq[j], f)) for i, j, _ in pairs)
                      for f in REQ_FIELDS}
 
     return {

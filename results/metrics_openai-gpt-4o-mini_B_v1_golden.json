@@ -7,12 +7,12 @@
       "temperature": 0.7,
       "top_p": 0.9
     },
-    "run_log": "/Users/v.senchenko/Desktop/Python/requirements-to-test/results/openai-gpt-4o-mini_B_v1.jsonl",
+    "run_log": "/sessions/rcw-014ji5ld9lu61x2yfriqmt8i/mnt/requirements-to-test/results/openai-gpt-4o-mini_B_v1.jsonl",
     "split": "golden",
     "match_threshold": 0.75,
     "cover_threshold": 0.8,
     "actor_match_threshold": 0.8,
-    "computed_at": "2026-10-26T16:04:24+00:00"
+    "computed_at": "2026-10-27T12:49:29+00:00"
   },
   "operational": {
     "n_rows": 31,
@@ -21,6 +21,9 @@
     "n_partial_failed": 0,
     "partial_failed_pct": 0.0,
     "valid_first_try_pct": 100.0,
+    "n_capped": 0,
+    "capped_pct": 0.0,
+    "n_duplicates_removed": 0,
     "n_repair_attempted": 0,
     "n_repaired": 0,
     "n_requirements_checked": 486,
@@ -51,7 +54,7 @@
       "precision": 0.8064516129032258,
       "recall": 0.8928571428571429,
       "f1": 0.8474576271186439,
-      "f1_macro": 0.8509706959706959
+      "f1_macro": 0.8509706959706961
     },
     "requirements": {
       "precision": 0.5683060109289617,
@@ -69,13 +72,15 @@
       "type": 0.5126582278481012,
       "testable": 0.5506329113924051,
       "id": 0.5759493670886076,
-      "section": 0.06329113924050633
+      "section": 0.06329113924050633,
+      "section_leaf": 0.43670886075949367
     },
     "requirement_field_accuracy_matched": {
       "type": 0.7788461538461539,
       "testable": 0.8365384615384616,
       "id": 0.875,
-      "section": 0.09615384615384616
+      "section": 0.09615384615384616,
+      "section_leaf": 0.6634615384615384
     },
     "open_questions": {
       "n_gold": 10,
@@ -94,7 +99,7 @@
       "precision": 0.8064516129032258,
       "recall": 0.8928571428571429,
       "f1": 0.8474576271186439,
-      "f1_macro": 0.8509706959706959
+      "f1_macro": 0.8509706959706961
     },
     "requirements": {
       "precision": 0.5683060109289617,
@@ -112,13 +117,15 @@
       "type": 0.5126582278481012,
       "testable": 0.5506329113924051,
       "id": 0.5759493670886076,
-      "section": 0.06329113924050633
+      "section": 0.06329113924050633,
+      "section_leaf": 0.43670886075949367
     },
     "requirement_field_accuracy_matched": {
       "type": 0.7788461538461539,
       "testable": 0.8365384615384616,
       "id": 0.875,
-      "section": 0.09615384615384616
+      "section": 0.09615384615384616,
+      "section_leaf": 0.6634615384615384
     },
     "open_questions": {
       "n_gold": 10,
@@ -148,7 +155,8 @@
           "type": 11,
           "testable": 10,
           "id": 11,
-          "section": 0
+          "section": 0,
+          "section_leaf": 11
         },
         "merged": 0,
         "split": 0,
@@ -239,7 +247,8 @@
           "type": 22,
           "testable": 30,
           "id": 30,
-          "section": 9
+          "section": 9,
+          "section_leaf": 30
         },
         "merged": 0,
         "split": 3,
@@ -425,7 +434,8 @@
           "type": 11,
           "testable": 10,
           "id": 15,
-          "section": 0
+          "section": 0,
+          "section_leaf": 0
         },
         "merged": 0,
         "split": 0,
@@ -536,7 +546,8 @@
           "type": 9,
           "testable": 11,
           "id": 14,
-          "section": 0
+          "section": 0,
+          "section_leaf": 11
         },
         "merged": 1,
         "split": 0,
@@ -642,7 +653,8 @@
           "type": 8,
           "testable": 7,
           "id": 0,
-          "section": 0
+          "section": 0,
+          "section_leaf": 0
         },
         "merged": 1,
         "split": 0,
@@ -728,7 +740,8 @@
           "type": 7,
           "testable": 6,
           "id": 7,
-          "section": 0
+          "section": 0,
+          "section_leaf": 7
         },
         "merged": 0,
         "split": 0,
@@ -799,7 +812,8 @@
           "type": 6,
           "testable": 6,
           "id": 9,
-          "section": 0
+          "section": 0,
+          "section_leaf": 9
         },
         "merged": 0,
         "split": 0,
@@ -880,7 +894,8 @@
           "type": 4,
           "testable": 4,
           "id": 4,
-          "section": 0
+          "section": 0,
+          "section_leaf": 0
         },
         "merged": 0,
         "split": 0,
@@ -936,7 +951,8 @@
           "type": 3,
           "testable": 2,
           "id": 0,
-          "section": 0
+          "section": 0,
+          "section_leaf": 0
         },
         "merged": 4,
         "split": 0,
@@ -987,7 +1003,8 @@
           "type": 0,
           "testable": 1,
           "id": 1,
-          "section": 1
+          "section": 1,
+          "section_leaf": 1
         },
         "merged": 0,
         "split": 0,

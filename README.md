@@ -2,7 +2,22 @@
 
 Extract structured requirements from messy text excerpts (taken from the PURE requirements
 documents) using a schema, and compare a paid cloud model with a local model:
-field-level accuracy, response validity, latency, and cost.
+field-level accuracy, response validity, latency, and cost. The comparison report is in [`REPORT.md`](REPORT.md).
+
+## Quick start
+Python 3.11+.
+
+    python3 -m venv .venv && source .venv/bin/activate
+    pip install -r requirements.txt
+    cp .env.example .env      # put your OPENROUTER_API_KEY into .env (needed only to re-run the cloud model)
+    python main.py
+
+`python main.py` runs every model x sampling x prompt version from `config.yaml` (2 x 2 x 2 = 8 runs over the 31
+excerpts), writes the logs to `results/`, computes the metrics on the golden set and prints the comparison table
+(also saved to `report/table.md`). Finished documents are skipped, so on the results that are committed here it
+takes seconds and costs nothing. A model that cannot be reached (no API key, Ollama not running) is skipped and its
+committed results are used. To redo everything from scratch use `python main.py --force`: the cloud runs cost about
+$0.15 in total, the local model needs about two hours on a laptop and the setup described under Setup.
 
 ## Structure
 - `data/texts` — clean text excerpts cut from the PDFs (31 files)
@@ -13,12 +28,15 @@ field-level accuracy, response validity, latency, and cost.
 - `src/schema.py` — Pydantic schema of the extraction result
 - `src/prompts.py` — loads a prompt version and inserts the document text
 - `src/clients/` — model clients behind one interface (`base.py`); `openai_compat.py` serves both OpenRouter and Ollama
+- `main.py` — one-command entry point: all runs, metrics, table
 - `src/run.py` — runs a model x sampling x prompt over the excerpts and writes `results/*.jsonl`
 - `src/metrics.py`, `src/eval.py` — metrics per run and the comparison table
 - `config.yaml` — models, prices, timeouts, sampling configs
 - `prompts/` — prompt versions (`extract_v1.md`, …)
-- `CHANGELOG.md` — what changed between prompt versions and why
-- `results/` — run logs (jsonl); `report/` — final comparison
+- `prompts/CHANGELOG.md` — what changed between prompt versions and why
+- `results/` — logs of the 8 main runs (`<model>_<sampling>_<prompt>.jsonl`), their metrics (`metrics_*.json`) and `summary.csv`; `results/experiments/` — logs of the dev experiments behind `prompts/CHANGELOG.md` (not part of the final comparison)
+- `REPORT.md` — the comparison report; `report/table.md` — the generated table
+- `tests/` — checks with a fake model client, no API calls: `python tests/test_repair.py`, `python tests/test_limits.py`, `python tests/test_prompt_defs.py`
 
 ## Data source
 The excerpts come from the PURE dataset of public software requirements documents (79 PDFs):
@@ -28,7 +46,7 @@ https://zenodo.org/records/1414117, licensed CC BY 4.0. The PDFs are not include
 same license, with attribution to the original dataset.
 
 ## Setup
-Python 3.10+ (the schema uses `X | None`).
+Python 3.11+.
 
     pip install -r requirements.txt
     cp .env.example .env      # then put your OPENROUTER_API_KEY into .env
@@ -55,15 +73,14 @@ Excerpts are split by source document (two excerpts per document, so splitting b
 - `excluded` (10) — the other excerpt of each golden document; too similar to golden, not used
 
 Prompt v1 was written after reading the golden texts, so it partly saw them; later versions are
-justified by dev errors only (see `CHANGELOG.md`).
+justified by dev errors only (see `prompts/CHANGELOG.md`).
 
     python make_splits.py
 
 ## Schema
 `Extraction` (`src/schema.py`): `doc_title`, `domain` (enum), `language` (enum), `actors` (list),
 `requirements` (list of `Requirement`: `id`, `section`, `text`, `type`, `testable`),
-`has_acceptance_criteria`, `open_questions`. Field descriptions live only in the schema and reach
-the model through structured output; the prompt holds only rules the schema cannot express.
+`has_acceptance_criteria`, `open_questions`. Field descriptions live in the schema (`Field(description=...)`). They reach a cloud model through structured output; the local model (Ollama) gets the schema only as an output grammar, not its text, so everything it must know has to be in the prompt (see `prompts/CHANGELOG.md`, v3).
 
 ## Prompts
 Build a prompt for a document:
@@ -71,7 +88,7 @@ Build a prompt for a document:
     from src.prompts import build_prompt
     prompt = build_prompt("v1", document_text)
 
-Versions and their rationale are in `CHANGELOG.md`.
+Versions and their rationale are in `prompts/CHANGELOG.md`.
 
 ## Labeling conventions (golden set)
 - One requirement per complete statement; a list under a single "shall" is one requirement.
@@ -148,4 +165,4 @@ client: `python tests/test_repair.py` (validation, copy check, repair), `python 
 
 ### Loops of the local model
 
-The local model sometimes loops inside a JSON array until `max_tokens`. For it, `config.yaml` sets `schema_limits` (`maxItems` in the request schema: actors 10, open_questions 10, requirements 40); validation uses the unchanged Pydantic schema. Exact repeats inside one answer are dropped (`n_duplicates_removed`), and an answer that reaches the requirements limit is marked `requirements_capped` (`capped_pct` in the metrics). A log file does not mix rows made with different limits (`--force`). Evidence and rejected alternatives (repetition penalty, chunking) are in `CHANGELOG.md`.
+The local model sometimes loops inside a JSON array until `max_tokens`. For it, `config.yaml` sets `schema_limits` (`maxItems` in the request schema: actors 10, open_questions 10, requirements 40); validation uses the unchanged Pydantic schema. Exact repeats inside one answer are dropped (`n_duplicates_removed`), and an answer that reaches the requirements limit is marked `requirements_capped` (`capped_pct` in the metrics). A log file does not mix rows made with different limits (`--force`). Evidence and rejected alternatives (repetition penalty, chunking) are in `prompts/CHANGELOG.md`.

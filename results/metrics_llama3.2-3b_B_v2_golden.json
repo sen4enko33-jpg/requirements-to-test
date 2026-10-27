@@ -1,0 +1,627 @@
+{
+  "meta": {
+    "model": "llama3.2:3b",
+    "prompt_version": "v2",
+    "sampling_name": "B",
+    "sampling": {
+      "temperature": 0.7,
+      "top_p": 0.9
+    },
+    "run_log": "/sessions/rcw-014ji5ld9lu61x2yfriqmt8i/mnt/requirements-to-test/results/llama3.2-3b_B_v2.jsonl",
+    "split": "golden",
+    "match_threshold": 0.75,
+    "cover_threshold": 0.8,
+    "actor_match_threshold": 0.8,
+    "computed_at": "2026-10-27T12:49:33+00:00"
+  },
+  "operational": {
+    "n_rows": 31,
+    "n_failed": 1,
+    "valid_pct": 96.7741935483871,
+    "n_partial_failed": 15,
+    "partial_failed_pct": 48.38709677419355,
+    "valid_first_try_pct": 93.54838709677419,
+    "n_capped": 5,
+    "capped_pct": 16.129032258064516,
+    "n_duplicates_removed": 131,
+    "n_repair_attempted": 17,
+    "n_repaired": 10,
+    "n_requirements_checked": 404,
+    "n_copy_violations": 30,
+    "copy_violation_pct": 7.425742574257425,
+    "copy_violation_pct_first_try": 7.969151670951156,
+    "n_docs_with_copy_violations": 15,
+    "n_empty": 2,
+    "empty_pct": 6.451612903225806,
+    "latency_p50_s": 38.4225,
+    "latency_p95_s": 106.79539999999999,
+    "latency_all_p50_s": 38.703,
+    "latency_all_p95_s": 106.46100000000001,
+    "tokens_in_total": 82238,
+    "tokens_out_total": 68043,
+    "mean_attempts": 1.5483870967741935,
+    "cost_per_1000_docs_usd": 0.0
+  },
+  "quality_all_docs": {
+    "n_docs": 10,
+    "scalar_accuracy": {
+      "doc_title": 0.3,
+      "domain": 0.2,
+      "language": 0.7,
+      "has_acceptance_criteria": 0.4
+    },
+    "actors": {
+      "precision": 0.4883720930232558,
+      "recall": 0.75,
+      "f1": 0.5915492957746479,
+      "f1_macro": 0.5871428571428571
+    },
+    "requirements": {
+      "precision": 0.29069767441860467,
+      "recall": 0.15822784810126583,
+      "f1": 0.20491803278688525,
+      "f1_macro": 0.16295442022578452,
+      "n_gold": 158,
+      "tp": 25,
+      "merged": 27,
+      "split": 1,
+      "missed": 45,
+      "extra": 32
+    },
+    "requirement_field_accuracy_strict": {
+      "type": 0.11392405063291139,
+      "testable": 0.13924050632911392,
+      "id": 0.02531645569620253,
+      "section": 0.02531645569620253,
+      "section_leaf": 0.0379746835443038
+    },
+    "requirement_field_accuracy_matched": {
+      "type": 0.72,
+      "testable": 0.88,
+      "id": 0.16,
+      "section": 0.16,
+      "section_leaf": 0.24
+    },
+    "open_questions": {
+      "n_gold": 10,
+      "n_pred": 9
+    }
+  },
+  "quality_valid_only": {
+    "n_docs": 9,
+    "scalar_accuracy": {
+      "doc_title": 0.3333333333333333,
+      "domain": 0.2222222222222222,
+      "language": 0.7777777777777778,
+      "has_acceptance_criteria": 0.4444444444444444
+    },
+    "actors": {
+      "precision": 0.4883720930232558,
+      "recall": 0.84,
+      "f1": 0.6176470588235294,
+      "f1_macro": 0.6523809523809523
+    },
+    "requirements": {
+      "precision": 0.29069767441860467,
+      "recall": 0.16778523489932887,
+      "f1": 0.2127659574468085,
+      "f1_macro": 0.18106046691753835,
+      "n_gold": 149,
+      "tp": 25,
+      "merged": 27,
+      "split": 1,
+      "missed": 36,
+      "extra": 32
+    },
+    "requirement_field_accuracy_strict": {
+      "type": 0.12080536912751678,
+      "testable": 0.1476510067114094,
+      "id": 0.026845637583892617,
+      "section": 0.026845637583892617,
+      "section_leaf": 0.040268456375838924
+    },
+    "requirement_field_accuracy_matched": {
+      "type": 0.72,
+      "testable": 0.88,
+      "id": 0.16,
+      "section": 0.16,
+      "section_leaf": 0.24
+    },
+    "open_questions": {
+      "n_gold": 10,
+      "n_pred": 9
+    }
+  },
+  "per_doc": [
+    {
+      "doc_id": "2004_sprat_1",
+      "failed": false,
+      "scalars": {
+        "doc_title": 1,
+        "domain": 0,
+        "language": 1,
+        "has_acceptance_criteria": 0
+      },
+      "actors": {
+        "tp": 4,
+        "n_gold": 4,
+        "n_pred": 8
+      },
+      "requirements": {
+        "tp": 1,
+        "n_gold": 11,
+        "n_pred": 12,
+        "field_correct": {
+          "type": 1,
+          "testable": 1,
+          "id": 0,
+          "section": 0,
+          "section_leaf": 1
+        },
+        "merged": 7,
+        "split": 0,
+        "missed": 2,
+        "extra": 4,
+        "pairs": [
+          [
+            0,
+            0,
+            1.0
+          ]
+        ]
+      },
+      "open_questions": {
+        "n_gold": 1,
+        "n_pred": 4
+      }
+    },
+    {
+      "doc_id": "2004_grid_bgc_2",
+      "failed": false,
+      "scalars": {
+        "doc_title": 1,
+        "domain": 0,
+        "language": 1,
+        "has_acceptance_criteria": 0
+      },
+      "actors": {
+        "tp": 2,
+        "n_gold": 2,
+        "n_pred": 3
+      },
+      "requirements": {
+        "tp": 4,
+        "n_gold": 38,
+        "n_pred": 10,
+        "field_correct": {
+          "type": 4,
+          "testable": 4,
+          "id": 4,
+          "section": 0,
+          "section_leaf": 0
+        },
+        "merged": 6,
+        "split": 0,
+        "missed": 19,
+        "extra": 0,
+        "pairs": [
+          [
+            3,
+            2,
+            0.959
+          ],
+          [
+            1,
+            1,
+            0.953
+          ],
+          [
+            0,
+            0,
+            0.939
+          ],
+          [
+            10,
+            6,
+            0.922
+          ]
+        ]
+      },
+      "open_questions": {
+        "n_gold": 4,
+        "n_pred": 0
+      }
+    },
+    {
+      "doc_id": "2007_central_trading_system_1",
+      "failed": false,
+      "scalars": {
+        "doc_title": 0,
+        "domain": 0,
+        "language": 1,
+        "has_acceptance_criteria": 0
+      },
+      "actors": {
+        "tp": 2,
+        "n_gold": 3,
+        "n_pred": 3
+      },
+      "requirements": {
+        "tp": 0,
+        "n_gold": 15,
+        "n_pred": 12,
+        "field_correct": {
+          "type": 0,
+          "testable": 0,
+          "id": 0,
+          "section": 0,
+          "section_leaf": 0
+        },
+        "merged": 1,
+        "split": 0,
+        "missed": 3,
+        "extra": 11,
+        "pairs": []
+      },
+      "open_questions": {
+        "n_gold": 5,
+        "n_pred": 2
+      }
+    },
+    {
+      "doc_id": "2008_caiso_1",
+      "failed": false,
+      "scalars": {
+        "doc_title": 0,
+        "domain": 0,
+        "language": 1,
+        "has_acceptance_criteria": 1
+      },
+      "actors": {
+        "tp": 4,
+        "n_gold": 6,
+        "n_pred": 6
+      },
+      "requirements": {
+        "tp": 0,
+        "n_gold": 19,
+        "n_pred": 1,
+        "field_correct": {
+          "type": 0,
+          "testable": 0,
+          "id": 0,
+          "section": 0,
+          "section_leaf": 0
+        },
+        "merged": 1,
+        "split": 0,
+        "missed": 0,
+        "extra": 0,
+        "pairs": []
+      },
+      "open_questions": {
+        "n_gold": 0,
+        "n_pred": 0
+      }
+    },
+    {
+      "doc_id": "2007_ertms_2",
+      "failed": false,
+      "scalars": {
+        "doc_title": 1,
+        "domain": 1,
+        "language": 1,
+        "has_acceptance_criteria": 0
+      },
+      "actors": {
+        "tp": 2,
+        "n_gold": 2,
+        "n_pred": 4
+      },
+      "requirements": {
+        "tp": 8,
+        "n_gold": 14,
+        "n_pred": 12,
+        "field_correct": {
+          "type": 1,
+          "testable": 6,
+          "id": 0,
+          "section": 4,
+          "section_leaf": 5
+        },
+        "merged": 1,
+        "split": 0,
+        "missed": 4,
+        "extra": 3,
+        "pairs": [
+          [
+            5,
+            2,
+            1.0
+          ],
+          [
+            6,
+            3,
+            0.987
+          ],
+          [
+            9,
+            8,
+            0.983
+          ],
+          [
+            12,
+            7,
+            0.98
+          ],
+          [
+            2,
+            6,
+            0.977
+          ],
+          [
+            11,
+            10,
+            0.975
+          ],
+          [
+            10,
+            9,
+            0.971
+          ],
+          [
+            13,
+            11,
+            0.97
+          ]
+        ]
+      },
+      "open_questions": {
+        "n_gold": 0,
+        "n_pred": 1
+      }
+    },
+    {
+      "doc_id": "2009_video_search_1",
+      "failed": false,
+      "scalars": {
+        "doc_title": 0,
+        "domain": 1,
+        "language": 1,
+        "has_acceptance_criteria": 1
+      },
+      "actors": {
+        "tp": 2,
+        "n_gold": 2,
+        "n_pred": 10
+      },
+      "requirements": {
+        "tp": 7,
+        "n_gold": 18,
+        "n_pred": 11,
+        "field_correct": {
+          "type": 7,
+          "testable": 6,
+          "id": 0,
+          "section": 0,
+          "section_leaf": 0
+        },
+        "merged": 4,
+        "split": 0,
+        "missed": 0,
+        "extra": 0,
+        "pairs": [
+          [
+            14,
+            7,
+            0.969
+          ],
+          [
+            15,
+            8,
+            0.967
+          ],
+          [
+            13,
+            6,
+            0.964
+          ],
+          [
+            16,
+            9,
+            0.963
+          ],
+          [
+            11,
+            4,
+            0.953
+          ],
+          [
+            17,
+            10,
+            0.947
+          ],
+          [
+            12,
+            5,
+            0.942
+          ]
+        ]
+      },
+      "open_questions": {
+        "n_gold": 0,
+        "n_pred": 2
+      }
+    },
+    {
+      "doc_id": "2005_grid_3d_2",
+      "failed": true,
+      "scalars": {
+        "doc_title": 0,
+        "domain": 0,
+        "language": 0,
+        "has_acceptance_criteria": 0
+      },
+      "actors": {
+        "tp": 0,
+        "n_gold": 3,
+        "n_pred": 0
+      },
+      "requirements": {
+        "tp": 0,
+        "n_gold": 9,
+        "n_pred": 0,
+        "field_correct": {
+          "type": 0,
+          "testable": 0,
+          "id": 0,
+          "section": 0,
+          "section_leaf": 0
+        },
+        "merged": 0,
+        "split": 0,
+        "missed": 9,
+        "extra": 0,
+        "pairs": []
+      },
+      "open_questions": {
+        "n_gold": 0,
+        "n_pred": 0
+      }
+    },
+    {
+      "doc_id": "2001_space_fractions_1",
+      "failed": false,
+      "scalars": {
+        "doc_title": 0,
+        "domain": 0,
+        "language": 0,
+        "has_acceptance_criteria": 1
+      },
+      "actors": {
+        "tp": 2,
+        "n_gold": 2,
+        "n_pred": 5
+      },
+      "requirements": {
+        "tp": 0,
+        "n_gold": 9,
+        "n_pred": 4,
+        "field_correct": {
+          "type": 0,
+          "testable": 0,
+          "id": 0,
+          "section": 0,
+          "section_leaf": 0
+        },
+        "merged": 2,
+        "split": 0,
+        "missed": 1,
+        "extra": 2,
+        "pairs": []
+      },
+      "open_questions": {
+        "n_gold": 0,
+        "n_pred": 0
+      }
+    },
+    {
+      "doc_id": "1998_themas_2",
+      "failed": false,
+      "scalars": {
+        "doc_title": 0,
+        "domain": 0,
+        "language": 1,
+        "has_acceptance_criteria": 1
+      },
+      "actors": {
+        "tp": 1,
+        "n_gold": 2,
+        "n_pred": 2
+      },
+      "requirements": {
+        "tp": 5,
+        "n_gold": 18,
+        "n_pred": 18,
+        "field_correct": {
+          "type": 5,
+          "testable": 5,
+          "id": 0,
+          "section": 0,
+          "section_leaf": 0
+        },
+        "merged": 2,
+        "split": 1,
+        "missed": 5,
+        "extra": 9,
+        "pairs": [
+          [
+            16,
+            14,
+            1.0
+          ],
+          [
+            15,
+            13,
+            1.0
+          ],
+          [
+            13,
+            12,
+            0.938
+          ],
+          [
+            10,
+            8,
+            0.924
+          ],
+          [
+            12,
+            10,
+            0.889
+          ]
+        ]
+      },
+      "open_questions": {
+        "n_gold": 0,
+        "n_pred": 0
+      }
+    },
+    {
+      "doc_id": "0000_gamma_j_2",
+      "failed": false,
+      "scalars": {
+        "doc_title": 0,
+        "domain": 0,
+        "language": 0,
+        "has_acceptance_criteria": 0
+      },
+      "actors": {
+        "tp": 2,
+        "n_gold": 2,
+        "n_pred": 2
+      },
+      "requirements": {
+        "tp": 0,
+        "n_gold": 7,
+        "n_pred": 6,
+        "field_correct": {
+          "type": 0,
+          "testable": 0,
+          "id": 0,
+          "section": 0,
+          "section_leaf": 0
+        },
+        "merged": 3,
+        "split": 0,
+        "missed": 2,
+        "extra": 3,
+        "pairs": []
+      },
+      "open_questions": {
+        "n_gold": 0,
+        "n_pred": 0
+      }
+    }
+  ]
+}

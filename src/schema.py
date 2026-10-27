@@ -34,9 +34,10 @@ class Requirement(BaseModel):
     section: str | None = Field(
         default=None,
         description=(
-            "Heading path of the block the requirement belongs to, built from the headings visible in the excerpt: "
-            "parent heading > nearest heading, without section numbers, joined with ' > ' "
-            "(e.g. 'Projection Object > Update'); null if the excerpt has no headings"
+            "Heading path of the block the requirement belongs to: the title of its parent heading and of its "
+            "nearest heading above it, as they appear in the excerpt, without section numbers, joined with ' > ' "
+            "(e.g. 'Projection Object > Update'). At most two levels; only the nearest heading if it has no parent "
+            "heading in the excerpt. null if no heading is printed above the requirement in the excerpt"
         ),
     )
     text: str = Field(description="The requirement statement, copied from the source exactly as written; only layout artifacts (numbering, page headers, line breaks) are removed")

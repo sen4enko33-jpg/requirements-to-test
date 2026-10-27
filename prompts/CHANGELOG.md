@@ -8,14 +8,14 @@ Each entry records what changed and why; results are added after the evaluation 
 **What it is.** Minimal instruction prompt: role, task, seven general rules, the document placeholder. Field descriptions are not repeated here (they live in the schema). No examples, no edge-case handling.
 
 **Design decisions.**
-- Field descriptions live only in `Field(description=...)` in `src/schema.py`; the schema reaches the model through structured output (OpenAI-compatible `response_format` json_schema, used for both OpenRouter and Ollama). The prompt holds only what the schema cannot say: when to use null, what not to extract, copy-as-is rules.
+- Field descriptions live only in `Field(description=...)` in `src/schema.py`; the schema reaches the model through structured output (OpenAI-compatible `response_format` json_schema, used for both OpenRouter and Ollama). The prompt holds only what the schema cannot say: when to use null, what not to extract, copy-as-is rules. *(Correction of 2026-10-27: this holds for the cloud model only. Ollama turns the schema into an output grammar and does not pass the descriptions to the model, so llama never saw them; see "v3" below.)*
 - `text` of a requirement is copied from the source exactly as written, including typos; only layout artifacts (numbering, page headers, line breaks) are removed. The golden set keeps source typos in requirement text for the same reason.
 - `open_questions` accepts only items the text itself marks as unresolved; `has_acceptance_criteria` is true only for explicit acceptance criteria.
 - One requirement per complete statement; a list under a single "shall" stays one requirement.
 
 **Known gaps (expected, not yet measured).** Granularity of use-case steps and event lists, handling of "Intentionally deleted" items and assumptions, `section` building when headings are partly cut off, ids given at section level, and sentences inserted in another language. These are the candidates for v2.
 
-**Results.** Golden set: 10 excerpts, 158 requirements; every configuration ran on all 31 excerpts. Full run report: `report/report_v1.md`; table: `report/table.md`; all metrics: `results/summary.csv`.
+**Results.** Golden set: 10 excerpts, 158 requirements; every configuration ran on all 31 excerpts. Final report: `REPORT.md`; table: `report/table.md`; all metrics: `results/summary.csv`.
 
 | model | sampling | valid | req. P / R / F1 | domain | actors F1 | type | testable | section | latency p50 / p95 | $ per 1000 docs |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -40,7 +40,7 @@ Field accuracies are strict (a requirement that was not found counts as wrong); 
 
 ## v2 (2026-10-25) — fixes found on the dev split
 
-**What changed.** Two rules added after rule 7 of v1 (rules 1–7 are word for word the same); the schema is unchanged, so v1 and v2 differ only in the prompt.
+**What changed.** Two rules added after rule 7 of v1 (rules 1–7 are word for word the same); the schema is unchanged, so v1 and v2 differ only in the prompt (true for all runs up to 2026-10-26; see "v3" for the later reword of the `section` description).
 - 8. `section` is built from heading titles only, never a bare number, with one example.
 - 9. Each requirement is listed once; stop at the end of the excerpt; statements that differ in one detail are different requirements.
 
@@ -51,7 +51,7 @@ Field accuracies are strict (a requirement that was not found counts as wrong); 
 
 **Iterations on dev.** Rules were tested on dev only (cloud A and local B, one run each, so differences of a few points are noise, especially for llama B at temperature 0.7).
 1. Rules 8–11 (11: `doc_title` only if printed, 10: `domain` by purpose, `space` only for space systems). gpt-4o-mini: bare-number sections 66 → 0, but every document became `other` (gaia_1 `space` → `other`, probably wrong) and the same total of requirements (168) shifted: znix_2 13 → 19, peazip_1 15 → 22 (descriptive sentences), peazip_2 19 → 7 (several statements merged into one). The phrase "and are all kept" in rule 9 was suspected of pushing the model to extract more; it was removed.
-2. Rules 8–11 again, rule 10 reworded. gpt-4o-mini run and one llama run were discarded: the prompt file started with a stray line of text pasted by mistake (the runs are kept as `results/dev_iter2_contaminated_*` for reference). The clean llama B run: bare-number sections 163 of 187 → 0 of 118, but `domain` = `space` for 10 of 10 documents (naming `space` in the prompt seems to push the small model to it) and `doc_title` filled for 10 of 10 (page headers such as "Software Requirements Specification" instead of null).
+2. Rules 8–11 again, rule 10 reworded. gpt-4o-mini run and one llama run were discarded: the prompt file started with a stray line of text pasted by mistake (the runs are kept as `results/experiments/dev_iter2_contaminated_*` for reference). The clean llama B run: bare-number sections 163 of 187 → 0 of 118, but `domain` = `space` for 10 of 10 documents (naming `space` in the prompt seems to push the small model to it) and `doc_title` filled for 10 of 10 (page headers such as "Software Requirements Specification" instead of null).
 3. Rules 8–9 only (final). Rules 10 and 11 were dropped: no benefit for gpt-4o-mini, and they made llama worse; without them `doc_title` and `domain` return to v1 behaviour. Final dev numbers, v1 → v2:
 
 | dev (11 excerpts) | gpt-4o-mini A | llama B |
@@ -64,7 +64,7 @@ Field accuracies are strict (a requirement that was not found counts as wrong); 
 | latency p50 | 10.2 → 9.5 s | 32.8 → 14.5 s |
 
 **Design decisions.**
-- Rule 8 repeats what the schema description of `section` already says. This is a deliberate exception to "describe a field once, in the schema": the models ignore the schema text, so v2 adds an explicit rule with an example. The schema stays untouched to keep the v1/v2 comparison clean.
+- Rule 8 repeats what the schema description of `section` already says. This is a deliberate exception to "describe a field once, in the schema": gpt-4o-mini often ignored the schema text and llama never received it (see "v3" below), so v2 adds an explicit rule with an example. The schema stays untouched to keep the v1/v2 comparison clean (until 2026-10-27: the `section` description was reworded later, see "v3").
 - Not changed: `id`, `type`, `testable` (no labels on dev, so it cannot be said whether leaving `id` empty in 79% of requirements or labelling almost everything `functional` / `yes` is an error); empty and truncated local answers (a rule would be a guess; the loop fix is described in "Local-model loops" below).
 
 **Known weaknesses of v2 (from dev).**
@@ -73,7 +73,7 @@ Field accuracies are strict (a requirement that was not found counts as wrong); 
 - llama's `domain` stays unreliable and cannot be fixed by the prompt.
 - At temperature 0.7 a single llama run varies a lot (peazip_1: 10 → 40 requirements, truncated answers 0–2 per run).
 
-**Results vs v1.** _to be filled after the evaluation on the golden set_
+**Results vs v1.** gpt-4o-mini on the golden set (10 excerpts), sampling A: section strict 9% → 20%, last heading 54% → 60%; req. F1 0.65 → 0.65 (P 0.61 → 0.58, R 0.69 → 0.73). Cost: partial 0% → 13%, $0.80 → $0.99 per 1000 docs. llama3.2:3b, sampling A: req. F1 0.24 → 0.30, section last heading 6% → 14%, partial 19% → 48%. Differences in F1 are within noise (10 documents, one run); see REPORT.md.
 
 ## Local-model loops (2026-10-26) — array limits, not a prompt change
 
@@ -113,11 +113,31 @@ Failed documents 3 → 0, no call took the 90 s cut-off. Repeats removed: librar
 - Local logs of v1 and v2 made without limits are not comparable with new ones: both versions are re-run with the limits before the final table.
 - One run at sampling A; sampling B was not tested.
 
-<!-- Template for the next entry:
+## v3 (2026-10-27) — tried and rejected: field definitions in the prompt
 
-## v3 (date)
+**Why.** Review of the `section` definition (lecturer feedback, point 3). The schema description of `section` was reworded: at most two levels, one title if there is no parent heading, `null` if no heading is printed above the requirement. Comparing dev runs of v2 before and after the reword showed that for llama nothing changed: the same requirements and sections in all 11 documents and the same number of input tokens. For gpt-4o-mini the input grew by about 30 tokens per document. Ollama uses the schema only as an output grammar and does not pass the descriptions to the model, so in v1 and v2 llama never saw any field description (`type`, `testable`, `domain`, `id`, `open_questions`, ...); only the prompt text reaches it. For gpt-4o-mini the effect of the reworded `section` description was small (paths with 3 levels 3 → 3, `null` 14 → 15 of about 185 requirements).
 
-**What changed.** ...
-**Why.** (which errors from the error analysis it targets)
-**Results vs v1.** ...
--->
+**What changed.** v3 = v2 plus a "Field definitions" block that repeats the schema descriptions word for word (`tests/test_prompt_defs.py` checks it), the sentence that pointed to the schema replaced, and rules 5 and 8 aligned with the new `section` definition. The values of `domain` are not listed (naming `space` earlier pushed llama to it).
+
+**Result on dev** (sampling A, 11 excerpts, v2 → v3). There are no labels on dev, so only signals that need no labels.
+
+| | gpt-4o-mini | llama |
+|---|---|---|
+| status | 11 ok → 11 ok | 7 ok, 4 partial → 3 ok, 8 partial |
+| requirements | 182 → 159 | 151 → 263 |
+| copy violations | 0 → 0 | 15 → 39 |
+| `id` filled / found in the excerpt | 34 / 34 → 33 / 33 | 59 / 53 → 255 / 26 |
+| run time of the 11 excerpts | 131 → 150 s | 590 → 1138 s |
+
+- llama invented identifiers: the description of `id` has the example 'REQ-12' and llama filled `REQ-1`, `REQ-3`, ... in 255 requirements, only 26 of the ids are in the text.
+- llama went back to extracting headings and diagram labels (agentmom_1 0 → 39 requirements, among them "3.2.1 Unicast Communication" as a constraint; 22 of 39 not copied) and gave 4–8 times more requirements for peazip_1, znix_1, library_1. Probable cause, not tested separately: the wording "All requirements found in the excerpt" and the examples in the definitions.
+- `type` shifted strongly (llama: constraint 10 → 107 of 263); whether it is more correct cannot be said without labels.
+- gpt-4o-mini: no breakage, fewer requirements, more diverse `type`; whether this is better is for the golden evaluation.
+
+**Decision.** v3 is rejected and was not evaluated on the golden set; `prompts/extract_v3.md` stays as a record. The final comparison is v1 against v2. Not tried: definitions of only `type` and `testable` without examples.
+
+**Consequences.**
+- Field descriptions in the schema work only for the cloud model; the claims in the v1 entry and in the README are corrected.
+- The model comparison has this difference built in: gpt-4o-mini sees the definitions of `type` and `testable`, llama does not. It goes into the limitations of the report.
+- The `section` description was reworded on 2026-10-27, after the v1 golden runs and the v2 dev iterations. v1 and v2 are re-run with the new schema (and the array limits) before the final table; earlier v1 numbers are history.
+- Moving a definition into the prompt can backfire on a small model (the same effect as naming `space`): examples are copied.

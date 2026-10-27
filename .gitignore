@@ -223,6 +223,6 @@ __marimo__/
 .DS_Store
 
 # one-text smoke runs
-results/adhoc_*
+results/experiments/adhoc_*
 .idea/
 adhoc_loop_diag.py
