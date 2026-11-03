@@ -37,10 +37,13 @@ $0.15 in total, the local model needs about two hours on a laptop and the setup 
 - `results/` — logs of the 8 main runs (`<model>_<sampling>_<prompt>.jsonl`), their metrics (`metrics_*.json`) and `summary.csv`; `results/experiments/` — logs of the dev experiments behind `prompts/CHANGELOG.md` (not part of the final comparison)
 - `REPORT.md` — the comparison report; `report/table.md` — the generated table
 - `tests/` — checks with a fake model client, no API calls: `python tests/test_repair.py`, `python tests/test_limits.py`, `python tests/test_prompt_defs.py`
+- `rag/` — the RAG part of the project (corpus, ingestion, later chunking and search); see "RAG: corpus and ingestion" below
+- `tests/test_ingest.py`, `tests/test_ingest_pipeline.py` — checks of the ingestion cleaning, OCR rule, duplicate detection and manifest (no API calls)
 
 ## Data source
-The excerpts come from the PURE dataset of public software requirements documents (79 PDFs):
-https://zenodo.org/records/1414117, licensed CC BY 4.0. The PDFs are not included in this repository.
+The excerpts come from the PURE dataset of public software requirements documents (79 documents, mostly PDF, some DOC,
+HTML and RTF): https://zenodo.org/records/1414117, licensed CC BY 4.0. The original files are not included in this
+repository, except the 40 that the RAG part uses (`rag/data/raw/`, see "RAG: corpus and ingestion").
 `data/texts` holds excerpts cut from them, `data/noisy` the same excerpts with artificial noise added by
 `add_noise.py`, `data/golden` the annotations written by hand. The excerpts and annotations are shared under the
 same license, with attribution to the original dataset.
@@ -166,3 +169,28 @@ client: `python tests/test_repair.py` (validation, copy check, repair), `python 
 ### Loops of the local model
 
 The local model sometimes loops inside a JSON array until `max_tokens`. For it, `config.yaml` sets `schema_limits` (`maxItems` in the request schema: actors 10, open_questions 10, requirements 40); validation uses the unchanged Pydantic schema. Exact repeats inside one answer are dropped (`n_duplicates_removed`), and an answer that reaches the requirements limit is marked `requirements_capped` (`capped_pct` in the metrics). A log file does not mix rows made with different limits (`--force`). Evidence and rejected alternatives (repetition penalty, chunking) are in `prompts/CHANGELOG.md`.
+
+## RAG: corpus and ingestion
+
+The RAG part works on 41 documents: 40 requirements documents of the PURE dataset (26 PDF, 10 DOC, 3 HTML, 1 RTF, CC BY 4.0) and one sample company policy (`remote_work_policy.pdf`, supplied by the author, not part of PURE). `rag/corpus.yaml` lists them with the reason each one is in the corpus (for example, similar or versioned documents for the trap questions of the test set); the originals are in `rag/data/raw/`.
+
+    python -m rag.ingest.cli            # raw files -> rag/data/processed/*.md + rag/data/manifest.json
+    python -m rag.ingest.cli --force    # process everything again (--ids a b: only these documents)
+
+Unchanged files are not processed again: the manifest stores the hash of every raw file and of the ingestion code. The cleaned documents and the manifest are committed, so the next steps do not need the tools below.
+
+**What ingestion does** (`rag/ingest/`):
+
+- *Extraction to Markdown with the structure kept.* PDF (PyMuPDF): headings from font size and section numbers, bullets as `- `, a `<!-- page N -->` marker before each page (for citing pages). DOC and RTF are converted to DOCX by LibreOffice, then `Title` becomes `# `, `Heading N` becomes N+1 hashes, list paragraphs become `- ` (`List Number` becomes `1. `), tables become `| a | b |` rows. HTML (BeautifulSoup): `<main>` (else `<body>`), `h1`-`h6` become `#`-`######`, `li` becomes `- `, tables become rows; old pages without `h1`-`h6` use short all-bold paragraphs or list items as headings. Tables inside PDFs are not parsed, their text stays in reading order.
+- *Scans.* A PDF page with no text layer (fewer than 80 characters) that is one big picture (at least 60% of the page) is a scan page; when most pages are scans, they are read with OCR (Tesseract, English; `RAG_OCR_LANG=eng+ukr` after installing the language pack) and then processed like any other PDF. A figure with little text in an otherwise digital PDF is not OCR-ed (OCR of a diagram is noise). If OCR is missing or finds nothing, the document gets the status `skipped_scanned` in the manifest.
+- *Cleaning* (`clean.py`; every rule counts what it removed in the manifest): Unicode normalisation, U+FFFD and soft hyphens; running headers and footers (a line repeated at the top or bottom of at least 30% of the pages) and page numbers; tables of contents; the navigation bar of HTML pages; paragraphs and hyphenated words cut by a line or page break; separator lines and single letters. A document gets a warning if the cleaning removed more than 25% of its words, has fewer than 300 words or has no headings.
+- *Duplicates* (`dedup.py`): documents with the same normalised text are exact duplicates (the first is kept, the other gets the status `duplicate`). Documents that share many 5-word shingles (Jaccard of at least 0.3 or containment of at least 0.6) are only marked as `near_duplicates`, not removed: other versions of a document are what the trap questions need. Currently one pair is marked: `2005_clarus_high` and `2005_clarus_low` (74% of the smaller text is in the larger one).
+- *Manifest* (`rag/data/manifest.json`): per document the title, year (from the file name), version and date (best effort, from the first page before the running header is removed), hashes of the raw file and of the cleaned text, page count, structure counts, cleaning statistics, warnings, status and duplicate information.
+
+**Install.** `pip install -r requirements.txt` (PyMuPDF, python-docx, BeautifulSoup, lxml); LibreOffice (`soffice` on the PATH) is needed to read DOC and RTF; Tesseract is needed only for scans.
+
+**Checks.** `python tests/test_ingest.py` (cleaning, OCR rule; the OCR checks are skipped when Tesseract is missing) and `python tests/test_ingest_pipeline.py` (duplicates, manifest, cache).
+
+**Known limits.** Section headings of PDFs are detected heuristically: a numbered list item can look like a section and the first requirement id can stay in a heading. A scan is recognised only when most pages are scans. Lone letters such as the priority marks `H`/`L`/`M` of one document (`2005_clarus_low`) are removed by the cleaning as noise. The OCR language is English by default.
+
+Data: PURE requirements documents, CC BY 4.0 (https://zenodo.org/records/1414117). The sample policy `remote_work_policy.pdf` is a fictional document of a fictional company.

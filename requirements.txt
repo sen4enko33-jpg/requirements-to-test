@@ -3,3 +3,8 @@ pyyaml
 python-dotenv
 tenacity
 openai
+# RAG ingestion
+pymupdf
+python-docx
+beautifulsoup4
+lxml
