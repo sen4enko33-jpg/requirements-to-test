@@ -48,19 +48,11 @@ Copyright © 2005 Mixon/Hill, Inc.
 
 All rights reserved.
 
-4.12 Program Requirements................................................................................................................ 74
-
-APPENDIX A - DEFINITIONS, ACRONYMS, AND ABBREVIATIONS .......... 87
-
 APPENDIX B - SUPPLEMENTAL DESCRIPTION OF CLARUS QC TESTS... 90
 
 #### Table of Figures
 
-FIGURE 1 – SYSTEM ARCHITECTURAL DESCRIPTION CONTEXT................................................... 2 FIGURE 2 – CLARUS DATA ACQUISITION, PROCESSING, AND PUBLICATION............................. 9 FIGURE 3 – BASIC CLARUS SYSTEM OBJECTS AND FUNCTIONS.................................................. 11 FIGURE 4 – TIME HORIZONS FOR WEATHER DATA......................................................................... 14 FIGURE 5 – CLARUS USER LAYERS AND TIME HORIZON RELATIONSHIPS................................ 16 FIGURE 6 – CONTEXT DIAGRAM OF CLARUS USER NEEDS............................................................ 17 FIGURE 6 – DATA FLOWS WITHIN THE CLARUS SYSTEM............................................................... 21 FIGURE 7 – HIGH-LEVEL REQUIREMENTS CONTEXT...................................................................... 23
-
 #### Table of Tables
-
-TABLE 1 – POTENTIAL CLARUS ENVIRONMENTAL DATA ELEMENTS........................................ 13 TABLE 2 - EXPLANATION OF THE REQUIREMENTS TABLES ........................................................ 26 TABLE 3 – REQUIREMENT ID FORMAT............................................................................................... 26 TABLE 4 – ALLOCATION FORMAT....................................................................................................... 27
 
 Revision History
 

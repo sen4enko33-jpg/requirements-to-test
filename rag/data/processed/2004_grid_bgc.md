@@ -704,8 +704,6 @@ This project aggregates all input objects and simulation control functions. This
 
 ### 3.14 Daymet Output Object
 
-This is the object that will contain the output data for a daymet run......
-
 #### 3.14.1 Collaboration
 
 1. Daymet Output Objects can be shared.
@@ -903,8 +901,6 @@ A disturbance object contains the information representing climate factors that 
 3. The system shall change the project to an unlocked state. 4. Invalidate all dependant projects. 5. The system shall delete the output data project if created 5.1. Delete all the files from disk storage as well.
 
 ### 3.21 BiomeBGC Output Object
-
-This is the object that will contain the output data for a BiomeBGC run......
 
 #### 3.21.1 Sharing
 

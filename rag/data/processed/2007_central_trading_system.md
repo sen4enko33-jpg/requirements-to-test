@@ -16,8 +16,6 @@ Software Requirements Specification
 
 TABLE CONTENTS
 
-3.1 CONTEXT_LEVEL DFD............................................................................................. 9 3.2 LEVEL 1 DFD OF CENTRAL TRADING SYSTEM ....................................................... 9 3.3 LEVEL 2 DFD OF THE INSTRUCTION PRETRETEMENT...........................................10 3.4
-
 <!-- page 3 -->
 
 ## 1. Introduction

@@ -24,10 +24,6 @@ Software Requirements Specification for KeePass Password Safe Page ii
 
 Software Requirements Specification for KeePass Password Safe Page iii
 
-5. Other Nonfunctional Requirements.....................................................................................25
-
-5.1 Performance Requirements............................................................................................................ 25 5.2 Safety Requirements...................................................................................................................... 25 5.3 Software Quality Attributes...............................................................................26
-
 <!-- page 4 -->
 
 ## 1. Introduction

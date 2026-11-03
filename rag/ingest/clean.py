@@ -88,6 +88,24 @@ def _toc_like(u: str) -> bool:
     return len(t) <= 160 and bool(TOC_TAIL.search(t))
 
 
+DOT_LEADER_LINE = re.compile(r"(?:\.\s?){5,}")
+
+
+def _remove_leader_lines(units: list[str], stats: Counter) -> list[str]:
+    """Lines with dot leaders ('Introduction ......... 3') are left-overs of a table of contents: drop them."""
+    out, n = [], 0
+    for u in units:
+        if u.startswith(("<!--", "|")) or not DOT_LEADER_LINE.search(u):
+            out.append(u)
+            continue
+        keep = [ln for ln in u.split("\n") if not DOT_LEADER_LINE.search(ln)]
+        n += len(u.split("\n")) - len(keep)
+        if keep:
+            out.append("\n".join(keep))
+    stats["dot_leader_lines_removed"] = n
+    return out
+
+
 def _remove_toc(units: list[str], stats: Counter) -> list[str]:
     total = sum(len(u) for u in units) or 1
     drop: set[int] = set()
@@ -181,6 +199,7 @@ def clean(md: str, fmt: str) -> tuple[str, dict]:
     flat = [x for marker, us in pages for x in ([marker] if marker else []) + us]
 
     flat = _remove_toc(flat, stats)
+    flat = _remove_leader_lines(flat, stats)
     if fmt in ("html", "htm"):
         flat = _remove_nav_tables(flat, stats)
     flat = _merge_across_pages(flat, stats)

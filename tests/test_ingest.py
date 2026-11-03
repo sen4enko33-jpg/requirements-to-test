@@ -53,6 +53,9 @@ md = "<!-- page 1 -->\n\nThe first sentence ends here.\n\n<!-- page 2 -->\n\nthe
 check("no merge after a finished sentence", clean(md, "pdf")[1].get("paragraphs_merged", 0) == 0)
 md = "<!-- page 1 -->\n\nThe text goes on\n\n<!-- page 2 -->\n\n## 2. New section\n\nBody."
 check("no merge into a heading", "## 2. New section" in clean(md, "pdf")[0])
+toc = "# Doc\n\nIntro text of the document.\n\n1.0 Introduction ........ ..... 1-1\n1.1 Purpose ................. 1-2\n1.2 Scope ............... 1-3\n\n## 1. Real section\n\nBody with an ellipsis... and more."
+t, st = clean(toc, "doc")
+check("dot-leader lines removed, text with '...' kept", "Purpose" not in t and "Introduction ..." not in t and "ellipsis... and more" in t and st["dot_leader_lines_removed"] == 3)
 
 # --- table of contents (a real document has a lot of text after the contents)
 FILLER = "\n\n" + "\n\n".join("Filler paragraph number %d with enough words to look like a real document." % i for i in range(30))

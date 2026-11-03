@@ -1,6 +1,6 @@
 {
-  "created": "2026-11-03T12:18:14+0000",
-  "code_hash": "b39a1532a59f4b1b",
+  "created": "2026-11-03T12:37:10+0000",
+  "code_hash": "c0c03e4f9b65dd55",
   "ocr_lang": "eng",
   "tools": {
     "pymupdf": "1.28.2",
@@ -51,6 +51,7 @@
           "Ministry of Home Affairs Draft Core Scope Document Page 6 of 19"
         ],
         "toc_units_removed": 0,
+        "dot_leader_lines_removed": 0,
         "paragraphs_merged": 1,
         "garbage_removed": 0,
         "words_before": 5535,
@@ -73,9 +74,9 @@
       "title": "Software Requirements Specification (SRS)",
       "version": null,
       "date": null,
-      "sha256_text": "8a83e58ee96b7647da4665fb5e6a03edd40bb0ed2cdc8bcea32f5b2d8a93b674",
-      "words": 6936,
-      "chars": 50666,
+      "sha256_text": "4811b25415c51aede198de7478bea1fa8ef6c4b455343a549e422d63713ed09d",
+      "words": 6647,
+      "chars": 43375,
       "extraction": {
         "pages": 44,
         "chars_per_page": 1114,
@@ -97,10 +98,11 @@
           "14"
         ],
         "toc_units_removed": 0,
+        "dot_leader_lines_removed": 2,
         "garbage_removed": 0,
         "words_before": 7285,
-        "words_after": 6936,
-        "removed_share": 0.048
+        "words_after": 6647,
+        "removed_share": 0.088
       },
       "warnings": []
     },
@@ -141,6 +143,7 @@
           "5"
         ],
         "toc_units_removed": 11,
+        "dot_leader_lines_removed": 0,
         "garbage_removed": 28,
         "words_before": 3861,
         "words_after": 3498,
@@ -162,9 +165,9 @@
       "title": "THEMAS The Energy Management System",
       "version": "1",
       "date": "1998-10-14",
-      "sha256_text": "ad9d4d08c3b3eb82473aabd691decbece49ce5e56304f8f3ffdd9cf3df3705c8",
-      "words": 6359,
-      "chars": 45808,
+      "sha256_text": "84a43cfab99c84b2007109f194b1aa92fceef31e60ab3bafe287657c1bad5e6b",
+      "words": 5596,
+      "chars": 37787,
       "extraction": {
         "pages": 40,
         "chars_per_page": 1089,
@@ -181,10 +184,11 @@
           "D_THEMAS_SRS_001"
         ],
         "toc_units_removed": 0,
+        "dot_leader_lines_removed": 116,
         "garbage_removed": 3,
         "words_before": 6565,
-        "words_after": 6359,
-        "removed_share": 0.031
+        "words_after": 5596,
+        "removed_share": 0.148
       },
       "warnings": []
     },
@@ -216,6 +220,7 @@
         "fffd_removed": 0,
         "soft_hyphens_removed": 0,
         "toc_units_removed": 1,
+        "dot_leader_lines_removed": 0,
         "garbage_removed": 0,
         "words_before": 4965,
         "words_after": 4961,
@@ -251,6 +256,7 @@
         "fffd_removed": 0,
         "soft_hyphens_removed": 0,
         "toc_units_removed": 4,
+        "dot_leader_lines_removed": 0,
         "garbage_removed": 0,
         "words_before": 5761,
         "words_after": 5737,
@@ -284,6 +290,7 @@
         "fffd_removed": 0,
         "soft_hyphens_removed": 0,
         "toc_units_removed": 0,
+        "dot_leader_lines_removed": 0,
         "garbage_removed": 0,
         "words_before": 22084,
         "words_after": 22084,
@@ -328,6 +335,7 @@
           "SOFTWARE REQUIREMENTS SPECIFICATION 5"
         ],
         "toc_units_removed": 9,
+        "dot_leader_lines_removed": 0,
         "paragraphs_merged": 1,
         "garbage_removed": 0,
         "words_before": 4623,
@@ -362,6 +370,7 @@
         "fffd_removed": 0,
         "soft_hyphens_removed": 0,
         "toc_units_removed": 0,
+        "dot_leader_lines_removed": 0,
         "garbage_removed": 0,
         "words_before": 4680,
         "words_after": 4680,
@@ -406,6 +415,7 @@
           "Page 5 of 9 CS373 The Denominators (10-2), SRS Version 2.0"
         ],
         "toc_units_removed": 1,
+        "dot_leader_lines_removed": 0,
         "paragraphs_merged": 1,
         "garbage_removed": 0,
         "words_before": 3113,
@@ -451,6 +461,7 @@
           "EVLA Correlator Monitor and Control SRS 6"
         ],
         "toc_units_removed": 32,
+        "dot_leader_lines_removed": 0,
         "garbage_removed": 0,
         "words_before": 4395,
         "words_after": 4098,
@@ -495,6 +506,7 @@
           "6"
         ],
         "toc_units_removed": 16,
+        "dot_leader_lines_removed": 0,
         "garbage_removed": 0,
         "words_before": 1760,
         "words_after": 1654,
@@ -528,6 +540,7 @@
         "fffd_removed": 0,
         "soft_hyphens_removed": 0,
         "toc_units_removed": 0,
+        "dot_leader_lines_removed": 0,
         "garbage_removed": 0,
         "words_before": 9013,
         "words_after": 9013,
@@ -551,9 +564,9 @@
       "title": "Software Requirements Specification",
       "version": "1.0",
       "date": "2004-09-13",
-      "sha256_text": "e8dadb46f777e19118b892206533fce67b30982b17252209d76524e6184cbb22",
-      "words": 6972,
-      "chars": 52128,
+      "sha256_text": "7cb9f3fdae994c448f777d1b8937122052cb15bd25c1553129073471594ca398",
+      "words": 6944,
+      "chars": 51972,
       "extraction": {
         "pages": 34,
         "chars_per_page": 1442,
@@ -575,10 +588,11 @@
           "Page 15 of 15"
         ],
         "toc_units_removed": 0,
+        "dot_leader_lines_removed": 2,
         "garbage_removed": 0,
         "words_before": 7240,
-        "words_after": 6972,
-        "removed_share": 0.037
+        "words_after": 6944,
+        "removed_share": 0.041
       },
       "warnings": []
     },
@@ -608,6 +622,7 @@
         "fffd_removed": 0,
         "soft_hyphens_removed": 0,
         "toc_units_removed": 1,
+        "dot_leader_lines_removed": 0,
         "garbage_removed": 0,
         "words_before": 4838,
         "words_after": 4834,
@@ -641,6 +656,7 @@
         "fffd_removed": 0,
         "soft_hyphens_removed": 0,
         "toc_units_removed": 0,
+        "dot_leader_lines_removed": 0,
         "garbage_removed": 0,
         "words_before": 9736,
         "words_after": 9736,
@@ -674,6 +690,7 @@
         "fffd_removed": 0,
         "soft_hyphens_removed": 0,
         "toc_units_removed": 0,
+        "dot_leader_lines_removed": 0,
         "garbage_removed": 0,
         "words_before": 2435,
         "words_after": 2435,
@@ -695,9 +712,9 @@
       "title": "Security and Privacy Requirements Analysis Tool (SPRAT) Software Requirements Specification",
       "version": "2.00",
       "date": "2004-07",
-      "sha256_text": "da1faeca3cca479dbd465e19e331aada54ae796b7beeb9dd7e2c7662ce9921ca",
-      "words": 6683,
-      "chars": 47176,
+      "sha256_text": "690d15e2a5f19eb1891cc3e907f7e2f734cf73b8812a77eb488c272985d95200",
+      "words": 6677,
+      "chars": 46455,
       "extraction": {
         "pages": 33,
         "chars_per_page": 1440,
@@ -719,11 +736,12 @@
           "15"
         ],
         "toc_units_removed": 8,
+        "dot_leader_lines_removed": 2,
         "paragraphs_merged": 4,
         "garbage_removed": 3,
         "words_before": 6925,
-        "words_after": 6683,
-        "removed_share": 0.035
+        "words_after": 6677,
+        "removed_share": 0.036
       },
       "warnings": []
     },
@@ -764,6 +782,7 @@
           "Open Watcom Linux Port Page 14 of 54 GUI Software Requirements Specification"
         ],
         "toc_units_removed": 11,
+        "dot_leader_lines_removed": 0,
         "garbage_removed": 2,
         "words_before": 10092,
         "words_after": 9097,
@@ -809,6 +828,7 @@
           "Open Watcom Linux Port Page 14 of 55 Compiler / Linker Software Requirements Specification"
         ],
         "toc_units_removed": 3,
+        "dot_leader_lines_removed": 0,
         "paragraphs_merged": 3,
         "garbage_removed": 42,
         "words_before": 12244,
@@ -830,7 +850,7 @@
       "near_duplicates": [
         {
           "doc_id": "2005_clarus_low",
-          "jaccard": 0.33,
+          "jaccard": 0.331,
           "containment": 0.746
         }
       ],
@@ -849,6 +869,7 @@
         "fffd_removed": 0,
         "soft_hyphens_removed": 0,
         "toc_units_removed": 0,
+        "dot_leader_lines_removed": 0,
         "garbage_removed": 0,
         "words_before": 10120,
         "words_after": 10120,
@@ -869,16 +890,16 @@
       "near_duplicates": [
         {
           "doc_id": "2005_clarus_high",
-          "jaccard": 0.33,
+          "jaccard": 0.331,
           "containment": 0.746
         }
       ],
       "title": "Clarus Weather System Design",
       "version": null,
       "date": "2005-12",
-      "sha256_text": "df6eff5518630f24e29e6e9403e0bf6a1fc7913681fef4cbdc2229dab994ceab",
-      "words": 20266,
-      "chars": 143189,
+      "sha256_text": "68af7fdf7945503bb9981c7f75d16094a35615a7d542f0278ae0707ea4f83e00",
+      "words": 20146,
+      "chars": 141645,
       "extraction": {
         "pages": 99,
         "chars_per_page": 1442,
@@ -895,10 +916,11 @@
           "Detailed System Requirements Specification"
         ],
         "toc_units_removed": 27,
+        "dot_leader_lines_removed": 4,
         "garbage_removed": 46,
         "words_before": 21628,
-        "words_after": 20266,
-        "removed_share": 0.063
+        "words_after": 20146,
+        "removed_share": 0.069
       },
       "warnings": []
     },
@@ -916,9 +938,9 @@
       "title": "Software Requirements Specification",
       "version": "1.0",
       "date": "2005-03-04",
-      "sha256_text": "134b1650ae03e2ec56e78f6422df17e858a637f198da7bd5d68d86c04f03ebb7",
-      "words": 2189,
-      "chars": 17329,
+      "sha256_text": "f4dde0dbeee536ec01769be56a7afdc88b631c22a61c181c2070666d6c1d260f",
+      "words": 2071,
+      "chars": 13323,
       "extraction": {
         "pages": 15,
         "chars_per_page": 1157,
@@ -940,10 +962,11 @@
           "Page 5 of 15"
         ],
         "toc_units_removed": 1,
+        "dot_leader_lines_removed": 4,
         "garbage_removed": 0,
         "words_before": 2402,
-        "words_after": 2189,
-        "removed_share": 0.089
+        "words_after": 2071,
+        "removed_share": 0.138
       },
       "warnings": []
     },
@@ -975,6 +998,7 @@
         "fffd_removed": 24,
         "soft_hyphens_removed": 0,
         "toc_units_removed": 0,
+        "dot_leader_lines_removed": 0,
         "nav_tables_removed": 1,
         "garbage_removed": 0,
         "words_before": 2867,
@@ -1020,6 +1044,7 @@
           "PSA167D006-15 Page 15"
         ],
         "toc_units_removed": 0,
+        "dot_leader_lines_removed": 0,
         "garbage_removed": 4,
         "words_before": 29097,
         "words_after": 28271,
@@ -1041,9 +1066,9 @@
       "title": "Central Trading System",
       "version": "1.0",
       "date": null,
-      "sha256_text": "1eb28f6d2b0e7031a4b4422646fec383d7848484e565ce407986317d9a04932e",
-      "words": 2340,
-      "chars": 16337,
+      "sha256_text": "b6a98f10fe2e6509639c4dabc2569abce8ecdbedee004fbf5866c0c149dbb95e",
+      "words": 2317,
+      "chars": 16022,
       "extraction": {
         "pages": 17,
         "chars_per_page": 1025,
@@ -1065,11 +1090,12 @@
           "Version 1.0 7"
         ],
         "toc_units_removed": 11,
+        "dot_leader_lines_removed": 1,
         "paragraphs_merged": 1,
         "garbage_removed": 0,
         "words_before": 2548,
-        "words_after": 2340,
-        "removed_share": 0.082
+        "words_after": 2317,
+        "removed_share": 0.091
       },
       "warnings": []
     },
@@ -1099,6 +1125,7 @@
         "fffd_removed": 0,
         "soft_hyphens_removed": 0,
         "toc_units_removed": 0,
+        "dot_leader_lines_removed": 0,
         "garbage_removed": 2,
         "words_before": 2540,
         "words_after": 2536,
@@ -1143,6 +1170,7 @@
           "PSA167D005-7 Page 15"
         ],
         "toc_units_removed": 0,
+        "dot_leader_lines_removed": 0,
         "garbage_removed": 0,
         "words_before": 21940,
         "words_after": 21300,
@@ -1164,9 +1192,9 @@
       "title": "COMPREHENSIVE WATERSHED MANAGEMENT",
       "version": null,
       "date": "2007-02-13",
-      "sha256_text": "3e318b9c73d839591aee9ef6109655a240c1b90dafa7293a4c91fd5198bb4213",
-      "words": 14565,
-      "chars": 98070,
+      "sha256_text": "a8d161121c912950c60fbd54a8e24af7d20f4b09181626daa9b66aac79bf2c31",
+      "words": 14166,
+      "chars": 89027,
       "extraction": {
         "pages": 42,
         "chars_per_page": 2323,
@@ -1188,11 +1216,12 @@
           "14"
         ],
         "toc_units_removed": 1,
+        "dot_leader_lines_removed": 2,
         "paragraphs_merged": 7,
         "garbage_removed": 0,
         "words_before": 15229,
-        "words_after": 14565,
-        "removed_share": 0.044
+        "words_after": 14166,
+        "removed_share": 0.07
       },
       "warnings": []
     },
@@ -1231,6 +1260,7 @@
           "Black Start Capability Plan"
         ],
         "toc_units_removed": 8,
+        "dot_leader_lines_removed": 0,
         "garbage_removed": 0,
         "words_before": 2575,
         "words_after": 2417,
@@ -1252,9 +1282,9 @@
       "title": "Software Requirements Specification",
       "version": "1.10",
       "date": null,
-      "sha256_text": "3bbf294638715f789e18200d4fd03a976a55e3f269b4481592a30e86440b3897",
-      "words": 6812,
-      "chars": 42195,
+      "sha256_text": "b9ab41119c04d286a915a7afcff1f09a6e31a3a1f96ad6e149100553bf37edec",
+      "words": 6796,
+      "chars": 41672,
       "extraction": {
         "pages": 29,
         "chars_per_page": 1568,
@@ -1275,11 +1305,12 @@
           "Software Requirements Specification for KeePass Password Safe Page 6"
         ],
         "toc_units_removed": 12,
+        "dot_leader_lines_removed": 2,
         "paragraphs_merged": 1,
         "garbage_removed": 0,
         "words_before": 7312,
-        "words_after": 6812,
-        "removed_share": 0.068
+        "words_after": 6796,
+        "removed_share": 0.071
       },
       "warnings": []
     },
@@ -1309,6 +1340,7 @@
         "fffd_removed": 0,
         "soft_hyphens_removed": 0,
         "toc_units_removed": 0,
+        "dot_leader_lines_removed": 0,
         "garbage_removed": 71,
         "words_before": 8989,
         "words_after": 8918,
@@ -1353,6 +1385,7 @@
           "9/17/2009 AEIT 5"
         ],
         "toc_units_removed": 10,
+        "dot_leader_lines_removed": 0,
         "garbage_removed": 0,
         "words_before": 4136,
         "words_after": 3860,
@@ -1397,6 +1430,7 @@
           "Confidential and Proprietary Page 14 of 62 November 9th, 2009"
         ],
         "toc_units_removed": 16,
+        "dot_leader_lines_removed": 0,
         "paragraphs_merged": 1,
         "garbage_removed": 0,
         "words_before": 17668,
@@ -1431,6 +1465,7 @@
         "fffd_removed": 0,
         "soft_hyphens_removed": 0,
         "toc_units_removed": 18,
+        "dot_leader_lines_removed": 0,
         "garbage_removed": 0,
         "words_before": 5002,
         "words_after": 4901,
@@ -1475,6 +1510,7 @@
           "Page 6"
         ],
         "toc_units_removed": 20,
+        "dot_leader_lines_removed": 0,
         "garbage_removed": 0,
         "words_before": 3916,
         "words_after": 3595,
@@ -1519,6 +1555,7 @@
           "Software Requirements Specification for PeaZip Page 15"
         ],
         "toc_units_removed": 13,
+        "dot_leader_lines_removed": 0,
         "paragraphs_merged": 2,
         "garbage_removed": 0,
         "words_before": 7912,
@@ -1565,6 +1602,7 @@
           "Software Requirements Specification for x-ray Page 6"
         ],
         "toc_units_removed": 11,
+        "dot_leader_lines_removed": 0,
         "paragraphs_merged": 1,
         "garbage_removed": 0,
         "words_before": 3007,
@@ -1587,9 +1625,9 @@
       "title": "Software Requirements Specification for Mashbot",
       "version": "1.0",
       "date": "2010-02-15",
-      "sha256_text": "e3be11e8d75fec7f26cd89210fe46870f60962b71471f11e14465ba7010bd855",
-      "words": 4279,
-      "chars": 22484,
+      "sha256_text": "7cd5cc2eb26a57b8a77cf9bb08762efb69518702151cb2aa04e1d968e60f12f0",
+      "words": 3163,
+      "chars": 19840,
       "extraction": {
         "pages": 15,
         "chars_per_page": 1424,
@@ -1610,13 +1648,16 @@
           "6"
         ],
         "toc_units_removed": 2,
+        "dot_leader_lines_removed": 4,
         "paragraphs_merged": 1,
         "garbage_removed": 0,
         "words_before": 4359,
-        "words_after": 4279,
-        "removed_share": 0.018
+        "words_after": 3163,
+        "removed_share": 0.274
       },
-      "warnings": []
+      "warnings": [
+        "cleaning removed 27% of the words"
+      ]
     },
     {
       "doc_id": "2011_opensg_0_1",
@@ -1644,6 +1685,7 @@
         "fffd_removed": 0,
         "soft_hyphens_removed": 0,
         "toc_units_removed": 0,
+        "dot_leader_lines_removed": 0,
         "garbage_removed": 0,
         "words_before": 1196,
         "words_after": 1196,
@@ -1686,6 +1728,7 @@
           "Page 3 of 3"
         ],
         "toc_units_removed": 0,
+        "dot_leader_lines_removed": 0,
         "garbage_removed": 0,
         "words_before": 307,
         "words_after": 265,
