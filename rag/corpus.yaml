@@ -1,0 +1,208 @@
+# RAG corpus: 40 documents from the PURE requirements dataset (CC BY 4.0).
+# role: why the document is in the corpus (traps = similar or versioned documents for the test set).
+documents:
+  - doc_id: 0000_cctns
+    file: "0000 - cctns.pdf"
+    format: pdf
+    year: null
+    role: domain_diversity
+  - doc_id: 0000_gamma_j
+    file: "0000 - gamma j.pdf"
+    format: pdf
+    year: null
+    role: step1_document
+  - doc_id: 0000_inventory
+    file: "0000 - inventory.pdf"
+    format: pdf
+    year: null
+    role: version_or_similar_pair:inventory
+  - doc_id: 1998_themas
+    file: "1998 - themas.pdf"
+    format: pdf
+    year: 1998
+    role: step1_document
+  - doc_id: 1999_dii
+    file: "1999 - dii.htm"
+    format: htm
+    year: 1999
+    role: format_diversity
+  - doc_id: 1999_multi_mahjong
+    file: "1999 - multi-mahjong.html"
+    format: html
+    year: 1999
+    role: format_diversity
+  - doc_id: 2000_nasa_x38
+    file: "2000 - nasa x38.doc"
+    format: doc
+    year: 2000
+    role: format_diversity
+  - doc_id: 2001_esa
+    file: "2001 - esa.pdf"
+    format: pdf
+    year: 2001
+    role: domain_diversity
+  - doc_id: 2001_libra
+    file: "2001 - libra.doc"
+    format: doc
+    year: 2001
+    role: format_diversity
+  - doc_id: 2001_space_fractions
+    file: "2001 - space fractions.pdf"
+    format: pdf
+    year: 2001
+    role: step1_document
+  - doc_id: 2002_evla_corr
+    file: "2002 - evla corr.pdf"
+    format: pdf
+    year: 2002
+    role: domain_diversity
+  - doc_id: 2003_agentmom
+    file: "2003 - agentmom.pdf"
+    format: pdf
+    year: 2003
+    role: step1_document
+  - doc_id: 2004_e_procurement
+    file: "2004 - e-procurement.rtf"
+    format: rtf
+    year: 2004
+    role: format_diversity
+  - doc_id: 2004_grid_bgc
+    file: "2004 - grid bgc.pdf"
+    format: pdf
+    year: 2004
+    role: step1_document
+  - doc_id: 2004_ijis
+    file: "2004 - ijis.doc"
+    format: doc
+    year: 2004
+    role: format_diversity
+  - doc_id: 2004_jse
+    file: "2004 - jse.doc"
+    format: doc
+    year: 2004
+    role: format_diversity
+  - doc_id: 2004_philips
+    file: "2004 - philips.doc"
+    format: doc
+    year: 2004
+    role: format_diversity
+  - doc_id: 2004_sprat
+    file: "2004 - sprat.pdf"
+    format: pdf
+    year: 2004
+    role: step1_document
+  - doc_id: 2004_watcom_gui
+    file: "2004 - watcom gui.pdf"
+    format: pdf
+    year: 2004
+    role: version_or_similar_pair:watcom
+  - doc_id: 2004_watcom
+    file: "2004 - watcom.pdf"
+    format: pdf
+    year: 2004
+    role: version_or_similar_pair:watcom
+  - doc_id: 2005_clarus_high
+    file: "2005 - clarus high.doc"
+    format: doc
+    year: 2005
+    role: version_or_similar_pair:clarus
+  - doc_id: 2005_clarus_low
+    file: "2005 - clarus low.pdf"
+    format: pdf
+    year: 2005
+    role: version_or_similar_pair:clarus
+  - doc_id: 2005_grid_3d
+    file: "2005 - grid 3D.pdf"
+    format: pdf
+    year: 2005
+    role: step1_document
+  - doc_id: 2005_nenios
+    file: "2005 - nenios.html"
+    format: html
+    year: 2005
+    role: format_diversity
+  - doc_id: 2006_eirene_sys_15
+    file: "2006 - eirene sys 15.pdf"
+    format: pdf
+    year: 2006
+    role: version_or_similar_pair:eirene
+  - doc_id: 2007_central_trading_system
+    file: "2007 - central trading system.pdf"
+    format: pdf
+    year: 2007
+    role: step1_document
+  - doc_id: 2007_e_store
+    file: "2007 - e-store.doc"
+    format: doc
+    year: 2007
+    role: format_diversity
+  - doc_id: 2007_eirene_fun_7
+    file: "2007 - eirene fun 7.pdf"
+    format: pdf
+    year: 2007
+    role: version_or_similar_pair:eirene
+  - doc_id: 2007_water_use
+    file: "2007 - water use.pdf"
+    format: pdf
+    year: 2007
+    role: domain_diversity
+  - doc_id: 2008_caiso
+    file: "2008 - caiso.pdf"
+    format: pdf
+    year: 2008
+    role: step1_document
+  - doc_id: 2008_keepass
+    file: "2008 - keepass.pdf"
+    format: pdf
+    year: 2008
+    role: domain_diversity
+  - doc_id: 2008_virtual_ed
+    file: "2008 - virtual ed.doc"
+    format: doc
+    year: 2008
+    role: format_diversity
+  - doc_id: 2009_email
+    file: "2009 - email.pdf"
+    format: pdf
+    year: 2009
+    role: domain_diversity
+  - doc_id: 2009_inventory_2_0
+    file: "2009 - inventory 2.0.pdf"
+    format: pdf
+    year: 2009
+    role: version_or_similar_pair:inventory
+  - doc_id: 2009_library_doc
+    file: "2009 - library.doc"
+    format: doc
+    year: 2009
+    role: version_or_similar_pair:library
+  - doc_id: 2009_library_pdf
+    file: "2009 - library.pdf"
+    format: pdf
+    year: 2009
+    role: version_or_similar_pair:library
+  - doc_id: 2009_peazip
+    file: "2009 - peazip.pdf"
+    format: pdf
+    year: 2009
+    role: domain_diversity
+  - doc_id: 2009_video_search
+    file: "2009 - video search.pdf"
+    format: pdf
+    year: 2009
+    role: step1_document
+  - doc_id: 2010_mashboot
+    file: "2010 - mashboot.pdf"
+    format: pdf
+    year: 2010
+    role: domain_diversity
+  - doc_id: 2011_opensg_0_1
+    file: "2011 - opensg 0.1.doc"
+    format: doc
+    year: 2011
+    role: format_diversity
+  - doc_id: remote_work_policy
+    file: "remote_work_policy.pdf"
+    format: pdf
+    year: 2026
+    role: non_pure_sample_policy
