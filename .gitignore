@@ -229,3 +229,6 @@ adhoc_loop_diag.py
 
 # temporary previews of the ingestion output (not committed)
 rag/data/_preview/
+rag/.cache/
+rag/data/chroma/
+rag/data/chunks_fixed.jsonl

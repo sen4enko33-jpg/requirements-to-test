@@ -87,6 +87,34 @@ md = doc("# T", "tiny title page.", "## P1", para(200))
 ch = chunk_document(parse_blocks(md))
 check("tiny first chunk merged forward", len(ch) == 1 and ch[0]["text"].startswith("T"))
 
+# --- token limit (a fake tokenizer: a word that starts with "code" costs 3 tokens, other words 1)
+fake = lambda t: sum(3 if w.startswith("code") else 1 for w in t.split())
+MT = 480
+lines = [f"code{i} code{i + 1} code{i + 2} code{i + 3}." for i in range(0, 400, 4)]       # 100 short blocks, 12 tokens each
+ch = chunk_document(parse_blocks(doc("# T", "## Log", *lines)), tokens=fake)
+check("token limit: many small blocks", all(c["n_tokens"] <= MT for c in ch) and len(ch) >= 3)
+check("token limit: n_tokens is the token count of the text", all(c["n_tokens"] == fake(c["text"]) for c in ch))
+check("token limit: no text lost", all(f"code{i}" in " ".join(c["text"] for c in ch) for i in range(400)))
+ch = chunk_document(parse_blocks(doc("# T", "## Log", para(300, "code"))), tokens=fake)
+check("token limit: one long paragraph is cut", len(ch) >= 2 and all(c["n_tokens"] <= MT for c in ch))
+ch = chunk_document(parse_blocks(doc("# T", "## Log", " ".join(f"code{i}" for i in range(300)))), tokens=fake)      # one sentence
+check("token limit: one long sentence is cut by words", len(ch) >= 2 and all(c["n_tokens"] <= MT for c in ch))
+rows = "\n".join(f"| code{i} | code{i} code{i} |" for i in range(60))
+ch = chunk_document(parse_blocks(doc("# T", "## Tab", "| a | b |\n|---|---|\n" + rows)), tokens=fake)
+check("token limit: table cut by rows, header repeated", len(ch) >= 2 and all(c["n_tokens"] <= MT for c in ch)
+      and all(c["text"].count("| a | b |") >= 1 for c in ch))
+ch = chunk_document(parse_blocks(doc("# T", "## S", para(250), para(250))), tokens=fake)
+check("token limit: prose is not affected", [c["n_words"] for c in ch] == [c["n_words"] for c in chunk_document(parse_blocks(doc("# T", "## S", para(250), para(250))))])
+check("no token function: unchanged output", chunk_document(parse_blocks(md)) == chunk_document(parse_blocks(md), tokens=None))
+with tempfile.TemporaryDirectory() as d:
+    d = Path(d)
+    (d / "processed").mkdir()
+    (d / "processed" / "a.md").write_text(doc("# Doc A", "## One", *lines), encoding="utf-8")
+    (d / "manifest.json").write_text(json.dumps({"code_hash": "x", "documents": [{"doc_id": "a", "file": "a.pdf", "title": "A", "year": 1, "version": None, "date": None, "sha256_text": "h", "status": "ok"}]}))
+    s = build(d, d / "chunks.jsonl", d / "chunks_manifest.json", tokens=fake)
+    rec = [json.loads(l) for l in (d / "chunks.jsonl").read_text().splitlines()]
+    check("pipeline: n_tokens and params recorded", all(r["n_tokens"] <= MT for r in rec) and s["params"]["max_tokens"] == MT)
+
 # determinism
 md = doc("# T", "## S", para(500))
 check("deterministic", chunk_document(parse_blocks(md)) == chunk_document(parse_blocks(md)))

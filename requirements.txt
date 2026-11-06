@@ -8,3 +8,7 @@ pymupdf
 python-docx
 beautifulsoup4
 lxml
+# RAG retrieval
+fastembed
+chromadb
+rank_bm25

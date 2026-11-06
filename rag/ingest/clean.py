@@ -88,7 +88,7 @@ def _toc_like(u: str) -> bool:
     return len(t) <= 160 and bool(TOC_TAIL.search(t))
 
 
-DOT_LEADER_LINE = re.compile(r"(?:\.\s?){5,}")
+DOT_LEADER_LINE = re.compile(r"(?:\.\s?){5,}|_{8,}\s*\d{1,4}\s*$")
 
 
 def _remove_leader_lines(units: list[str], stats: Counter) -> list[str]:

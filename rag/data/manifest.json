@@ -1,6 +1,6 @@
 {
-  "created": "2026-11-03T12:37:10+0000",
-  "code_hash": "c0c03e4f9b65dd55",
+  "created": "2026-11-06T11:52:09+0000",
+  "code_hash": "ecf3e3c20bd62d7b",
   "ocr_lang": "eng",
   "tools": {
     "pymupdf": "1.28.2",
@@ -8,9 +8,9 @@
     "beautifulsoup4": "4.15.0",
     "lxml": "6.1.3"
   },
-  "n_documents": 41,
+  "n_documents": 42,
   "counts": {
-    "ok": 41
+    "ok": 42
   },
   "documents": [
     {
@@ -564,9 +564,9 @@
       "title": "Software Requirements Specification",
       "version": "1.0",
       "date": "2004-09-13",
-      "sha256_text": "7cb9f3fdae994c448f777d1b8937122052cb15bd25c1553129073471594ca398",
-      "words": 6944,
-      "chars": 51972,
+      "sha256_text": "e8370d87c56716949efb2979b9933399deefe4176ae7c1269d5ed86effa2daa8",
+      "words": 5984,
+      "chars": 36761,
       "extraction": {
         "pages": 34,
         "chars_per_page": 1442,
@@ -588,11 +588,11 @@
           "Page 15 of 15"
         ],
         "toc_units_removed": 0,
-        "dot_leader_lines_removed": 2,
+        "dot_leader_lines_removed": 85,
         "garbage_removed": 0,
         "words_before": 7240,
-        "words_after": 6944,
-        "removed_share": 0.041
+        "words_after": 5984,
+        "removed_share": 0.173
       },
       "warnings": []
     },
@@ -1703,7 +1703,13 @@
       "status": "ok",
       "error": null,
       "duplicate_of": null,
-      "near_duplicates": [],
+      "near_duplicates": [
+        {
+          "doc_id": "remote_work_policy_2023",
+          "jaccard": 0.525,
+          "containment": 0.694
+        }
+      ],
       "title": "Remote Work Policy",
       "version": null,
       "date": "2026-01-15",
@@ -1736,6 +1742,57 @@
       },
       "warnings": [
         "very short document (265 words)"
+      ]
+    },
+    {
+      "doc_id": "remote_work_policy_2023",
+      "file": "remote_work_policy_2023.pdf",
+      "format": "pdf",
+      "year": 2023,
+      "role": "outdated_version_trap",
+      "sha256_raw": "c7f07c11a147ff7356df3840891d4f52f128f0ac6d79eb6688490c4df511cafd",
+      "status": "ok",
+      "error": null,
+      "duplicate_of": null,
+      "near_duplicates": [
+        {
+          "doc_id": "remote_work_policy",
+          "jaccard": 0.525,
+          "containment": 0.694
+        }
+      ],
+      "title": "Remote Work Policy",
+      "version": null,
+      "date": "2023-03-01",
+      "sha256_text": "a71ce57f6b60080b917268338636c508d4918855d6d89825c9e69d69169f6b86",
+      "words": 269,
+      "chars": 1649,
+      "extraction": {
+        "pages": 3,
+        "chars_per_page": 573,
+        "headings": 8,
+        "list_items": 0,
+        "ocr_pages": 0
+      },
+      "cleaning": {
+        "fffd_removed": 0,
+        "soft_hyphens_removed": 0,
+        "running_lines_removed": 6,
+        "running_examples": [
+          "Northwind Logistics — Internal Effective 2023-03-01",
+          "Page 1 of 3",
+          "Page 2 of 3",
+          "Page 3 of 3"
+        ],
+        "toc_units_removed": 0,
+        "dot_leader_lines_removed": 0,
+        "garbage_removed": 0,
+        "words_before": 311,
+        "words_after": 269,
+        "removed_share": 0.135
+      },
+      "warnings": [
+        "very short document (269 words)"
       ]
     }
   ]

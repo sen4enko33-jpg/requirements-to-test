@@ -206,3 +206,8 @@ documents:
     format: pdf
     year: 2026
     role: non_pure_sample_policy
+  - doc_id: remote_work_policy_2023
+    file: "remote_work_policy_2023.pdf"
+    format: pdf
+    year: 2023
+    role: outdated_version_trap          # synthetic older version of remote_work_policy (rag/tools/make_policy_2023.py)

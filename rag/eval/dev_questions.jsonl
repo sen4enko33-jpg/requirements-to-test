@@ -1,0 +1,11 @@
+{"id": "d01", "question": "At least how many working days in advance must remote days be requested under the current policy?", "answerable": true, "doc_id": "remote_work_policy", "evidence": "Remote days are requested in the HR portal at least one working day in advance."}
+{"id": "d02", "question": "What must company laptops use when they are connected to a network outside the office?", "answerable": true, "doc_id": "remote_work_policy", "evidence": "Company laptops must use full disk encryption and the corporate VPN when connected to any network outside the office."}
+{"id": "d03", "question": "How many digits of the credit card number does the E-Store show?", "answerable": true, "doc_id": "2007_e_store", "evidence": "It shall always be shown with just the last 4 digits of the credit card number."}
+{"id": "d04", "question": "By what date must the AEIT submit the proposed plan to the Governor?", "answerable": true, "doc_id": "2009_email", "evidence": "By December 31, 2009, the AEIT shall submit the proposed plan to the Governor, the President of the Senate, and the Speaker of the House of Representatives."}
+{"id": "d05", "question": "How much is a parent billed per month if only two children are enrolled?", "answerable": true, "doc_id": "2005_nenios", "evidence": "If only two children are enrolled a parent shall be billed $157.50 at the end of each month."}
+{"id": "u01", "question": "How many days of paid vacation do Northwind Logistics employees get?", "answerable": false}
+{"id": "u02", "question": "What is the monthly salary of a team lead at Northwind Logistics?", "answerable": false}
+{"id": "u03", "question": "Does the KeePass specification require fingerprint login?", "answerable": false}
+{"id": "u04", "question": "Which cloud provider hosts the E-Store?", "answerable": false}
+{"id": "u05", "question": "What is the dress code in the Northwind office?", "answerable": false}
+{"id": "u06", "question": "What is the capital of France?", "answerable": false}

@@ -1,303 +1,354 @@
 {
-  "created": "2026-11-03T12:37:32+0000",
+  "created": "2026-11-06T11:52:18+0000",
   "strategy": "structural-v1",
-  "code_hash": "2426a5b524dc193c",
-  "ingestion_code_hash": "c0c03e4f9b65dd55",
+  "code_hash": "89e388c90065ea57",
+  "ingestion_code_hash": "ecf3e3c20bd62d7b",
   "params": {
     "target_words": 300,
     "max_words": 400,
     "min_words": 60,
-    "overlap_max_words": 60
+    "overlap_max_words": 60,
+    "max_tokens": 480,
+    "tokenizer": "BAAI/bge-small-en-v1.5"
   },
-  "n_documents": 41,
-  "n_chunks": 1552,
+  "n_documents": 42,
+  "n_chunks": 1669,
   "documents": {
     "0000_cctns": {
       "chunks": 21,
       "words_mean": 244,
       "words_max": 297,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 0,
+      "over_512_tokens": 0
     },
     "0000_gamma_j": {
       "chunks": 38,
       "words_mean": 176,
       "words_max": 377,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 0,
+      "over_512_tokens": 0
     },
     "0000_inventory": {
       "chunks": 34,
       "words_mean": 101,
       "words_max": 209,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 0,
+      "over_512_tokens": 0
     },
     "1998_themas": {
       "chunks": 21,
       "words_mean": 268,
       "words_max": 356,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 0,
+      "over_512_tokens": 0
     },
     "1999_dii": {
-      "chunks": 28,
-      "words_mean": 181,
-      "words_max": 300,
+      "chunks": 29,
+      "words_mean": 176,
+      "words_max": 307,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 1,
+      "over_512_tokens": 0
     },
     "1999_multi_mahjong": {
-      "chunks": 33,
-      "words_mean": 174,
-      "words_max": 362,
+      "chunks": 34,
+      "words_mean": 169,
+      "words_max": 276,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 0,
+      "over_512_tokens": 0
     },
     "2000_nasa_x38": {
-      "chunks": 99,
-      "words_mean": 232,
-      "words_max": 342,
+      "chunks": 108,
+      "words_mean": 214,
+      "words_max": 311,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 0,
+      "over_512_tokens": 0
     },
     "2001_esa": {
-      "chunks": 25,
-      "words_mean": 173,
-      "words_max": 304,
+      "chunks": 30,
+      "words_mean": 145,
+      "words_max": 293,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 1,
+      "over_512_tokens": 0
     },
     "2001_libra": {
       "chunks": 42,
       "words_mean": 108,
       "words_max": 281,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 0,
+      "over_512_tokens": 0
     },
     "2001_space_fractions": {
       "chunks": 18,
       "words_mean": 163,
       "words_max": 293,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 0,
+      "over_512_tokens": 0
     },
     "2002_evla_corr": {
       "chunks": 32,
       "words_mean": 126,
       "words_max": 291,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 0,
+      "over_512_tokens": 0
     },
     "2003_agentmom": {
-      "chunks": 9,
-      "words_mean": 182,
-      "words_max": 341,
+      "chunks": 10,
+      "words_mean": 164,
+      "words_max": 297,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 0,
+      "over_512_tokens": 0
     },
     "2004_e_procurement": {
-      "chunks": 37,
-      "words_mean": 247,
+      "chunks": 38,
+      "words_mean": 240,
       "words_max": 389,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 0,
+      "over_512_tokens": 1
     },
     "2004_grid_bgc": {
-      "chunks": 60,
-      "words_mean": 111,
+      "chunks": 50,
+      "words_mean": 116,
       "words_max": 284,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 0,
+      "over_512_tokens": 0
     },
     "2004_ijis": {
       "chunks": 23,
       "words_mean": 212,
       "words_max": 496,
       "oversize": 1,
-      "tiny": 0
+      "tiny": 0,
+      "over_512_tokens": 1
     },
     "2004_jse": {
-      "chunks": 48,
-      "words_mean": 206,
-      "words_max": 304,
+      "chunks": 53,
+      "words_mean": 188,
+      "words_max": 297,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 0,
+      "over_512_tokens": 0
     },
     "2004_philips": {
       "chunks": 15,
       "words_mean": 162,
       "words_max": 292,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 0,
+      "over_512_tokens": 0
     },
     "2004_sprat": {
       "chunks": 30,
       "words_mean": 224,
       "words_max": 297,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 0,
+      "over_512_tokens": 0
     },
     "2004_watcom_gui": {
-      "chunks": 45,
-      "words_mean": 204,
-      "words_max": 300,
+      "chunks": 60,
+      "words_mean": 158,
+      "words_max": 298,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 0,
+      "over_512_tokens": 0
     },
     "2004_watcom": {
-      "chunks": 45,
-      "words_mean": 253,
-      "words_max": 321,
+      "chunks": 89,
+      "words_mean": 131,
+      "words_max": 286,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 31,
+      "over_512_tokens": 0
     },
     "2005_clarus_high": {
-      "chunks": 43,
-      "words_mean": 242,
+      "chunks": 45,
+      "words_mean": 232,
       "words_max": 346,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 0,
+      "over_512_tokens": 0
     },
     "2005_clarus_low": {
-      "chunks": 81,
-      "words_mean": 254,
-      "words_max": 316,
+      "chunks": 94,
+      "words_mean": 219,
+      "words_max": 313,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 2,
+      "over_512_tokens": 0
     },
     "2005_grid_3d": {
       "chunks": 17,
       "words_mean": 120,
       "words_max": 226,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 0,
+      "over_512_tokens": 0
     },
     "2005_nenios": {
       "chunks": 16,
       "words_mean": 181,
       "words_max": 325,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 0,
+      "over_512_tokens": 0
     },
     "2006_eirene_sys_15": {
-      "chunks": 137,
-      "words_mean": 210,
-      "words_max": 350,
+      "chunks": 151,
+      "words_mean": 191,
+      "words_max": 315,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 3,
+      "over_512_tokens": 0
     },
     "2007_central_trading_system": {
       "chunks": 13,
       "words_mean": 176,
       "words_max": 300,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 0,
+      "over_512_tokens": 0
     },
     "2007_e_store": {
       "chunks": 23,
       "words_mean": 107,
       "words_max": 271,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 0,
+      "over_512_tokens": 0
     },
     "2007_eirene_fun_7": {
-      "chunks": 111,
-      "words_mean": 195,
-      "words_max": 348,
+      "chunks": 115,
+      "words_mean": 189,
+      "words_max": 319,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 1,
+      "over_512_tokens": 0
     },
     "2007_water_use": {
       "chunks": 66,
-      "words_mean": 218,
+      "words_mean": 217,
       "words_max": 389,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 0,
+      "over_512_tokens": 0
     },
     "2008_caiso": {
       "chunks": 12,
-      "words_mean": 203,
+      "words_mean": 202,
       "words_max": 300,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 0,
+      "over_512_tokens": 0
     },
     "2008_keepass": {
-      "chunks": 42,
-      "words_mean": 159,
-      "words_max": 380,
+      "chunks": 44,
+      "words_mean": 152,
+      "words_max": 342,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 1,
+      "over_512_tokens": 0
     },
     "2008_virtual_ed": {
       "chunks": 54,
       "words_mean": 164,
       "words_max": 368,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 0,
+      "over_512_tokens": 0
     },
     "2009_email": {
-      "chunks": 18,
-      "words_mean": 217,
-      "words_max": 341,
+      "chunks": 20,
+      "words_mean": 197,
+      "words_max": 325,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 0,
+      "over_512_tokens": 0
     },
     "2009_inventory_2_0": {
-      "chunks": 84,
-      "words_mean": 196,
-      "words_max": 380,
+      "chunks": 87,
+      "words_mean": 189,
+      "words_max": 328,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 2,
+      "over_512_tokens": 0
     },
     "2009_library_doc": {
-      "chunks": 22,
-      "words_mean": 228,
-      "words_max": 298,
+      "chunks": 23,
+      "words_mean": 221,
+      "words_max": 300,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 0,
+      "over_512_tokens": 0
     },
     "2009_library_pdf": {
-      "chunks": 21,
-      "words_mean": 170,
-      "words_max": 334,
+      "chunks": 22,
+      "words_mean": 162,
+      "words_max": 274,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 0,
+      "over_512_tokens": 0
     },
     "2009_peazip": {
       "chunks": 34,
       "words_mean": 217,
       "words_max": 321,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 0,
+      "over_512_tokens": 0
     },
     "2009_video_search": {
       "chunks": 20,
       "words_mean": 136,
       "words_max": 235,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 0,
+      "over_512_tokens": 0
     },
     "2010_mashboot": {
       "chunks": 25,
       "words_mean": 125,
       "words_max": 304,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 0,
+      "over_512_tokens": 0
     },
     "2011_opensg_0_1": {
       "chunks": 7,
       "words_mean": 171,
       "words_max": 279,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 0,
+      "over_512_tokens": 0
     },
     "remote_work_policy": {
       "chunks": 3,
       "words_mean": 86,
       "words_max": 103,
       "oversize": 0,
-      "tiny": 0
+      "tiny": 0,
+      "over_512_tokens": 0
+    },
+    "remote_work_policy_2023": {
+      "chunks": 3,
+      "words_mean": 87,
+      "words_max": 101,
+      "oversize": 0,
+      "tiny": 0,
+      "over_512_tokens": 0
     }
   }
 }

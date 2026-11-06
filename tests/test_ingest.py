@@ -56,6 +56,10 @@ check("no merge into a heading", "## 2. New section" in clean(md, "pdf")[0])
 toc = "# Doc\n\nIntro text of the document.\n\n1.0 Introduction ........ ..... 1-1\n1.1 Purpose ................. 1-2\n1.2 Scope ............... 1-3\n\n## 1. Real section\n\nBody with an ellipsis... and more."
 t, st = clean(toc, "doc")
 check("dot-leader lines removed, text with '...' kept", "Purpose" not in t and "Introduction ..." not in t and "ellipsis... and more" in t and st["dot_leader_lines_removed"] == 3)
+ul = "# Doc\n\nIntro text.\n\n## 1 Introduction ________________________7\n\n1.1 Purpose_____________________________7\n\n## 1 Introduction\n\nSigned: ______________ Steve Brown\n\nAttach package to: ____________________"
+t, st = clean(ul, "pdf")
+check("underscore leaders with a page number removed", "________7" not in t and "Purpose" not in t and st["dot_leader_lines_removed"] == 2)
+check("signature lines with underscores kept", "Signed: ______________ Steve Brown" in t and "Attach package to: ____" in t)
 
 # --- table of contents (a real document has a lot of text after the contents)
 FILLER = "\n\n" + "\n\n".join("Filler paragraph number %d with enough words to look like a real document." % i for i in range(30))
