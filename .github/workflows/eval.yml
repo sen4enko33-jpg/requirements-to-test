@@ -51,7 +51,7 @@ jobs:
           path: |
             task2-rag/rag/.cache
             .chroma
-          key: rag-index-${{ hashFiles('task2-rag/rag/data/chunks.jsonl', 'task2-rag/rag/models.py') }}
+          key: rag-index-${{ hashFiles('task2-rag/rag/data/chunks.jsonl', 'task2-rag/rag/models.py', 'task2-rag/requirements.txt') }}
       - name: Retrieval evaluation
         working-directory: task2-rag
         run: |
@@ -92,7 +92,7 @@ jobs:
           path: |
             task2-rag/rag/.cache
             .chroma
-          key: rag-index-${{ hashFiles('task2-rag/rag/data/chunks.jsonl', 'task2-rag/rag/models.py') }}
+          key: rag-index-${{ hashFiles('task2-rag/rag/data/chunks.jsonl', 'task2-rag/rag/models.py', 'task2-rag/requirements.txt') }}
       - name: Answer the test set and judge the answers
         working-directory: task2-rag
         run: |
