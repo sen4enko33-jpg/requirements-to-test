@@ -1,0 +1,6 @@
+# temporary previews of the ingestion output (not committed)
+rag/data/_preview/
+# downloaded models, vector index, the fixed-size baseline (rebuilt by the commands in README)
+rag/.cache/
+rag/data/chroma/
+rag/data/chunks_fixed.jsonl

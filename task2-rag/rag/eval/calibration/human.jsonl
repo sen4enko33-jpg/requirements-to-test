@@ -1,0 +1,12 @@
+{"id": "c01", "correct": false, "first_rating": true, "note": "first rated 'correct' (the value is somewhere in the answer); after the strict rule was chosen (the current value must be the main answer) re-labelled 'incorrect'"}
+{"id": "c02", "correct": false}
+{"id": "c03", "correct": false}
+{"id": "c04", "correct": false, "first_rating": true, "note": "first rated 'correct' (the value is somewhere in the answer); after the strict rule was chosen (the current value must be the main answer) re-labelled 'incorrect'"}
+{"id": "c05", "correct": true}
+{"id": "c06", "correct": true}
+{"id": "c07", "correct": true}
+{"id": "c08", "correct": true}
+{"id": "c09", "correct": true}
+{"id": "c10", "correct": false, "first_rating": true, "note": "first rated 'correct' (the value is somewhere in the answer); after the strict rule was chosen (the current value must be the main answer) re-labelled 'incorrect'"}
+{"id": "c11", "correct": true}
+{"id": "c12", "correct": true}

@@ -1,0 +1,18 @@
+# Models of the RAG part (the same cloud model as in task 1). The key is read from OPENROUTER_API_KEY (.env).
+timeout_s: 60
+max_retries: 3
+max_tokens: 2048
+
+models:
+  cloud:
+    provider: openrouter
+    base_url: https://openrouter.ai/api/v1
+    api_key_env: OPENROUTER_API_KEY
+    model: openai/gpt-4o-mini
+    extra_body: {provider: {require_parameters: true}}   # route only to endpoints that support every request parameter
+  judge:                                                  # LLM judge of the evaluation: another model than the one that answers
+    provider: openrouter
+    base_url: https://openrouter.ai/api/v1
+    api_key_env: OPENROUTER_API_KEY
+    model: openai/gpt-4o
+    extra_body: {provider: {require_parameters: true}}

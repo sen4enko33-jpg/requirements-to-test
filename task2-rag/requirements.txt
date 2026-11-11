@@ -1,0 +1,17 @@
+# LLM client (a copy of the client of task 1, rag/llm)
+pydantic>=2
+pyyaml
+python-dotenv
+tenacity
+openai
+# ingestion
+pymupdf
+python-docx
+beautifulsoup4
+lxml
+# retrieval
+fastembed
+chromadb
+rank_bm25
+# optional: only to regenerate rag/data/raw/remote_work_policy_2023.pdf (rag/tools/make_policy_2023.py)
+# reportlab

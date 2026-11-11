@@ -1,0 +1,15 @@
+{
+  "retrieval": {
+    "_note": "structural chunking + hybrid search + reranker on rag/eval/retrieval_questions.jsonl; set below the measured values (MRR 0.76, recall@5 0.93, recall@10 0.93) so that a real regression fails and noise does not",
+    "key": "structural-v1|hybrid_rerank",
+    "min": {"mrr": 0.70, "recall@5": 0.85, "recall@10": 0.85}
+  },
+  "answers": {
+    "_note": "deterministic scorers on rag/eval/testset.jsonl (28 questions); measured for prompt v3: pass_all 0.93, pass_trap 1.0, refused_when_unanswerable 1.0",
+    "min": {"pass_all": 0.85, "pass_trap": 0.80, "refused_when_unanswerable": 0.80, "citations_valid": 1.0}
+  },
+  "judge": {
+    "_note": "LLM judge (gpt-4o, prompt judge_v2); measured for prompt v3: correct 0.86-0.89, faithful 0.95-1.0",
+    "min": {"correct": 0.80, "faithful_answered": 0.90}
+  }
+}
