@@ -6,20 +6,34 @@ documents (40 requirements documents of the PURE dataset and two sample company 
 chunks, with citations. The report is in [`REPORT.md`](REPORT.md) (this folder; the evaluation of the answers is there too).
 
 ## Quick start
-Python 3.11+. LibreOffice (`soffice` on the PATH) is needed to read DOC and RTF files, Tesseract only for scanned PDFs.
+Python 3.10+. LibreOffice (`soffice` on the PATH) is needed to read DOC and RTF files, Tesseract only for scanned PDFs.
 
     cd task2-rag
     python3 -m venv .venv && source .venv/bin/activate
     pip install -r requirements.txt
-    cp ../.env.example ../.env          # OPENROUTER_API_KEY, needed only for the answering step
-    python -m rag.ingest.cli            # raw files -> cleaned Markdown + manifest (cached)
-    python -m rag.chunking.cli          # -> rag/data/chunks.jsonl
-    python -m rag.retrieval.build       # embeds the chunks into Chroma (about 4 minutes on a CPU, resumable)
-    python -m rag.eval.run_retrieval    # recall@k and MRR -> rag/data/retrieval_results.md
+    cp ../.env.example ../.env          # OPENROUTER_API_KEY, needed only for the answering step (the key stays in .env, never in git)
+    python main.py                      # the whole part in one command (about 10 minutes the first time, then cached)
+    python main.py "How many days a week can employees work remotely?"    # one question, answered with citations
+
+`python main.py` runs: ingestion (raw files -> cleaned Markdown, cached), chunking, the Chroma index (about 4 minutes on a CPU the first
+time, resumable), the retrieval metrics (-> `rag/data/retrieval_results.md`), the answers to the 28 test questions with the scorers
+(-> `rag/data/answers_v3.jsonl`) and the CI thresholds. Without `OPENROUTER_API_KEY` the model steps are skipped and the rest runs.
+Options: `--steps ingest,chunk,index,retrieval,answers` (a subset), `--judge` (adds the LLM judge), `--prompt v1` (another answer prompt).
+The same steps one by one:
+
+    python -m rag.ingest.cli                       # raw files -> cleaned Markdown + manifest (cached)
+    python -m rag.chunking.cli                     # -> rag/data/chunks.jsonl (add --fixed for the baseline chunks)
+    python -m rag.retrieval.build                  # embeds the chunks into Chroma (--fixed for the baseline)
+    python -m rag.eval.run_retrieval               # recall@k and MRR -> rag/data/retrieval_results.md
     python -m rag.answer.cli "How many days a week can employees work remotely?"
     python -m rag.eval.run_answers --prompt v3     # the 28-question test set: answers + scorers -> rag/data/answers_v3.jsonl
     python -m rag.eval.run_judge v3                # LLM judge (correct, faithful); judge model = models.judge in config.yaml
     python -m rag.eval.check_thresholds answers v3 # the thresholds of CI (rag/eval/thresholds.json)
+
+**Cost.** Embeddings and the reranker run locally (free). The answering model is `openai/gpt-4o-mini` through OpenRouter
+(0.15 USD per 1M input tokens, 0.60 USD per 1M output tokens, from `config.yaml`; check the current price on OpenRouter). One question uses about
+2950 input and 35 output tokens, which is **about 0.45 USD per 1000 questions** (measured on the 28 test questions: 0.013 USD). The LLM judge
+(`gpt-4o`) is only used for evaluation and costs extra per judged answer.
 
 All commands are run from this folder. The first run downloads the embedding model and the reranker (about 200 MB) into
 `rag/.cache/`. Tests (no network, no models): `for t in tests/test_*.py; do python $t; done`.

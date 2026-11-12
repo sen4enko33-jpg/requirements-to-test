@@ -5,7 +5,7 @@ documents) using a schema, and compare a paid cloud model with a local model:
 field-level accuracy, response validity, latency, and cost. The comparison report is in [`REPORT.md`](REPORT.md) (this folder).
 
 ## Quick start
-Python 3.11+.
+Python 3.10+.
 
     cd task1-extraction
     python3 -m venv .venv && source .venv/bin/activate
@@ -48,7 +48,7 @@ repository, except the 40 that task 2 uses (`../task2-rag/rag/data/raw/`).
 same license, with attribution to the original dataset.
 
 ## Setup
-Python 3.11+.
+Python 3.10+.
 
     pip install -r requirements.txt
     cp ../.env.example ../.env      # then put your OPENROUTER_API_KEY into .env (one .env in the repository root)

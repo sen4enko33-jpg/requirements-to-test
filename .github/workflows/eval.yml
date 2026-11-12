@@ -102,7 +102,7 @@ jobs:
       - name: Thresholds - scorers and judge
         working-directory: task2-rag
         run: |
-          python -m rag.eval.check_thresholds answers v3
+          python -m rag.eval.check_thresholds answers-live v3
           python -m rag.eval.check_thresholds judge v3
       - uses: actions/upload-artifact@v4
         if: always()

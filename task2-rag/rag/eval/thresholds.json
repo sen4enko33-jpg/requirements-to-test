@@ -17,6 +17,15 @@
       "citations_valid": 1.0
     }
   },
+  "answers_live": {
+    "_note": "for the manual run with the real model (the answers change from run to run: 26/28, 26/28, 24/28 for the same prompt and settings), so the minimums leave room for about two questions; the strict 'answers' minimums stay for the saved answers",
+    "min": {
+      "pass_all": 0.78,
+      "pass_trap": 0.67,
+      "refused_when_unanswerable": 0.67,
+      "citations_valid": 1.0
+    }
+  },
   "judge": {
     "_note": "LLM judge (gpt-4o, prompt judge_v2); measured for prompt v3: correct 0.86-0.89, faithful 0.95-1.0",
     "min": {

@@ -17,13 +17,13 @@ independent parts; each one has its own README, report, requirements and tests.
 - `.gitignore` - generic patterns; each part has its own `.gitignore` for its generated files
 
 ## How to run
-Always change into the folder of the part first; commands and paths in the READMEs are relative to it.
+One command per part, from its folder (needs `OPENROUTER_API_KEY` in `.env` for the model steps; Python 3.10+):
 
-    cp .env.example .env                        # put OPENROUTER_API_KEY into .env
-    # part 1
+    cp .env.example .env                        # put OPENROUTER_API_KEY into .env (the key is only in .env, never in git)
     cd task1-extraction && pip install -r requirements.txt && python main.py
-    # part 2
-    cd task2-rag && pip install -r requirements.txt && python -m rag.answer.cli "your question"
+    cd task2-rag && pip install -r requirements.txt && python main.py          # or: python main.py "your question"
+
+From the repository root `make run` runs both parts (`make run1`, `make run2` one of them, `make test` all tests).
 
 Tests (no network, no API key): in `task1-extraction/` run `python tests/test_repair.py`, `python tests/test_limits.py`,
 `python tests/test_prompt_defs.py`; in `task2-rag/` run every `tests/test_*.py`.
