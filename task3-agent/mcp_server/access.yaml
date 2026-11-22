@@ -1,0 +1,11 @@
+# Who may connect to the test-case tracker MCP server and with which rights.
+# A client says its team and role when it starts the server (env TRACKER_TEAM, TRACKER_ROLE, see README). With the stdio
+# transport the client launches the server itself, so this is configuration, not authentication: over HTTP the team would
+# come from a verified token. The server refuses to start for a team or role that is not listed here.
+teams:
+  hr-policy-qa:                # the agent of this repository: tests the Remote Work Policy
+    roles: [reader, writer]
+  payments-qa:                 # another team: its test cases live in the same tracker, our agent must not see them
+    roles: [reader, writer]
+  auditors:                    # may read their own rows, never write
+    roles: [reader]

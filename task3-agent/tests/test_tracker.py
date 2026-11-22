@@ -46,6 +46,25 @@ check("key: stable and normalised",
       idempotency_key("A", "a#0001", " Title  x") == idempotency_key("a", "A#0001", "title x")
       and idempotency_key("a", "a#0001", "t1") != idempotency_key("a", "a#0001", "t2"))
 
+# --- teams
+check("team: the default team is stored", tc["team"] == "hr-policy-qa")
+pay, _ = t.create(**{**ARGS, "title": "Card is checked for fraud", "requirement_ref": "2007_e_store#0010"}, team="payments-qa")
+check("team: another team is stored on its row", pay["team"] == "payments-qa")
+
+# --- a tracker.db of step 1.4 (no team column) is upgraded in place
+import sqlite3
+with tempfile.TemporaryDirectory() as d:
+    old = Path(d) / "old.db"
+    con = sqlite3.connect(old)
+    con.execute("CREATE TABLE test_cases (id INTEGER PRIMARY KEY, idempotency_key TEXT NOT NULL UNIQUE, doc_id TEXT NOT NULL, "
+                "requirement_ref TEXT NOT NULL, title TEXT NOT NULL, steps TEXT NOT NULL, expected TEXT NOT NULL, "
+                "created_at TEXT NOT NULL, run_id TEXT)")
+    con.execute("INSERT INTO test_cases VALUES (1, 'k', 'd', 'd#0001', 't', '[]', 'e', 'now', NULL)")
+    con.commit(); con.close()
+    up = Tracker(old)
+    check("upgrade: the old row keeps its data and gets the default team", up.get(1)["team"] == "hr-policy-qa" and up.count() == 1)
+    up.close()
+
 # --- on disk: survives a restart (a repeated request in a new process)
 with tempfile.TemporaryDirectory() as d:
     path = Path(d) / "sub" / "tracker.db"

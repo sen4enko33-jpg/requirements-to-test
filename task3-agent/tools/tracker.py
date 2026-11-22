@@ -27,9 +27,11 @@ CREATE TABLE IF NOT EXISTS test_cases (
     steps            TEXT NOT NULL,          -- JSON list of strings
     expected         TEXT NOT NULL,
     created_at       TEXT NOT NULL,
-    run_id           TEXT                    -- the agent request that created it (for the trace)
+    run_id           TEXT,                   -- the agent request that created it (for the trace)
+    team             TEXT NOT NULL DEFAULT 'hr-policy-qa'   -- the owning team: the MCP server shows a team only its own rows
 )
 """
+DEFAULT_TEAM = "hr-policy-qa"
 
 
 def _norm(text: str) -> str:
@@ -52,6 +54,9 @@ class Tracker:
         self._db = sqlite3.connect(self.path, check_same_thread=False, isolation_level=None)
         self._db.row_factory = sqlite3.Row
         self._db.execute(SCHEMA)
+        cols = {r["name"] for r in self._db.execute("PRAGMA table_info(test_cases)")}
+        if "team" not in cols:          # a tracker.db of step 1.4 (before teams): every old row belongs to the default team
+            self._db.execute(f"ALTER TABLE test_cases ADD COLUMN team TEXT NOT NULL DEFAULT '{DEFAULT_TEAM}'")
 
     @staticmethod
     def _row(r: sqlite3.Row) -> dict:
@@ -61,15 +66,15 @@ class Tracker:
         return d
 
     def create(self, doc_id: str, requirement_ref: str, title: str, steps: list[str], expected: str,
-               run_id: str | None = None, key: str | None = None) -> tuple[dict, bool]:
+               run_id: str | None = None, key: str | None = None, team: str = DEFAULT_TEAM) -> tuple[dict, bool]:
         """-> (the test case, created). created=False: it existed already (same idempotency key), nothing was written.
         key: the idempotency key; None = a hash of (doc_id, requirement_ref, title)."""
         key = key or idempotency_key(doc_id, requirement_ref, title)
         cur = self._db.execute(
-            "INSERT INTO test_cases (idempotency_key, doc_id, requirement_ref, title, steps, expected, created_at, run_id) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(idempotency_key) DO NOTHING",
+            "INSERT INTO test_cases (idempotency_key, doc_id, requirement_ref, title, steps, expected, created_at, run_id, team) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(idempotency_key) DO NOTHING",
             (key, doc_id, requirement_ref, title.strip(), json.dumps(steps, ensure_ascii=False), expected.strip(),
-             datetime.now(timezone.utc).isoformat(timespec="seconds"), run_id))
+             datetime.now(timezone.utc).isoformat(timespec="seconds"), run_id, team))
         created = cur.rowcount == 1
         row = self._db.execute("SELECT * FROM test_cases WHERE idempotency_key = ?", (key,)).fetchone()
         return self._row(row), created
