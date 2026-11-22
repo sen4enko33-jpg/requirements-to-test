@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 from . import descriptions
 from .corpus import Corpus, min_score, page_label, version_marks
 from .registry import Tool, ToolInputError
+from .session import Session
 
 TEXT_CHARS = 1500          # a search result carries at most this much text (get_passage gives the full passage)
 REF_PATTERN = r"^[A-Za-z0-9_.-]+#\d{4}$"
@@ -89,9 +90,11 @@ def _meta(c: dict) -> dict:
             "year": c.get("year"), "version": c.get("version"), "page": page_label(c) or None}
 
 
-def make_corpus_tools(corpus: Corpus | None = None, floor: float | None = "default") -> list[Tool]:
-    """floor: drop hits whose reranker score is below it ("default" = MIN_SCORE of task 2; None = keep all)."""
+def make_corpus_tools(corpus: Corpus | None = None, floor: float | None = "default", session: Session | None = None) -> list[Tool]:
+    """floor: drop hits whose reranker score is below it ("default" = MIN_SCORE of task 2; None = keep all).
+    session: records the refs returned to the model (create_test_ticket accepts only those)."""
     corpus = corpus or Corpus()
+    session = session if session is not None else Session()
     score_floor = min_score() if floor == "default" else floor
 
     def search_corpus(a: SearchArgs) -> dict:
@@ -105,6 +108,7 @@ def make_corpus_tools(corpus: Corpus | None = None, floor: float | None = "defau
         marks = version_marks(relevant)
         results = [{**_meta(h), "version_mark": marks.get(h["doc_id"]), "score": round(h["score"], 2),
                     "text": h["text"][:TEXT_CHARS], "truncated": len(h["text"]) > TEXT_CHARS} for h in relevant]
+        session.saw(r["ref"] for r in results)
         out = {"query": a.query, "filters": filters or {}, "results": results}
         if not results:
             out["note"] = ("nothing relevant found" + (f" ({len(hits)} weak hits dropped)" if hits else "")
@@ -128,6 +132,7 @@ def make_corpus_tools(corpus: Corpus | None = None, floor: float | None = "defau
             if cur is None:
                 break
             chain.append(cur)
+        session.saw(x["chunk_id"] for x in chain)
         return {"passages": [{**_meta(x), "text": x["text"]} for x in chain]}
 
     def list_documents(a: ListArgs) -> dict:

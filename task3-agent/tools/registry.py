@@ -67,6 +67,8 @@ class Tool:
     side_effect: bool = False              # changes something outside the conversation (needs a human confirmation)
     version: str = ""                      # version of the description (prompts/tools/<name>.yaml), written to the trace
     output_model: type[BaseModel] | None = None   # schema of the answer; checked before the answer reaches the model
+    precheck: Callable[[BaseModel], None] | None = None   # checks against the data (raises ToolInputError) before anything
+                                                          # runs - and before a person is asked to confirm the call
 
     def schema(self) -> dict:
         params = self.args_model.model_json_schema()
@@ -139,6 +141,28 @@ class ToolRegistry:
                                       "documents do not cover the question."), None
         return None, result if isinstance(result, str) else json.dumps(result, ensure_ascii=False, default=str), None
 
+    def check_args(self, name: str, raw_args: str) -> tuple[dict | None, ToolOutcome | None]:
+        """Validate a call without running it -> (arguments, None) or (None, the error outcome). The agent loop uses it to
+        show a person exactly what a side-effect tool will do before asking for the confirmation."""
+        tool = self.tools.get(name)
+        if tool is None:
+            return None, ToolOutcome(False, f"ERROR: unknown_tool: no tool named {name!r}; available: {', '.join(self.tools)}",
+                                     "unknown_tool")
+        try:
+            data = json.loads(raw_args or "{}")
+        except json.JSONDecodeError as e:
+            return None, ToolOutcome(False, f"ERROR: bad_json: arguments are not valid JSON ({e.msg})", "bad_json")
+        try:
+            args = tool.args_model.model_validate(data)
+        except ValidationError as e:
+            return None, ToolOutcome(False, f"ERROR: invalid_args: {_short_validation(e)}", "invalid_args")
+        if tool.precheck is not None:
+            try:
+                tool.precheck(args)
+            except ToolInputError as e:
+                return None, ToolOutcome(False, f"ERROR: invalid_args: {e}", "invalid_args", args.model_dump())
+        return args.model_dump(), None
+
     def execute(self, name: str, raw_args: str, timeout_s: float, time_left_s: float | None = None) -> ToolOutcome:
         """timeout_s: limit of one attempt; time_left_s: time left for the whole request (retries and pauses stop
         when it runs out; None = only timeout_s counts)."""
@@ -160,6 +184,11 @@ class ToolRegistry:
         except ValidationError as e:
             return fail("invalid_args", _short_validation(e))
         args_dict = args.model_dump()
+        if tool.precheck is not None:
+            try:
+                tool.precheck(args)
+            except ToolInputError as e:
+                return fail("invalid_args", str(e), args_dict)
         if timeout_s <= 0:
             return fail("timeout", "no time left for this request", args_dict)
 

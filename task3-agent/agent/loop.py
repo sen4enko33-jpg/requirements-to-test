@@ -7,8 +7,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from tools.registry import ToolRegistry
+from tools.registry import ToolOutcome, ToolRegistry
 
+from .confirm import Confirmer, deny_all
 from .limits import ANSWERED, LIMIT_REASONS, MODEL_ERROR, Budget, Limits
 from .llm import ChatModel
 from .trace import Trace
@@ -49,10 +50,20 @@ def _partial(reason: str, last_text: str | None, observations: list[tuple[str, s
     return "\n".join(lines)
 
 
+NOT_CONFIRMED = ("ERROR: not_confirmed: the user did not allow {tool}; nothing was changed. Do not call it again in this "
+                 "request; tell the user that nothing was created.")
+ALREADY_DECLINED = ("ERROR: not_confirmed: the user already declined a change in this request, so {tool} was not run and the "
+                    "user was not asked again; nothing was changed. Tell the user that nothing was created.")
+
+
 def run_agent(question: str, model: ChatModel, tools: ToolRegistry, limits: Limits, system_prompt: str,
-              trace: Trace | None = None, history: list[dict] | None = None, clock=None) -> AgentResult:
-    """history: earlier messages of the conversation (memory comes in a later step); clock: replaces time.monotonic in tests."""
+              trace: Trace | None = None, history: list[dict] | None = None, clock=None,
+              confirm: Confirmer | None = None) -> AgentResult:
+    """history: earlier messages of the conversation (memory comes in a later step); clock: replaces time.monotonic in tests;
+    confirm: asked before every tool with side_effect=True runs (default: decline, see agent/confirm.py)."""
     trace = trace or Trace()
+    confirm = confirm or deny_all
+    declined = False                        # after one "no" no further side effect runs in this request
     budget = Budget(limits, clock) if clock else Budget(limits)
     messages = [{"role": "system", "content": system_prompt}, *(history or []), {"role": "user", "content": question}]
     schemas = tools.schemas()
@@ -88,10 +99,32 @@ def run_agent(question: str, model: ChatModel, tools: ToolRegistry, limits: Limi
         # Every tool call of the step gets a result (the API rejects a conversation with an unanswered call), even when the
         # request runs out of time in the middle: the remaining calls then get a timeout error without running.
         for call in res.tool_calls:
-            left = budget.remaining_s()
-            out = tools.execute(call.name, call.arguments, min(limits.tool_timeout_s, left), time_left_s=left)
+            tool = tools.tools.get(call.name)
+            confirmed = None
+            out = None
+            if tool is not None and tool.side_effect:
+                # The gate is here, in code: the tool runs only after a "yes" for exactly these arguments.
+                args, bad = tools.check_args(call.name, call.arguments)
+                if bad is not None:
+                    out = bad                                      # an invalid call is rejected before anyone is asked
+                elif declined:
+                    confirmed = False
+                    out = ToolOutcome(False, ALREADY_DECLINED.format(tool=call.name), "not_confirmed", args)
+                    trace.log("confirm", step=step, call_id=call.id, name=call.name, args=args, approved=False,
+                              by="rule", note="already declined in this request")
+                else:
+                    d = confirm(call.name, args)
+                    confirmed = d.approved
+                    trace.log("confirm", step=step, call_id=call.id, name=call.name, args=args, approved=d.approved,
+                              by=d.by, note=d.note)
+                    if not d.approved:
+                        declined = True
+                        out = ToolOutcome(False, NOT_CONFIRMED.format(tool=call.name), "not_confirmed", args)
+            if out is None:
+                left = budget.remaining_s()
+                out = tools.execute(call.name, call.arguments, min(limits.tool_timeout_s, left), time_left_s=left)
             calls.append({"step": step, "name": call.name, "args": out.args, "ok": out.ok, "error_kind": out.error_kind,
-                          "attempts": out.attempts})
+                          "attempts": out.attempts, "confirmed": confirmed})
             observations.append((call.name, out.content))
             trace.log("tool", step=step, call_id=call.id, name=call.name, arguments=call.arguments, ok=out.ok,
                       error_kind=out.error_kind, attempts=out.attempts, attempt_errors=out.errors, result=out.content,

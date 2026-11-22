@@ -25,5 +25,5 @@ tool_retry:
   backoff_s: 0.5                       # pause before the 2nd attempt, doubled for every next one (429: Retry-After if longer)
   backoff_max_s: 4
 
-system_prompt: v3                      # prompts/system_<version>.md
+system_prompt: v5                      # prompts/system_<version>.md
 trace_dir: traces                      # one JSONL file per request (not in git)

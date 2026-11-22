@@ -11,6 +11,8 @@ An item is [tool:]kind[*n]: without a tool it applies to every tool, without *n 
   503       service unavailable
   schema    the service changed its format: the first field of every item of the answer list is renamed
             (for example results[].ref -> results[].ref_v2), so the output schema of the tool rejects it
+  lost      the call WAS executed, but the connection broke before the answer came back (the agent sees a timeout);
+            for a tool with a side effect this checks that a repeated request does not create a duplicate
 The counters count the attempts of the tool, retries included: with 503*1 the first attempt fails and the retry works.
 """
 from __future__ import annotations
@@ -20,8 +22,8 @@ from dataclasses import dataclass
 
 from .registry import Tool, ToolRegistry, ToolUnavailable
 
-KINDS = ("timeout", "429", "503", "schema")
-ITEM = re.compile(r"^(?:(?P<tool>[a-z_]+):)?(?P<kind>timeout|429|503|schema)(?:\*(?P<n>\d+))?$")
+KINDS = ("timeout", "429", "503", "schema", "lost")
+ITEM = re.compile(r"^(?:(?P<tool>[a-z_]+):)?(?P<kind>timeout|429|503|schema|lost)(?:\*(?P<n>\d+))?$")
 
 
 @dataclass
@@ -77,9 +79,13 @@ def wrap(tool: Tool, faults: list[Fault]) -> Tool:
                     raise ToolUnavailable(503, "[fault] HTTP 503 Service Unavailable")
                 if f.kind == "schema":
                     return _rename_first_fields(inner(args))
+                if f.kind == "lost":
+                    inner(args)                                   # the change happens ...
+                    raise ToolUnavailable(None, f"[fault] {tool.name}: connection lost before the answer")   # ... the answer does not
         return inner(args)
 
-    return Tool(tool.name, tool.description, tool.args_model, fn, tool.safe, tool.side_effect, tool.version, tool.output_model)
+    return Tool(tool.name, tool.description, tool.args_model, fn, tool.safe, tool.side_effect, tool.version, tool.output_model,
+                tool.precheck)
 
 
 def apply(registry: ToolRegistry, spec: str | None) -> list[Fault]:

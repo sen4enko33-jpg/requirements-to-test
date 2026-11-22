@@ -84,7 +84,8 @@ check("tool: the assistant tool call and the tool result go back to the model",
       second[-2]["role"] == "assistant" and second[-2]["tool_calls"][0]["function"]["name"] == "echo"
       and second[-1] == {"role": "tool", "tool_call_id": "c0", "content": '{"echo": "ping"}'})
 check("tool: recorded in the result",
-      r.tool_calls == [{"step": 1, "name": "echo", "args": {"text": "ping"}, "ok": True, "error_kind": None, "attempts": 1}])
+      r.tool_calls == [{"step": 1, "name": "echo", "args": {"text": "ping"}, "ok": True, "error_kind": None, "attempts": 1,
+                         "confirmed": None}])
 
 # --- two tool calls in one step: both get a result
 m = ScriptedModel(calls(("echo", '{"text": "a"}'), ("echo", '{"text": "b"}')), answer("a and b"))
