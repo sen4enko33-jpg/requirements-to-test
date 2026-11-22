@@ -1,0 +1,7 @@
+# Agent of task 3. Search over the corpus (from the next sub-step on) is imported from ../task2-rag, so its
+# requirements are needed too:  pip install -r requirements.txt -r ../task2-rag/requirements.txt
+pydantic==2.14.2
+pyyaml==6.0.3
+python-dotenv==1.2.4
+tenacity==9.2.1
+openai==3.46.0

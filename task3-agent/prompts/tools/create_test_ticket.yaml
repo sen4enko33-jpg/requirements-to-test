@@ -1,0 +1,13 @@
+name: create_test_ticket
+version: v1
+description: |
+  Creates a test case for ONE requirement in the test-case tracker. This CHANGES data outside the conversation and
+  needs the user's confirmation, which the system asks for itself.
+  Call it only when the user asks to create (file, add, save) a test case, AND you already know which requirement it
+  is for: its `ref` came from search_corpus or get_passage in this conversation (other refs are rejected).
+  Do NOT call it to answer a question, to "show" a test case, or with a requirement you guessed. If it is not clear which
+  requirement the user means (several candidates, or none found), ask the user first instead of calling the tool.
+  Arguments: `requirement_ref` - the ref of the passage with the requirement; `title` - a short name of the test case;
+  `steps` - 1-10 actions of the tester; `expected` - the expected result, taken from the requirement text.
+  Calling it again for the same requirement and title returns the existing test case (`duplicate`: true), it never
+  creates a second one. Returns {"ticket", "created", "duplicate", "doc_id", "requirement_ref", "title"}.
