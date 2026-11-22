@@ -6,6 +6,8 @@
 
 The search over the corpus uses the Chroma index of task 2: build it once in ../task2-rag with python -m rag.retrieval.build.
 
+Fault injection (tools/faults.py): FAULTS=search_corpus:503 python main.py "..." (also timeout, 429, schema, *n).
+
 Needs OPENROUTER_API_KEY in .env (repository root or this folder). Every run writes its trace to traces/<run_id>.jsonl."""
 from __future__ import annotations
 
@@ -26,7 +28,8 @@ from agent.loop import run_agent  # noqa: E402
 from agent.trace import Trace  # noqa: E402
 from tools.corpus import Corpus  # noqa: E402
 from tools.corpus_tools import make_corpus_tools  # noqa: E402
-from tools.registry import ToolRegistry  # noqa: E402
+from tools import faults  # noqa: E402
+from tools.registry import RetryPolicy, ToolRegistry  # noqa: E402
 
 
 def load_config() -> dict:
@@ -37,10 +40,14 @@ def load_system_prompt(version: str) -> str:
     return (ROOT / "prompts" / f"system_{version}.md").read_text(encoding="utf-8").strip()
 
 
-def build_tools() -> ToolRegistry:
+def build_tools(cfg: dict, fault_spec: str | None = None) -> ToolRegistry:
     corpus = Corpus()
     corpus.warm_up()          # load the search models now, not inside the first tool call (its timeout is short)
-    return ToolRegistry(make_corpus_tools(corpus))
+    registry = ToolRegistry(make_corpus_tools(corpus), RetryPolicy.from_config(cfg.get("tool_retry")))
+    if fault_spec:
+        faults.apply(registry, fault_spec)
+        print(f"[faults: {fault_spec}]", file=sys.stderr)
+    return registry
 
 
 def main() -> int:
@@ -61,7 +68,7 @@ def main() -> int:
     if a.max_cost is not None:
         limits.max_cost_usd = a.max_cost
 
-    result = run_agent(a.question, make_model(cfg, key), build_tools(), limits, load_system_prompt(cfg["system_prompt"]),
+    result = run_agent(a.question, make_model(cfg, key), build_tools(cfg, os.getenv("FAULTS")), limits, load_system_prompt(cfg["system_prompt"]),
                        Trace(ROOT / cfg["trace_dir"]))
     print(result.answer)
     u = result.usage

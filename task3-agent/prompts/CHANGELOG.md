@@ -3,6 +3,13 @@
 Versions of the system prompt are `prompts/system_<version>.md` (the one in use is `system_prompt` of `config.yaml`).
 Tool descriptions are `prompts/tools/<name>.yaml` with a `version` field; their changes are listed here too.
 
+## system_v3 (step 1.3)
+- Rule 6 splits the tool errors: wrong calls (fix and retry) and service failures (unavailable, rate_limited, timeout,
+  bad_output: say the service failed). With `FAULTS=search_corpus:schema` v2 answered "the documents do not contain this
+  information" although they do: a broken service was reported as a missing answer.
+- Rule 4: the search query is always English. With v2 the model still sent a Cyrillic query first in most runs and lost a
+  step on the rejection.
+
 ## search_corpus v2 (step 1.2)
 - The query must be in English. In the first real run the model searched in Ukrainian ("дні на тиждень віддалена робота"),
   found nothing twice and answered that the documents do not cover a question they answer. The description says so more

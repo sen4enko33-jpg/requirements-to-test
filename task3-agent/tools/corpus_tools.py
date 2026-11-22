@@ -34,6 +34,56 @@ class ListArgs(BaseModel):
     year: Optional[int] = Field(None, ge=1990, le=2100, description="Only documents of this year.")
 
 
+# --- schemas of the answers: checked by the registry before an answer reaches the model, so a changed format (a renamed
+# or missing field) becomes ERROR: bad_output in the trace instead of a silent None in the answer
+class PassageMeta(BaseModel):
+    ref: str = Field(pattern=REF_PATTERN)
+    doc_id: str
+    title: str
+    section: str
+    date: Optional[str] = None
+    year: Optional[int] = None
+    version: Optional[str] = None
+    page: Optional[str] = None
+
+
+class SearchHit(PassageMeta):
+    version_mark: Optional[str] = None
+    score: float
+    text: str
+    truncated: bool
+
+
+class SearchOutput(BaseModel):
+    query: str
+    filters: dict
+    results: list[SearchHit]
+    note: Optional[str] = None
+
+
+class Passage(PassageMeta):
+    text: str
+
+
+class PassageOutput(BaseModel):
+    passages: list[Passage] = Field(min_length=1)
+
+
+class DocumentRow(BaseModel):
+    doc_id: str
+    title: Optional[str] = None
+    year: Optional[int] = None
+    date: Optional[str] = None
+    version: Optional[str] = None
+    words: Optional[int] = None
+    near_duplicates: list[str]
+
+
+class ListOutput(BaseModel):
+    total: int
+    documents: list[DocumentRow]
+
+
 def _meta(c: dict) -> dict:
     return {"ref": c["chunk_id"], "doc_id": c["doc_id"], "title": c["title"], "section": c["section"], "date": c.get("date"),
             "year": c.get("year"), "version": c.get("version"), "page": page_label(c) or None}
@@ -90,8 +140,10 @@ def make_corpus_tools(corpus: Corpus | None = None, floor: float | None = "defau
                 for d in sorted(docs, key=lambda d: d["doc_id"])]
         return {"total": len(rows), "documents": rows}
 
-    def tool(name, args, fn):
-        return Tool(name, descriptions.description(name), args, fn, safe=True, side_effect=False, version=descriptions.version(name))
+    def tool(name, args, fn, output):
+        return Tool(name, descriptions.description(name), args, fn, safe=True, side_effect=False,
+                    version=descriptions.version(name), output_model=output)
 
-    return [tool("search_corpus", SearchArgs, search_corpus), tool("get_passage", PassageArgs, get_passage),
-            tool("list_documents", ListArgs, list_documents)]
+    return [tool("search_corpus", SearchArgs, search_corpus, SearchOutput),
+            tool("get_passage", PassageArgs, get_passage, PassageOutput),
+            tool("list_documents", ListArgs, list_documents, ListOutput)]

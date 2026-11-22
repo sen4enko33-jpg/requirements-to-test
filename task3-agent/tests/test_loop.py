@@ -83,7 +83,8 @@ second = m.calls[1]["messages"]
 check("tool: the assistant tool call and the tool result go back to the model",
       second[-2]["role"] == "assistant" and second[-2]["tool_calls"][0]["function"]["name"] == "echo"
       and second[-1] == {"role": "tool", "tool_call_id": "c0", "content": '{"echo": "ping"}'})
-check("tool: recorded in the result", r.tool_calls == [{"step": 1, "name": "echo", "args": {"text": "ping"}, "ok": True, "error_kind": None}])
+check("tool: recorded in the result",
+      r.tool_calls == [{"step": 1, "name": "echo", "args": {"text": "ping"}, "ok": True, "error_kind": None, "attempts": 1}])
 
 # --- two tool calls in one step: both get a result
 m = ScriptedModel(calls(("echo", '{"text": "a"}'), ("echo", '{"text": "b"}')), answer("a and b"))
@@ -143,12 +144,13 @@ def slow(_):
     return "late"
 
 
-reg = ToolRegistry([Tool("boom", "fails", NoArgs, boom), Tool("slow", "slow", NoArgs, slow)])
+reg = ToolRegistry([Tool("boom", "fails", NoArgs, boom), Tool("slow", "slow", NoArgs, slow)], sleep=lambda s: None)
 out = reg.execute("boom", "{}", 5)
 check("exception in a tool: ERROR: tool_error with the message", out.error_kind == "tool_error" and "database is down" in out.content)
 t0 = time.perf_counter()
 out = reg.execute("slow", "{}", 0.3)
-check("slow tool: ERROR: timeout after the tool timeout, not after the tool", out.error_kind == "timeout" and time.perf_counter() - t0 < 1.5)
+check("slow tool: ERROR: timeout after the tool timeout (3 attempts of 0.3 s), not after the tool",
+      out.error_kind == "timeout" and out.attempts == 3 and time.perf_counter() - t0 < 1.5)
 check("no time left: the tool is not started", reg.execute("slow", "{}", 0).error_kind == "timeout")
 m = ScriptedModel(calls(("boom", "{}")), answer("The service is unavailable."))
 r = run(m, tools=reg)

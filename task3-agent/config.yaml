@@ -19,5 +19,11 @@ limits:
   request_timeout_s: 120               # wall time of the whole request
   tool_timeout_s: 20                   # one tool call
 
-system_prompt: v2                      # prompts/system_<version>.md
+# Retries of a failed tool call (timeout, 429, 503): only for safe (read-only) tools, a tool that changes data runs once.
+tool_retry:
+  max_attempts: 3                      # the first attempt included
+  backoff_s: 0.5                       # pause before the 2nd attempt, doubled for every next one (429: Retry-After if longer)
+  backoff_max_s: 4
+
+system_prompt: v3                      # prompts/system_<version>.md
 trace_dir: traces                      # one JSONL file per request (not in git)

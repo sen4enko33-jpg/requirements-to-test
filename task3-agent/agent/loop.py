@@ -88,11 +88,14 @@ def run_agent(question: str, model: ChatModel, tools: ToolRegistry, limits: Limi
         # Every tool call of the step gets a result (the API rejects a conversation with an unanswered call), even when the
         # request runs out of time in the middle: the remaining calls then get a timeout error without running.
         for call in res.tool_calls:
-            out = tools.execute(call.name, call.arguments, min(limits.tool_timeout_s, budget.remaining_s()))
-            calls.append({"step": step, "name": call.name, "args": out.args, "ok": out.ok, "error_kind": out.error_kind})
+            left = budget.remaining_s()
+            out = tools.execute(call.name, call.arguments, min(limits.tool_timeout_s, left), time_left_s=left)
+            calls.append({"step": step, "name": call.name, "args": out.args, "ok": out.ok, "error_kind": out.error_kind,
+                          "attempts": out.attempts})
             observations.append((call.name, out.content))
             trace.log("tool", step=step, call_id=call.id, name=call.name, arguments=call.arguments, ok=out.ok,
-                      error_kind=out.error_kind, result=out.content, latency_s=round(out.latency_s, 3))
+                      error_kind=out.error_kind, attempts=out.attempts, attempt_errors=out.errors, result=out.content,
+                      latency_s=round(out.latency_s, 3))
             messages.append({"role": "tool", "tool_call_id": call.id, "content": out.content})
 
 

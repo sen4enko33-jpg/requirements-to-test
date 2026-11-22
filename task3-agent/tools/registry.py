@@ -1,14 +1,21 @@
-"""Tools of the agent: a description, a schema of the arguments (Pydantic) and a function.
+"""Tools of the agent: a description, a schema of the arguments and of the answer (Pydantic) and a function.
 
-`execute` never raises. Unknown tool, broken JSON, invalid arguments, an exception or a timeout of the tool come back as a
-text that starts with "ERROR: <kind>:", which goes to the model as the tool result, so the model can fix the call
-(or tell the user) and the agent keeps running."""
+`execute` never raises. Every problem comes back as a text that starts with "ERROR: <kind>:", which goes to the model as
+the tool result, so the model can fix the call or tell the user, and the agent keeps running:
+
+  unknown_tool, bad_json, invalid_args  the call is wrong: the model can fix it (never retried)
+  timeout, rate_limited, unavailable    the service is slow or down (429 / 503): retried with backoff, but only for safe
+                                        (read-only) tools; after the last attempt the model is told the service is down
+  bad_output                            the tool answered in another format than its output schema (an API that renamed
+                                        or dropped a field): not retried, the field is named in the error and the trace
+  tool_error                            any other exception (not retried)
+"""
 from __future__ import annotations
 
 import json
 import time
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeout
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Callable
 
 from pydantic import BaseModel, ValidationError
@@ -19,15 +26,47 @@ class ToolInputError(ValueError):
     The model gets it as ERROR: invalid_args, like a schema error, so it can fix the call."""
 
 
+class ToolUnavailable(RuntimeError):
+    """The service behind a tool answered 429 (rate limit) or 5xx, or its own client timed out (status None)."""
+
+    def __init__(self, status: int | None, message: str = "", retry_after_s: float | None = None):
+        super().__init__(message or (f"HTTP {status}" if status else "timeout"))
+        self.status, self.retry_after_s = status, retry_after_s
+
+    @property
+    def kind(self) -> str:
+        return "timeout" if self.status is None else "rate_limited" if self.status == 429 else "unavailable"
+
+
+RETRYABLE_KINDS = ("timeout", "rate_limited", "unavailable")
+
+
+@dataclass
+class RetryPolicy:
+    max_attempts: int = 3           # attempts of a safe tool, the first one included
+    backoff_s: float = 0.5          # pause before the 2nd attempt; doubled for every next one
+    backoff_max_s: float = 4.0
+
+    @classmethod
+    def from_config(cls, cfg: dict | None) -> "RetryPolicy":
+        return cls(**{k: v for k, v in (cfg or {}).items() if k in ("max_attempts", "backoff_s", "backoff_max_s")})
+
+    def pause(self, attempt: int, retry_after_s: float | None = None) -> float:
+        """Pause after the failed attempt number `attempt` (1-based). A Retry-After of the service wins when it is longer."""
+        p = min(self.backoff_max_s, self.backoff_s * 2 ** (attempt - 1))
+        return max(p, retry_after_s or 0.0)
+
+
 @dataclass
 class Tool:
     name: str
     description: str                       # when to call it, when not, what it returns
     args_model: type[BaseModel]            # schema of the arguments (sent to the model as JSON Schema)
     fn: Callable[[BaseModel], Any]         # gets the validated arguments, returns something JSON-serialisable
-    safe: bool = True                      # read-only: may be repeated (used by retries in a later sub-step)
+    safe: bool = True                      # read-only: may be repeated after a timeout / 429 / 503
     side_effect: bool = False              # changes something outside the conversation (needs a human confirmation)
     version: str = ""                      # version of the description (prompts/tools/<name>.yaml), written to the trace
+    output_model: type[BaseModel] | None = None   # schema of the answer; checked before the answer reaches the model
 
     def schema(self) -> dict:
         params = self.args_model.model_json_schema()
@@ -39,22 +78,29 @@ class Tool:
 class ToolOutcome:
     ok: bool
     content: str                           # what the model gets as the tool result
-    error_kind: str | None = None          # unknown_tool | bad_json | invalid_args | timeout | tool_error
+    error_kind: str | None = None          # see the module docstring
     args: dict | None = None               # the validated arguments (None when they were invalid)
     latency_s: float = 0.0
+    attempts: int = 0                      # how many times the tool ran (0 when the call was rejected before running)
+    errors: list[str] = field(default_factory=list)   # the error of every failed attempt, for the trace
 
 
-def _error(kind: str, msg: str, start: float, args: dict | None = None) -> ToolOutcome:
-    return ToolOutcome(False, f"ERROR: {kind}: {msg}", kind, args, time.perf_counter() - start)
+def _short_validation(e: ValidationError, what: str = "arguments", limit: int = 3) -> str:
+    errs = e.errors()
+    text = "; ".join(f"{'.'.join(map(str, err['loc'])) or what}: {err['msg']}" for err in errs[:limit])
+    return text + (f"; and {len(errs) - limit} more" if len(errs) > limit else "")
 
 
-def _short_validation(e: ValidationError) -> str:
-    return "; ".join(f"{'.'.join(map(str, err['loc'])) or 'arguments'}: {err['msg']}" for err in e.errors())
+UNAVAILABLE_HINT = ("Tell the user that this service is unavailable right now and that you cannot answer from the documents; "
+                    "do not answer from memory and do not say the documents do not cover the question.")
 
 
 class ToolRegistry:
-    def __init__(self, tools: list[Tool] | None = None):
+    def __init__(self, tools: list[Tool] | None = None, retry: RetryPolicy | None = None, sleep=time.sleep):
+        """sleep: replaced in tests, so the backoff pauses are recorded instead of waited."""
         self.tools: dict[str, Tool] = {}
+        self.retry = retry or RetryPolicy()
+        self.sleep = sleep
         for t in tools or []:
             self.add(t)
 
@@ -66,34 +112,74 @@ class ToolRegistry:
     def schemas(self) -> list[dict]:
         return [t.schema() for t in self.tools.values()]
 
-    def execute(self, name: str, raw_args: str, timeout_s: float) -> ToolOutcome:
-        start = time.perf_counter()
-        tool = self.tools.get(name)
-        if tool is None:
-            return _error("unknown_tool", f"no tool named {name!r}; available: {', '.join(self.tools)}", start)
-        try:
-            data = json.loads(raw_args or "{}")
-        except json.JSONDecodeError as e:
-            return _error("bad_json", f"arguments are not valid JSON ({e.msg})", start)
-        try:
-            args = tool.args_model.model_validate(data)
-        except ValidationError as e:
-            return _error("invalid_args", _short_validation(e), start)
-        args_dict = args.model_dump()
-        if timeout_s <= 0:
-            return _error("timeout", "no time left for this request", start, args_dict)
+    def _run_once(self, tool: Tool, args: BaseModel, timeout_s: float):
+        """-> (kind, message, retry_after) on failure or (None, content, None) on success."""
         # The tool runs in a worker thread so that a slow tool cannot block the agent past the timeout. Python cannot
         # kill the thread: a timed-out tool may still finish in the background, its result is ignored.
         pool = ThreadPoolExecutor(max_workers=1)
         try:
             result = pool.submit(tool.fn, args).result(timeout=timeout_s)
         except ToolInputError as e:
-            return _error("invalid_args", str(e), start, args_dict)
+            return "invalid_args", str(e), None
+        except ToolUnavailable as e:
+            return e.kind, f"{tool.name}: {e}", e.retry_after_s
         except FutureTimeout:
-            return _error("timeout", f"the tool did not answer within {timeout_s:.0f} s", start, args_dict)
+            return "timeout", f"{tool.name} did not answer within {timeout_s:.1f} s", None
         except Exception as e:
-            return _error("tool_error", f"{type(e).__name__}: {e}", start, args_dict)
+            return "tool_error", f"{type(e).__name__}: {e}", None
         finally:
             pool.shutdown(wait=False)
-        content = result if isinstance(result, str) else json.dumps(result, ensure_ascii=False, default=str)
-        return ToolOutcome(True, content, None, args_dict, time.perf_counter() - start)
+        if tool.output_model is not None and not isinstance(result, str):
+            try:
+                tool.output_model.model_validate(result)
+            except ValidationError as e:
+                return "bad_output", (f"{tool.name} answered in an unexpected format ({_short_validation(e, 'answer')}). "
+                                      "This is a failure of the service, not a missing answer: tell the user that the "
+                                      "service returned invalid data and that you cannot answer now. Do not say the "
+                                      "documents do not cover the question."), None
+        return None, result if isinstance(result, str) else json.dumps(result, ensure_ascii=False, default=str), None
+
+    def execute(self, name: str, raw_args: str, timeout_s: float, time_left_s: float | None = None) -> ToolOutcome:
+        """timeout_s: limit of one attempt; time_left_s: time left for the whole request (retries and pauses stop
+        when it runs out; None = only timeout_s counts)."""
+        start = time.perf_counter()
+        deadline = start + (time_left_s if time_left_s is not None else timeout_s * self.retry.max_attempts + 60)
+
+        def fail(kind, msg, args=None, attempts=0, errors=None):
+            return ToolOutcome(False, f"ERROR: {kind}: {msg}", kind, args, time.perf_counter() - start, attempts, errors or [])
+
+        tool = self.tools.get(name)
+        if tool is None:
+            return fail("unknown_tool", f"no tool named {name!r}; available: {', '.join(self.tools)}")
+        try:
+            data = json.loads(raw_args or "{}")
+        except json.JSONDecodeError as e:
+            return fail("bad_json", f"arguments are not valid JSON ({e.msg})")
+        try:
+            args = tool.args_model.model_validate(data)
+        except ValidationError as e:
+            return fail("invalid_args", _short_validation(e))
+        args_dict = args.model_dump()
+        if timeout_s <= 0:
+            return fail("timeout", "no time left for this request", args_dict)
+
+        errors: list[str] = []
+        attempts = 0
+        max_attempts = self.retry.max_attempts if tool.safe else 1
+        while True:
+            left = deadline - time.perf_counter()
+            if left <= 0:
+                return fail("timeout", "no time left for this request" + (f" after {attempts} attempt(s)" if attempts else ""),
+                            args_dict, attempts, errors)
+            attempts += 1
+            kind, msg, retry_after = self._run_once(tool, args, min(timeout_s, left))
+            if kind is None:
+                return ToolOutcome(True, msg, None, args_dict, time.perf_counter() - start, attempts, errors)
+            errors.append(f"{kind}: {msg}")
+            if kind not in RETRYABLE_KINDS:
+                return fail(kind, msg, args_dict, attempts, errors)
+            pause = self.retry.pause(attempts, retry_after)
+            if attempts >= max_attempts or time.perf_counter() + pause >= deadline:
+                why = (f"after {attempts} attempt(s)" if tool.safe else "not retried: the tool changes data")
+                return fail(kind, f"{msg} ({why}). {UNAVAILABLE_HINT}", args_dict, attempts, errors)
+            self.sleep(pause)
