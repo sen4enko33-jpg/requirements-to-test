@@ -3,6 +3,15 @@
 Versions of the system prompt are `prompts/system_<version>.md` (the one in use is `system_prompt` of `config.yaml`).
 Tool descriptions are `prompts/tools/<name>.yaml` with a `version` field; their changes are listed here too.
 
+## system_v6 (step 1.5, after the first evaluation run)
+- Rule 1: general questions (arithmetic and the like) are answered without tools. In the first run (task b03) v5 refused
+  "17 x 3" ("this is an arithmetic question, I cannot answer it"), reading rule 2 (facts only from tools) as a ban on
+  everything that is not in the documents.
+
+## list_documents v2 (step 1.5)
+- `title_contains` also matches the doc_id. In task e06 the agent looked for "keepass", got 0 documents (the title is the
+  generic "Software Requirements Specification", the name is only in the doc_id 2008_keepass) and gave up.
+
 ## system_v5 (step 1.4)
 - Rule 8 rewritten. With v4 the agent never created a test case: in 5 of 5 real runs with a clear requirement it asked the
   user for "a title and steps" instead, because "never guess" was read as "ask for everything". The confirmation is now

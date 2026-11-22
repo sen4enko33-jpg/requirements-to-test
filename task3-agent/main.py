@@ -30,12 +30,9 @@ from agent.limits import Limits  # noqa: E402
 from agent.llm import make_model  # noqa: E402
 from agent.loop import run_agent  # noqa: E402
 from agent.trace import Trace  # noqa: E402
+from tools.build import build_registry  # noqa: E402
 from tools.corpus import Corpus  # noqa: E402
-from tools.corpus_tools import make_corpus_tools  # noqa: E402
-from tools import faults  # noqa: E402
-from tools.registry import RetryPolicy, ToolRegistry  # noqa: E402
 from tools.session import Session  # noqa: E402
-from tools.ticket_tool import make_ticket_tool  # noqa: E402
 from tools.tracker import Tracker  # noqa: E402
 
 
@@ -45,17 +42,6 @@ def load_config() -> dict:
 
 def load_system_prompt(version: str) -> str:
     return (ROOT / "prompts" / f"system_{version}.md").read_text(encoding="utf-8").strip()
-
-
-def build_tools(cfg: dict, session: Session, fault_spec: str | None = None) -> ToolRegistry:
-    corpus = Corpus()
-    corpus.warm_up()          # load the search models now, not inside the first tool call (its timeout is short)
-    tools = make_corpus_tools(corpus, session=session) + [make_ticket_tool(Tracker(), corpus, session)]
-    registry = ToolRegistry(tools, RetryPolicy.from_config(cfg.get("tool_retry")))
-    if fault_spec:
-        faults.apply(registry, fault_spec)
-        print(f"[faults: {fault_spec}]", file=sys.stderr)
-    return registry
 
 
 def main() -> int:
@@ -83,7 +69,10 @@ def main() -> int:
         confirm = CliConfirmer()
     trace = Trace(ROOT / cfg["trace_dir"])
     session = Session(run_id=trace.run_id, request=a.question)
-    result = run_agent(a.question, make_model(cfg, key), build_tools(cfg, session, os.getenv("FAULTS")), limits,
+    corpus = Corpus()
+    corpus.warm_up()          # load the search models now, not inside the first tool call (its timeout is short)
+    tools = build_registry(cfg, corpus, Tracker(), session, os.getenv("FAULTS"))
+    result = run_agent(a.question, make_model(cfg, key), tools, limits,
                        load_system_prompt(cfg["system_prompt"]), trace, confirm=confirm)
     print(result.answer)
     u = result.usage

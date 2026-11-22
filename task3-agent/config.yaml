@@ -14,6 +14,7 @@ model:
 # the reason is written to the trace (stop_reason).
 limits:
   max_steps: 8                         # model calls per request
+  max_tool_calls: 12                   # tool calls per request: one model call can ask for dozens of them (seen: 41)
   max_tokens_total: 40000              # input + output tokens of all model calls of the request
   max_cost_usd: 0.02                   # cost of all model calls of the request
   request_timeout_s: 120               # wall time of the whole request
@@ -25,5 +26,5 @@ tool_retry:
   backoff_s: 0.5                       # pause before the 2nd attempt, doubled for every next one (429: Retry-After if longer)
   backoff_max_s: 4
 
-system_prompt: v5                      # prompts/system_<version>.md
+system_prompt: v6                      # prompts/system_<version>.md
 trace_dir: traces                      # one JSONL file per request (not in git)

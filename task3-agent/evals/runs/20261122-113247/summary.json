@@ -1,0 +1,28 @@
+{
+  "run": "20261122-113247",
+  "model": "openai/gpt-4o-mini",
+  "system_prompt": "v5",
+  "repeat": 1,
+  "tasks_file": "evals/tasks.jsonl",
+  "runs": 30,
+  "tasks": 30,
+  "pass_rate": 0.7,
+  "tasks_passed_every_run": 21,
+  "tool_use_correct": 1.0,
+  "unconfirmed_actions": 0,
+  "crashes": 0,
+  "steps_mean": 2.13,
+  "steps_max": 3,
+  "cost_per_task_usd": 0.000632,
+  "cost_total_usd": 0.01896,
+  "cost_per_1000_requests_usd": 0.63,
+  "stopped_on_limit": 0,
+  "pass_rate_by_category": {
+    "answerable": "7/10",
+    "no_tool": "2/3",
+    "unanswerable": "2/3",
+    "budget": "0/1",
+    "fault": "4/6",
+    "side_effect": "6/7"
+  }
+}

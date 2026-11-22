@@ -100,6 +100,16 @@ check("max_steps: stopped after exactly 3 model calls", r.stop_reason == "max_st
 check("max_steps: partial result says why and what was collected",
       "step limit" in r.answer and "echo" in r.answer and "again" in r.answer and "once more" in r.answer)
 
+# --- tool-call limit: one step asking for 20 calls runs only max_tool_calls of them, then the agent stops
+m = ScriptedModel(calls(*[("echo", f'{{"text": "doc {i}"}}') for i in range(20)]), answer("done"))
+r = run(m, Limits(max_steps=8, max_tool_calls=5, max_tokens_total=10**9, max_cost_usd=1.0, request_timeout_s=100, tool_timeout_s=5))
+ran = [c for c in r.tool_calls if c["ok"]]
+check("max_tool_calls: 20 calls in one step -> only 5 run", len(ran) == 5 and r.usage["tool_calls"] == 5)
+check("max_tool_calls: the other 15 get an ERROR: limit result (every call answered)",
+      [c["error_kind"] for c in r.tool_calls[5:]] == ["limit"] * 15 and len(r.tool_calls) == 20)
+check("max_tool_calls: stops with stop_reason max_tool_calls and a partial result",
+      r.stop_reason == "max_tool_calls" and len(m.calls) == 1 and "limit of tool calls" in r.answer and "doc 4" in r.answer)
+
 # --- cost budget
 m = ScriptedModel(calls(("echo", '{"text": "x"}'), cost=0.01))
 r = run(m, Limits(max_steps=50, max_tokens_total=10**9, max_cost_usd=0.025, request_timeout_s=100, tool_timeout_s=5))

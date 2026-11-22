@@ -16,6 +16,7 @@ from .trace import Trace
 
 STOP_TEXT = {
     "max_steps": "the step limit of the request was reached",
+    "max_tool_calls": "the limit of tool calls of the request was reached",
     "budget_tokens": "the token budget of the request was used up",
     "budget_cost": "the cost budget of the request was used up",
     "timeout": "the time limit of the request was reached",
@@ -50,6 +51,8 @@ def _partial(reason: str, last_text: str | None, observations: list[tuple[str, s
     return "\n".join(lines)
 
 
+TOOL_LIMIT = ("ERROR: limit: this request reached its limit of {n} tool calls, so this call was not run. Answer with what "
+              "you have.")
 NOT_CONFIRMED = ("ERROR: not_confirmed: the user did not allow {tool}; nothing was changed. Do not call it again in this "
                  "request; tell the user that nothing was created.")
 ALREADY_DECLINED = ("ERROR: not_confirmed: the user already declined a change in this request, so {tool} was not run and the "
@@ -102,7 +105,10 @@ def run_agent(question: str, model: ChatModel, tools: ToolRegistry, limits: Limi
             tool = tools.tools.get(call.name)
             confirmed = None
             out = None
-            if tool is not None and tool.side_effect:
+            if budget.tool_calls >= limits.max_tool_calls:
+                # a model can ask for dozens of calls in one step (41 in the first evaluation run): the extra ones never run
+                out = ToolOutcome(False, TOOL_LIMIT.format(n=limits.max_tool_calls), "limit")
+            elif tool is not None and tool.side_effect:
                 # The gate is here, in code: the tool runs only after a "yes" for exactly these arguments.
                 args, bad = tools.check_args(call.name, call.arguments)
                 if bad is not None:
@@ -121,6 +127,7 @@ def run_agent(question: str, model: ChatModel, tools: ToolRegistry, limits: Limi
                         declined = True
                         out = ToolOutcome(False, NOT_CONFIRMED.format(tool=call.name), "not_confirmed", args)
             if out is None:
+                budget.tool_calls += 1
                 left = budget.remaining_s()
                 out = tools.execute(call.name, call.arguments, min(limits.tool_timeout_s, left), time_left_s=left)
             calls.append({"step": step, "name": call.name, "args": out.args, "ok": out.ok, "error_kind": out.error_kind,

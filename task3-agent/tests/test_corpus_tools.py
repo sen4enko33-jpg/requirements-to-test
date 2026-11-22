@@ -126,6 +126,9 @@ data = json.loads(call(reg, "list_documents", {"title_contains": "remote work"})
 check("list_documents: title filter, any case, with the other version as near duplicate",
       [d["doc_id"] for d in data["documents"]] == ["remote_work_policy", "remote_work_policy_2023"]
       and data["documents"][0]["near_duplicates"] == ["remote_work_policy_2023"])
+data = json.loads(call(reg, "list_documents", {"title_contains": "keepass"}).content)
+check("list_documents: the filter also matches the doc_id (the KeePass title is generic)",
+      [d["doc_id"] for d in data["documents"]] == ["2008_keepass"])
 data = json.loads(call(reg, "list_documents", {"year": 2023}).content)
 check("list_documents: year filter", "remote_work_policy_2023" in [d["doc_id"] for d in data["documents"]]
       and all(d["year"] == 2023 for d in data["documents"]))
@@ -154,7 +157,7 @@ check("loop: search result reaches the model and the answer cites its ref",
 check("loop: the search call is recorded", r.tool_calls[0]["name"] == "search_corpus")
 t = Trace()
 run_agent("q", Scripted(ChatResult("hi")), reg, Limits(), "sys", t)
-check("trace: tool versions at the start", t.of("start")[0]["tool_versions"] == {"search_corpus": "v2", "get_passage": "v1", "list_documents": "v1"})
+check("trace: tool versions at the start", t.of("start")[0]["tool_versions"] == {"search_corpus": "v2", "get_passage": "v1", "list_documents": "v2"})
 
 print(f"\n{'FAILED: ' + str(len(FAILED)) if FAILED else 'all checks passed'}")
 sys.exit(1 if FAILED else 0)

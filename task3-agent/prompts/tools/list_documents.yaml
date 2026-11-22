@@ -1,9 +1,10 @@
 name: list_documents
-version: v1
+version: v2
 description: |
   Lists the documents of the collection with their metadata (no text): doc_id, title, year, date, version, number of
   words and near-duplicate documents (other versions of the same document).
   Call it when the user asks which documents exist, how many there are, which versions of a document exist, or when you
   need a doc_id to search one document only.
   Do NOT call it to answer questions about the content of documents (use search_corpus).
-  Optional filters: `title_contains` (case-insensitive part of the title), `year`. Returns {"total", "documents": [...]}.
+  Optional filters: `title_contains` (case-insensitive part of the title or of the doc_id; many titles are generic, such
+  as "Software Requirements Specification", and the system name is only in the doc_id, e.g. 2008_keepass), `year`. Returns {"total", "documents": [...]}.

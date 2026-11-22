@@ -31,7 +31,8 @@ class PassageArgs(BaseModel):
 
 
 class ListArgs(BaseModel):
-    title_contains: Optional[str] = Field(None, min_length=2, max_length=100, description="Part of the title, any case.")
+    title_contains: Optional[str] = Field(None, min_length=2, max_length=100,
+                                          description="Part of the title or of the doc_id, any case.")
     year: Optional[int] = Field(None, ge=1990, le=2100, description="Only documents of this year.")
 
 
@@ -137,7 +138,7 @@ def make_corpus_tools(corpus: Corpus | None = None, floor: float | None = "defau
 
     def list_documents(a: ListArgs) -> dict:
         docs = [d for d in corpus.documents.values()
-                if (a.title_contains is None or a.title_contains.lower() in (d.get("title") or "").lower())
+                if (a.title_contains is None or a.title_contains.lower() in f"{d.get('title') or ''} {d['doc_id']}".lower())
                 and (a.year is None or d.get("year") == a.year)]
         rows = [{"doc_id": d["doc_id"], "title": d.get("title"), "year": d.get("year"), "date": d.get("date"),
                  "version": d.get("version"), "words": d.get("words"),
