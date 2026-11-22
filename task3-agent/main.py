@@ -46,8 +46,8 @@ def main() -> int:
 
     load_dotenv(ROOT / ".env"); load_dotenv(ROOT.parent / ".env")
     cfg = load_config()
-    key = os.getenv(cfg["model"]["api_key_env"])
-    if not key:
+    key = (os.getenv(cfg["model"]["api_key_env"]) or "").strip()   # a pasted key often ends with a newline: invalid in a header
+    if key in {"your-key-here", ""}:
         sys.exit(f"no {cfg['model']['api_key_env']}: copy .env.example to .env (repository root) and put the key there")
     limits = Limits.from_config(cfg["limits"])
     if a.max_steps is not None:

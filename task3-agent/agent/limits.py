@@ -17,7 +17,7 @@ LIMIT_REASONS = (MAX_STEPS, BUDGET_TOKENS, BUDGET_COST, TIMEOUT)
 
 @dataclass
 class Limits:
-    max_steps: int = 8
+    max_steps: int = 5
     max_tokens_total: int = 40000
     max_cost_usd: float = 0.02
     request_timeout_s: float = 120.0
