@@ -1,7 +1,10 @@
 """The agent of task 3 in one command:  python main.py "your question"
 
   python main.py "Hello, what can you do?"
-  python main.py "Echo the text 'hi' with the echo tool" --max-steps 3
+  python main.py "How many days a week can employees work remotely?"
+  python main.py "Which documents are about weather?" --max-steps 3
+
+The search over the corpus uses the Chroma index of task 2: build it once in ../task2-rag with python -m rag.retrieval.build.
 
 Needs OPENROUTER_API_KEY in .env (repository root or this folder). Every run writes its trace to traces/<run_id>.jsonl."""
 from __future__ import annotations
@@ -21,7 +24,8 @@ from agent.limits import Limits  # noqa: E402
 from agent.llm import make_model  # noqa: E402
 from agent.loop import run_agent  # noqa: E402
 from agent.trace import Trace  # noqa: E402
-from tools.echo import ECHO  # noqa: E402
+from tools.corpus import Corpus  # noqa: E402
+from tools.corpus_tools import make_corpus_tools  # noqa: E402
 from tools.registry import ToolRegistry  # noqa: E402
 
 
@@ -34,7 +38,9 @@ def load_system_prompt(version: str) -> str:
 
 
 def build_tools() -> ToolRegistry:
-    return ToolRegistry([ECHO])
+    corpus = Corpus()
+    corpus.warm_up()          # load the search models now, not inside the first tool call (its timeout is short)
+    return ToolRegistry(make_corpus_tools(corpus))
 
 
 def main() -> int:

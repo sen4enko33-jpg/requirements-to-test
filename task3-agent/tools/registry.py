@@ -14,6 +14,11 @@ from typing import Any, Callable
 from pydantic import BaseModel, ValidationError
 
 
+class ToolInputError(ValueError):
+    """Raised by a tool when the arguments are valid by the schema but wrong for the data (an unknown doc_id or ref).
+    The model gets it as ERROR: invalid_args, like a schema error, so it can fix the call."""
+
+
 @dataclass
 class Tool:
     name: str
@@ -22,6 +27,7 @@ class Tool:
     fn: Callable[[BaseModel], Any]         # gets the validated arguments, returns something JSON-serialisable
     safe: bool = True                      # read-only: may be repeated (used by retries in a later sub-step)
     side_effect: bool = False              # changes something outside the conversation (needs a human confirmation)
+    version: str = ""                      # version of the description (prompts/tools/<name>.yaml), written to the trace
 
     def schema(self) -> dict:
         params = self.args_model.model_json_schema()
@@ -81,6 +87,8 @@ class ToolRegistry:
         pool = ThreadPoolExecutor(max_workers=1)
         try:
             result = pool.submit(tool.fn, args).result(timeout=timeout_s)
+        except ToolInputError as e:
+            return _error("invalid_args", str(e), start, args_dict)
         except FutureTimeout:
             return _error("timeout", f"the tool did not answer within {timeout_s:.0f} s", start, args_dict)
         except Exception as e:

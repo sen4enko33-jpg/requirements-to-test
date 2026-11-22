@@ -1,0 +1,9 @@
+name: get_passage
+version: v1
+description: |
+  Returns the full text of one passage by its `ref` (from search_corpus), optionally with the neighbouring passages of
+  the same document (`before`, `after`: 0-2 each).
+  Call it when a search result is cut (`truncated`: true) or when the answer probably continues in the next or previous
+  passage (a list, a table, a sentence that refers to the previous one).
+  Do NOT call it with a ref you did not get from search_corpus, and do not use it to read whole documents.
+  Returns {"passages": [{"ref", "doc_id", "title", "section", "date", "page", "text"}]} in document order.

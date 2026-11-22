@@ -60,7 +60,7 @@ def run_agent(question: str, model: ChatModel, tools: ToolRegistry, limits: Limi
     observations: list[tuple[str, str]] = []
     last_text: str | None = None
     trace.log("start", question=question, model=getattr(model, "name", "?"), tools=[s["function"]["name"] for s in schemas],
-              limits=vars(limits))
+              tool_versions={t.name: t.version for t in tools.tools.values() if t.version}, limits=vars(limits))
 
     def finish(reason: str, answer: str) -> AgentResult:
         complete = reason == ANSWERED

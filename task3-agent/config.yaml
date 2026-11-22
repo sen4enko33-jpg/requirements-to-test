@@ -19,5 +19,5 @@ limits:
   request_timeout_s: 120               # wall time of the whole request
   tool_timeout_s: 20                   # one tool call
 
-system_prompt: v1                      # prompts/system_<version>.md
+system_prompt: v2                      # prompts/system_<version>.md
 trace_dir: traces                      # one JSONL file per request (not in git)
