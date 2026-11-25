@@ -5,7 +5,8 @@
   python -m evals.run --only a01,f04       # some tasks;  --category fault,side_effect  some groups
 
 Every task runs with its own empty tracker (plus the tickets of its `setup`), its own FAULTS, its own confirmations
-(`answers`, the rest is "no") and its own limits. Output in evals/runs/<date-time>/:
+(`answers`, the rest is "no") and its own limits. The tracker is one file of the run (tracker.db, cleared for every task,
+deleted at the end), read by the MCP tracker server, which is started once for the run. Output in evals/runs/<date-time>/:
   traces/<task>_r<n>.jsonl   the trace of every run
   results.jsonl              one line per run: passed, failed checks, stop reason, steps, tokens, cost, tools, answer
   summary.md, summary.json   the metrics (pass rate, tool use, actions without permission, steps and cost per task)
@@ -37,6 +38,7 @@ from agent.trace import Trace  # noqa: E402
 from evals.checks import run_checks, tool_names, unconfirmed_side_effects  # noqa: E402
 from tools.build import build_registry  # noqa: E402
 from tools.corpus import Corpus  # noqa: E402
+from tools.mcp_tools import mcp_tools, open_server  # noqa: E402
 from tools.session import Session  # noqa: E402
 from tools.tracker import Tracker, idempotency_key  # noqa: E402
 
@@ -49,9 +51,13 @@ def load_tasks(path: Path = TASKS) -> list[dict]:
     return [json.loads(l) for l in path.read_text(encoding="utf-8").splitlines() if l.strip()]
 
 
-def setup_tracker(task: dict) -> Tracker:
-    """An empty tracker in memory with the tickets of the task's setup, keyed like the agent keys them (request + ref)."""
-    tracker = Tracker(":memory:")
+def setup_tracker(task: dict, tracker: Tracker | None = None) -> Tracker:
+    """An empty tracker with the tickets of the task's setup, keyed like the agent keys them (request + ref).
+    tracker: the file of this evaluation run that the MCP server reads (cleared here); None = a new one in memory."""
+    if tracker is None:
+        tracker = Tracker(":memory:")
+    else:
+        tracker.clear()
     for i, tk in enumerate(task.get("setup", {}).get("tickets", []), 1):
         doc = tk["requirement_ref"].split("#")[0]
         tracker.create(doc, tk["requirement_ref"], tk.get("title", f"Existing test case {i}"), tk.get("steps", ["existing step"]),
@@ -61,14 +67,14 @@ def setup_tracker(task: dict) -> Tracker:
 
 
 def run_task(task: dict, rep: int, cfg: dict, model, corpus: Corpus, system_prompt: str, trace_dir: Path | None,
-             sleep=None) -> dict:
+             sleep=None, tracker: Tracker | None = None, mcp=None) -> dict:
     """One run of one task -> a result row. A crash of the agent run is recorded as a failed task with the error (the other
     tasks still run); a broken task definition raises (tests/test_checks.py validates tasks.jsonl so it does not happen)."""
     run_id = f"{task['id']}_r{rep}"
     trace = Trace(trace_dir, run_id=run_id) if trace_dir else Trace(run_id=run_id)
     if trace.path and trace.path.exists():
         trace.path.unlink()
-    tracker = setup_tracker(task)
+    tracker = setup_tracker(task, tracker)
     before = tracker.count()
     session = Session(run_id=run_id, request=task["question"])
     limits = Limits.from_config({**cfg["limits"], **task.get("limits", {})})
@@ -76,7 +82,8 @@ def run_task(task: dict, rep: int, cfg: dict, model, corpus: Corpus, system_prom
     row = {"id": task["id"], "category": task["category"], "rep": rep, "question": task["question"], "faults": task.get("faults")}
     t0 = time.perf_counter()
     try:
-        tools = build_registry(cfg, corpus, tracker, session, task.get("faults"), sleep=sleep, quiet=True)
+        tools = build_registry(cfg, corpus, tracker, session, task.get("faults"), sleep=sleep, quiet=True,
+                               extra_tools=mcp_tools(mcp) if mcp else [])
         r = run_agent(task["question"], model, tools, limits, system_prompt, trace, confirm=confirm)
     except Exception as e:                                 # a bug of the harness or the agent: recorded, the run goes on
         row.update(passed=False, error=f"{type(e).__name__}: {e}", traceback=traceback.format_exc(),
@@ -192,20 +199,26 @@ def main() -> int:
     model = make_model(cfg, key)
     corpus = Corpus()
     corpus.warm_up()
-    meta = {"run": run_name, "model": model.name, "system_prompt": cfg["system_prompt"], "repeat": a.repeat,
+    tracker = Tracker(out / "tracker.db")       # one file for the run, cleared for every task; the MCP server reads it
+    mcp = open_server(cfg, "tracker", db=tracker.path)
+    meta = {"run": run_name, "mcp_tools": [t.name for t in mcp.tools] if mcp else [], "model": model.name, "system_prompt": cfg["system_prompt"], "repeat": a.repeat,
             "tasks_file": str(TASKS.relative_to(ROOT))}
 
     rows = []
     with (out / "results.jsonl").open("w", encoding="utf-8") as f:
         for rep in range(1, a.repeat + 1):
             for t in tasks:
-                row = run_task(t, rep, cfg, model, corpus, system_prompt, out / "traces")
+                row = run_task(t, rep, cfg, model, corpus, system_prompt, out / "traces", tracker=tracker, mcp=mcp)
                 rows.append(row)
                 f.write(json.dumps(row, ensure_ascii=False) + "\n")
                 f.flush()
                 print(f"{'PASS' if row['passed'] else 'FAIL'} {t['id']} r{rep} {row.get('stop_reason', 'crash')} "
                       f"steps={row.get('steps', '-')} ${row.get('cost_usd', 0):.5f}"
                       + ("" if row["passed"] else f"  {row.get('failed')}"), flush=True)
+    if mcp:
+        mcp.close()
+    tracker.close()
+    (out / "tracker.db").unlink(missing_ok=True)
     summary, md = summarize(rows, meta)
     (out / "summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     (out / "summary.md").write_text(md, encoding="utf-8")

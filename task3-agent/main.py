@@ -11,6 +11,10 @@ Without a terminal the change is declined; --answers y,n gives the answers in ad
 
 Fault injection (tools/faults.py): FAULTS=search_corpus:503 python main.py "..." (also timeout, 429, schema, *n).
 
+The test cases already in the tracker are read through the MCP server mcp_server/tracker_server.py: main.py starts it as a
+subprocess for the request (config.yaml, section mcp) and its tools list_test_cases / get_test_case join the agent's tools.
+Its log goes to traces/mcp_tracker.log. If it does not start, the agent runs without these two tools.
+
 Needs OPENROUTER_API_KEY in .env (repository root or this folder). Every run writes its trace to traces/<run_id>.jsonl."""
 from __future__ import annotations
 
@@ -32,6 +36,7 @@ from agent.loop import run_agent  # noqa: E402
 from agent.trace import Trace  # noqa: E402
 from tools.build import build_registry  # noqa: E402
 from tools.corpus import Corpus  # noqa: E402
+from tools.mcp_tools import mcp_tools, open_server  # noqa: E402
 from tools.session import Session  # noqa: E402
 from tools.tracker import Tracker  # noqa: E402
 
@@ -71,9 +76,16 @@ def main() -> int:
     session = Session(run_id=trace.run_id, request=a.question)
     corpus = Corpus()
     corpus.warm_up()          # load the search models now, not inside the first tool call (its timeout is short)
-    tools = build_registry(cfg, corpus, Tracker(), session, os.getenv("FAULTS"))
-    result = run_agent(a.question, make_model(cfg, key), tools, limits,
-                       load_system_prompt(cfg["system_prompt"]), trace, confirm=confirm)
+    tracker = Tracker()
+    conn = open_server(cfg, "tracker", db=tracker.path)       # the server reads the same file the agent writes
+    try:
+        tools = build_registry(cfg, corpus, tracker, session, os.getenv("FAULTS"),
+                               extra_tools=mcp_tools(conn) if conn else [])
+        result = run_agent(a.question, make_model(cfg, key), tools, limits,
+                           load_system_prompt(cfg["system_prompt"]), trace, confirm=confirm)
+    finally:
+        if conn:
+            conn.close()
     print(result.answer)
     u = result.usage
     print(f"\n[stop: {result.stop_reason} | steps {u['steps']} | tokens {u['tokens_in']}+{u['tokens_out']} | "

@@ -89,5 +89,9 @@ class Tracker:
     def count(self) -> int:
         return self._db.execute("SELECT COUNT(*) FROM test_cases").fetchone()[0]
 
+    def clear(self) -> None:
+        """Delete every row (the evaluation runner gives every task an empty tracker in the same file)."""
+        self._db.execute("DELETE FROM test_cases")
+
     def close(self) -> None:
         self._db.close()

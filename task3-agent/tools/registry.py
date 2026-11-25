@@ -8,6 +8,8 @@ the tool result, so the model can fix the call or tell the user, and the agent k
                                         (read-only) tools; after the last attempt the model is told the service is down
   bad_output                            the tool answered in another format than its output schema (an API that renamed
                                         or dropped a field): not retried, the field is named in the error and the trace
+  forbidden, not_found                  a decision of the service (403 / 404, e.g. the MCP tracker): not retried, the
+                                        message of the service goes to the model as it is
   tool_error                            any other exception (not retried)
 """
 from __future__ import annotations
@@ -36,6 +38,14 @@ class ToolUnavailable(RuntimeError):
     @property
     def kind(self) -> str:
         return "timeout" if self.status is None else "rate_limited" if self.status == 429 else "unavailable"
+
+
+class ToolRefused(RuntimeError):
+    """The service answered, and the answer is a refusal that a retry cannot change: 403 forbidden, 404 not found."""
+
+    def __init__(self, kind: str, message: str):
+        super().__init__(message)
+        self.kind = kind
 
 
 RETRYABLE_KINDS = ("timeout", "rate_limited", "unavailable")
@@ -125,6 +135,8 @@ class ToolRegistry:
             return "invalid_args", str(e), None
         except ToolUnavailable as e:
             return e.kind, f"{tool.name}: {e}", e.retry_after_s
+        except ToolRefused as e:
+            return e.kind, str(e), None
         except FutureTimeout:
             return "timeout", f"{tool.name} did not answer within {timeout_s:.1f} s", None
         except Exception as e:

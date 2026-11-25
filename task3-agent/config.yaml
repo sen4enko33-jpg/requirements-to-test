@@ -26,5 +26,15 @@ tool_retry:
   backoff_s: 0.5                       # pause before the 2nd attempt, doubled for every next one (429: Retry-After if longer)
   backoff_max_s: 4
 
+# MCP servers the agent connects to (step 2). The agent starts each one as a subprocess (stdio) with its own Python, for the
+# whole request; its tools (names, descriptions, schemas, read-only or not) come from the server, see tools/mcp_tools.py.
+mcp:
+  tracker:
+    module: mcp_server.tracker_server  # python -m <module>
+    env: {TRACKER_TEAM: hr-policy-qa, TRACKER_ROLE: reader}   # who the agent is for the server (mcp_server/access.yaml)
+    start_timeout_s: 30                # the server did not start -> the agent runs without its tools and says so
+    call_timeout_s: 15                 # one tools/call (the tool_timeout_s of the request can only shorten it)
+    log: traces/mcp_tracker.log        # stderr of the server (its ALLOW / DENY lines), not mixed into the answer
+
 system_prompt: v6                      # prompts/system_<version>.md
 trace_dir: traces                      # one JSONL file per request (not in git)
