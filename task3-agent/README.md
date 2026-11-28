@@ -27,7 +27,7 @@ Python 3.10+.
     FAULTS=search_corpus:503 python main.py "..." # fake failures: timeout, 429, 503, schema, lost
     python main.py "..." --max-steps 3 --max-cost 0.005
 
-Tests without a model: `for t in tests/test_*.py; do .venv/bin/python $t | tail -1; done` (411 checks).
+Tests without a model: `for t in tests/test_*.py; do .venv/bin/python $t | tail -1; done` (419 checks).
 Evaluation on the model: `python -m evals.run --repeat 3` (about $0.07).
 
 ## Tools
@@ -168,6 +168,10 @@ Long-term memory of a user between sessions ([`agent/memory.py`](agent/memory.py
 Final run (`evals/runs/20261128-164246`, system_v9, 49 test scenarios x 3): 137/147 passed (93%), 0 actions without
 permission, 2.2 steps and $0.00066 per run. a10, d01 and h03 fail every time and v04 once; the metrics, the three
 failures and the table of fault scenarios are in [`REPORT.md`](REPORT.md).
+
+## Reflection
+[`REFLECTION.md`](REFLECTION.md): five episodes of building this agent with a coding agent (what it did well, what
+was rewritten and why, how the code was checked); its instructions are in [`../CLAUDE.md`](../CLAUDE.md).
 
 ## Layout
 - `main.py`, `config.yaml` - the agent and its settings
