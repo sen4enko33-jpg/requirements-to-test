@@ -37,5 +37,5 @@ mcp:
     call_timeout_s: 15                 # one tools/call (the tool_timeout_s of the request can only shorten it)
     log: traces/mcp_tms.log            # stderr of the server (its ALLOW / DENY lines), not mixed into the answer
 
-system_prompt: v7                      # prompts/system_<version>.md
+system_prompt: v9                      # prompts/system_<version>.md
 trace_dir: traces                      # one JSONL file per request (not in git)

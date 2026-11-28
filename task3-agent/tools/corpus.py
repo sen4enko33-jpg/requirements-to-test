@@ -1,7 +1,9 @@
 """Access to the corpus of task 2: the chunks, the document manifest and the search (Chroma + BM25 + reranker).
 
 Nothing is copied: the package `rag` is imported from ../task2-rag (or TASK2_RAG_DIR), and the index built there
-(`python -m rag.retrieval.build` in task2-rag) is used as it is. The search models load lazily on the first search;
+(`python -m rag.retrieval.build` in task2-rag) is used as it is. The documents of corpus_extra/ (tools/extra_corpus.py:
+wiki pages with a prompt injection, step 3.1) are added on top: their chunks join the chunks of task 2, their vectors are
+kept in memory, and one search covers both. The search models load lazily on the first search;
 call `warm_up()` before a request so that the loading does not count against the timeout of a tool call."""
 from __future__ import annotations
 
@@ -10,6 +12,8 @@ import os
 import sys
 from functools import cached_property
 from pathlib import Path
+
+from .extra_corpus import EXTRA_DIR, CombinedStore, MemoryStore, load_extra
 
 TASK2 = Path(os.environ.get("TASK2_RAG_DIR", Path(__file__).resolve().parents[2] / "task2-rag")).resolve()
 DATA = TASK2 / "rag" / "data"
@@ -24,21 +28,31 @@ class Corpus:
     """chunks: chunk dicts of chunks.jsonl; documents: the `documents` of manifest.json; retriever: object with
     .search(query, k, mode, filters) (the real one is created on first use). Tests pass small fakes."""
 
-    def __init__(self, chunks: list[dict] | None = None, documents: list[dict] | None = None, retriever=None):
+    def __init__(self, chunks: list[dict] | None = None, documents: list[dict] | None = None, retriever=None,
+                 extra_dir: Path | None = EXTRA_DIR):
+        """extra_dir: the folder of the extra documents; None = only the corpus of task 2. Chunks or documents given
+        (tests) are used as they are, without the extra documents."""
         self._chunks, self._documents, self._retriever = chunks, documents, retriever
+        self.extra_dir = extra_dir if chunks is None and documents is None else None
+
+    @cached_property
+    def extra(self) -> tuple[list[dict], list[dict]]:
+        """(manifest rows, chunks) of corpus_extra/."""
+        return load_extra(self.extra_dir) if self.extra_dir is not None else ([], [])
 
     @cached_property
     def chunks(self) -> dict[str, dict]:
         rows = self._chunks
         if rows is None:
             rows = [json.loads(l) for l in (DATA / "chunks.jsonl").read_text(encoding="utf-8").splitlines() if l.strip()]
-        return {c["chunk_id"]: c for c in rows}
+        return {c["chunk_id"]: c for c in [*rows, *self.extra[1]]}
 
     @cached_property
     def documents(self) -> dict[str, dict]:
         docs = self._documents
         if docs is None:
             docs = json.loads((DATA / "manifest.json").read_text(encoding="utf-8"))["documents"]
+        docs = [*docs, *self.extra[0]]
         # duplicates are not chunked, so they cannot be searched or cited
         return {d["doc_id"]: d for d in docs if d.get("status", "ok") == "ok"}
 
@@ -47,7 +61,18 @@ class Corpus:
         if self._retriever is None:
             _import_rag()
             from rag.retrieval.factory import make_retriever
-            self._retriever = make_retriever("structural")
+            base = make_retriever("structural")
+            extra = self.extra[1]
+            if not extra:
+                self._retriever = base
+            else:
+                # the retriever of task 2 over all chunks: Chroma for its own, memory for the extra ones
+                from rag.models import embed_fns
+                from rag.retrieval.search import Retriever
+                embed_docs, _ = embed_fns()
+                store = CombinedStore(base.store, MemoryStore(extra, embed_docs))
+                self._retriever = Retriever([*base.chunks.values(), *extra], store, base.embed_query, base.rerank,
+                                            base.rrf_k, base.candidates, base.rerank_top)
         return self._retriever
 
     def warm_up(self) -> None:

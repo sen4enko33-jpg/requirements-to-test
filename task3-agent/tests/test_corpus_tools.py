@@ -120,11 +120,12 @@ check("get_passage: at most 2 neighbours", call(reg, "get_passage", {"ref": mid,
 
 # --- list_documents
 data = json.loads(call(reg, "list_documents", {}).content)
-check("list_documents: all 42 documents of the corpus", data["total"] == 42 == len(data["documents"]))
+check("list_documents: all 44 documents (42 of task 2 + 2 wiki pages of corpus_extra)",
+      data["total"] == 44 == len(data["documents"]))
 check("list_documents: metadata only, no text", "text" not in data["documents"][0] and "title" in data["documents"][0])
 data = json.loads(call(reg, "list_documents", {"title_contains": "remote work"}).content)
 check("list_documents: title filter, any case, with the other version as near duplicate",
-      [d["doc_id"] for d in data["documents"]] == ["remote_work_policy", "remote_work_policy_2023"]
+      [d["doc_id"] for d in data["documents"]] == ["remote_work_policy", "remote_work_policy_2023", "wiki_remote_work_faq"]
       and data["documents"][0]["near_duplicates"] == ["remote_work_policy_2023"])
 data = json.loads(call(reg, "list_documents", {"title_contains": "keepass"}).content)
 check("list_documents: the filter also matches the doc_id (the KeePass title is generic)",

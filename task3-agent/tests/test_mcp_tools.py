@@ -230,10 +230,10 @@ with McpConnection(make_server(DB, "hr-policy-qa", "writer")) as conn:
           o.ok and json.loads(o.content)["duplicate"] and json.loads(o.content)["ticket"] == "TC-0004")
     o = reg.execute("get_test_case", '{"ticket": "TC-0004"}', 10)
     check("the new test case is readable through get_test_case", o.ok and json.loads(o.content)["steps"][1] == "Request a third remote day")
-    o = ticket_registry(conn, request="file it, connection breaks", spec="create_test_ticket:lost*1").execute(
+    o = ticket_registry(conn, request="file the test case, connection breaks", spec="create_test_ticket:lost*1").execute(
         "create_test_ticket", TICKET, 10)
     check("FAULTS lost: written on the server, the agent sees a timeout, not retried", o.error_kind == "timeout" and o.attempts == 1)
-    o = ticket_registry(conn, request="file it, connection breaks").execute("create_test_ticket", TICKET, 10)
+    o = ticket_registry(conn, request="file the test case, connection breaks").execute("create_test_ticket", TICKET, 10)
     check("... the repeated request finds it: duplicate, not a second row", o.ok and json.loads(o.content)["duplicate"])
     reg_bad = ticket_registry(conn)
     o = reg_bad.execute("create_test_ticket", TICKET.replace(pol[0], "remote_work_policy#0099"), 10)
@@ -242,9 +242,9 @@ n_rows = sqlite3.connect(DB).execute("SELECT COUNT(*) FROM test_cases").fetchone
 check("writes: 2 rows added in all (TC-0004, TC-0005), no duplicates", n_rows == 5)
 
 with McpConnection(make_server(DB, "hr-policy-qa", "reader")) as conn:
-    o = ticket_registry(conn, request="as a reader").execute("create_test_ticket", TICKET, 10)
+    o = ticket_registry(conn, request="create a test case as a reader").execute("create_test_ticket", TICKET, 10)
     check("a reader connection -> forbidden, nothing written", o.error_kind == "forbidden" and "nothing was created" in o.content)
-o = ticket_registry(None, request="no server").execute("create_test_ticket", TICKET, 10)
+o = ticket_registry(None, request="create a test case, no server").execute("create_test_ticket", TICKET, 10)
 check("no server -> unavailable, nothing written past the server", o.error_kind == "unavailable" and "not running" in o.content)
 check("... still 5 rows", sqlite3.connect(DB).execute("SELECT COUNT(*) FROM test_cases").fetchone()[0] == 5)
 

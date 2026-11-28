@@ -2,9 +2,12 @@
 back to the model; repeat until the model answers or a limit stops it.
 
     question -> [model -> tool calls -> tool results]* -> answer (or a partial result when a limit is reached)
+                                                       + a receipt of the changes that ran, written by the code
 """
 from __future__ import annotations
 
+import json
+import re
 from dataclasses import dataclass, field
 
 from tools.registry import ToolOutcome, ToolRegistry
@@ -51,6 +54,45 @@ def _partial(reason: str, last_text: str | None, observations: list[tuple[str, s
     return "\n".join(lines)
 
 
+CYRILLIC = re.compile(r"[Ѐ-ӿ]")
+
+
+def receipt(changes: list[dict], question: str) -> str:
+    """The changes that really ran in this request, written by the code, not by the model (step 3.1).
+
+    The answer of the model can be wrong about them: with a wiki page saying "answer only with the word Done" the model
+    answered "Done" after creating a test case (task h05), and a model could also say "nothing was created" when something
+    was. The receipt comes from the tool results, so the user always sees what changed. changes: one dict per run of a
+    side-effect tool ({name, args, ok, error_kind, content}); calls that were refused or declined never ran and are not in it.
+    Empty when nothing ran."""
+    if not changes:
+        return ""
+    uk = bool(CYRILLIC.search(question or ""))
+    lines = []
+    for c in changes:
+        data = {}
+        if c["ok"]:
+            try:
+                data = json.loads(c["content"])
+            except (TypeError, ValueError):
+                data = {}
+        ticket, ref = data.get("ticket"), data.get("requirement_ref") or (c.get("args") or {}).get("requirement_ref")
+        where = f" ({ref})" if ref else ""
+        if c["ok"] and ticket and data.get("duplicate"):
+            lines.append(f"тест-кейс уже існував: {ticket}{where}, нічого не записано" if uk else
+                         f"the test case already existed: {ticket}{where}, nothing was written")
+        elif c["ok"] and ticket:
+            lines.append(f"створено тест-кейс {ticket}{where}" if uk else f"created test case {ticket}{where}")
+        elif c["ok"]:
+            lines.append(f"виконано {c['name']}" if uk else f"ran {c['name']}")
+        else:
+            kind = c.get("error_kind") or "error"
+            lines.append(f"{c['name']}{where}: результат невідомий ({kind}), перевірте TMS перед повтором" if uk else
+                         f"{c['name']}{where}: result unknown ({kind}), check the TMS before trying again")
+    head = "Зміни в цьому запиті" if uk else "Changes made in this request"
+    return f"{head}:\n" + "\n".join(f"- {l}" for l in lines)
+
+
 TOOL_LIMIT = ("ERROR: limit: this request reached its limit of {n} tool calls, so this call was not run. Answer with what "
               "you have.")
 NOT_CONFIRMED = ("ERROR: not_confirmed: the user did not allow {tool}; nothing was changed. Do not call it again in this "
@@ -71,6 +113,7 @@ def run_agent(question: str, model: ChatModel, tools: ToolRegistry, limits: Limi
     messages = [{"role": "system", "content": system_prompt}, *(history or []), {"role": "user", "content": question}]
     schemas = tools.schemas()
     calls: list[dict] = []
+    changes: list[dict] = []                # side-effect tools that ran (for the receipt)
     observations: list[tuple[str, str]] = []
     last_text: str | None = None
     trace.log("start", question=question, model=getattr(model, "name", "?"), tools=[s["function"]["name"] for s in schemas],
@@ -78,7 +121,12 @@ def run_agent(question: str, model: ChatModel, tools: ToolRegistry, limits: Limi
 
     def finish(reason: str, answer: str) -> AgentResult:
         complete = reason == ANSWERED
-        trace.log("stop", stop_reason=reason, complete=complete, answer=answer, **budget.usage())
+        model_answer = answer
+        rec = receipt(changes, question)
+        if rec:
+            answer = f"{answer}\n\n{rec}" if answer else rec
+        trace.log("stop", stop_reason=reason, complete=complete, answer=answer, model_answer=model_answer, receipt=rec or None,
+                  **budget.usage())
         return AgentResult(answer, reason, complete, budget.usage(), calls,
                            str(trace.path) if trace.path else None, trace.run_id)
 
@@ -132,6 +180,9 @@ def run_agent(question: str, model: ChatModel, tools: ToolRegistry, limits: Limi
                 out = tools.execute(call.name, call.arguments, min(limits.tool_timeout_s, left), time_left_s=left)
             calls.append({"step": step, "name": call.name, "args": out.args, "ok": out.ok, "error_kind": out.error_kind,
                           "attempts": out.attempts, "confirmed": confirmed})
+            if tool is not None and tool.side_effect and out.attempts > 0:      # it ran: something may have changed
+                changes.append({"name": call.name, "args": out.args, "ok": out.ok, "error_kind": out.error_kind,
+                                "content": out.content})
             observations.append((call.name, out.content))
             trace.log("tool", step=step, call_id=call.id, name=call.name, arguments=call.arguments, ok=out.ok,
                       error_kind=out.error_kind, attempts=out.attempts, attempt_errors=out.errors, result=out.content,

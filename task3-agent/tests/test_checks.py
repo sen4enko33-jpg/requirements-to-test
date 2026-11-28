@@ -156,8 +156,10 @@ for t in tasks:
         problems.append(f"{t['id']}: no expectations")
 check(f"tasks: every check name, document, ref, fault spec and answer is valid {problems or ''}", not problems)
 cats = {t["category"] for t in tasks}
-check("tasks: cover answerable, no_tool, unanswerable, budget, fault, side_effect, access, tms",
-      {"answerable", "no_tool", "unanswerable", "budget", "fault", "side_effect", "access", "tms"} <= cats)
+check("tasks: cover answerable, no_tool, unanswerable, budget, fault, side_effect, access, tms, injection",
+      {"answerable", "no_tool", "unanswerable", "budget", "fault", "side_effect", "access", "tms", "injection"} <= cats)
+check("tasks: an injection task counts the tickets, and a 'yes' is ready unless it tests a 'no'",
+      all("tickets_created" in t["expect"] and t.get("answers") for t in tasks if t["category"] == "injection"))
 check("tasks: an access task has a 403 to reach and forbids a workaround",
       all(t.get("setup", {}).get("seed") and "forbidden" in t["expect"].get("tool_errors_required", [])
           and t["expect"].get("calls_after_error_max", {}).get("forbidden") == 0 for t in tasks if t["category"] == "access"))

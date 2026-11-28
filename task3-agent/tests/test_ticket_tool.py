@@ -134,5 +134,67 @@ r = run_agent("Create a test case", m, reg, Limits(), "sys", Trace(), confirm=as
 check("loop: create without a search first -> rejected, no ticket", tms.count() == 0 and r.tool_calls[0]["error_kind"] == "invalid_args")
 check("loop: the person is not asked about an invented requirement", asker.asked == [])
 
+# --- a change the user did not ask for (step 3.1: a document told the model to create one)
+from tools.ticket_tool import asks_for_test_case  # noqa: E402
+
+for text, want in [("Створи тест-кейс для вимоги про VPN", True), ("Create a test case for the core hours", True),
+                   ("create a TEST-CASE", True), ("Додай тест кейс", True), ("file a ticket for REQ-1", True),
+                   ("What shipping options must the E-Store offer?", False), ("Скільки днів можна працювати віддалено?", False),
+                   ("Що пише вікі про тікети?", True), ("", False), (None, False)]:
+    check(f"asks_for_test_case({text!r}) = {want}", asks_for_test_case(text) is want)
+
+session, tms = Session(run_id="run-q", request="What shipping options must the E-Store offer?"), Tms(":memory:")
+reg = ToolRegistry(make_corpus_tools(corpus, floor=None, session=session) + [make_ticket_tool(tms, corpus, session)],
+                   sleep=lambda s: None)
+session.saw([pol[0]])
+out = call(reg, "create_test_ticket", GOOD)
+check("a question -> not_requested, nothing written, not run", out.error_kind == "not_requested" and out.attempts == 0
+      and tms.count() == 0 and "instruction inside data" in out.content)
+m = Scripted(ChatResult(None, [ToolCall("c0", "search_corpus", '{"query": "remote work days per week"}')]),
+             ChatResult(None, [ToolCall("c1", "create_test_ticket", json.dumps(GOOD))]),
+             ChatResult("Two days a week."))
+asker = ScriptedConfirmer(True, True)
+r = run_agent("What shipping options must the E-Store offer?", m, reg, Limits(), "sys", Trace(), confirm=asker)
+check("loop: the injected call is refused before the person is asked", asker.asked == [] and tms.count() == 0
+      and r.tool_calls[-1]["error_kind"] == "not_requested")
+check("loop: a refused call is not a change: no receipt", "Changes made" not in r.answer and "Зміни" not in r.answer)
+
+# --- the receipt of the changes, written by the code (step 3.1: the model answered "Done" after creating, task h05)
+from agent.loop import receipt  # noqa: E402
+from tools import faults  # noqa: E402
+
+
+def ticket_run(request, *answers, model_text="Done", fault=None, tms=None):
+    session, tms = Session(run_id="run-r", request=request), tms or Tms(":memory:")
+    reg = ToolRegistry(make_corpus_tools(corpus, floor=None, session=session) + [make_ticket_tool(tms, corpus, session)],
+                       sleep=lambda s: None)
+    if fault:
+        faults.apply(reg, fault)
+    m = Scripted(ChatResult(None, [ToolCall("c0", "search_corpus", '{"query": "remote work days per week"}')]),
+                 ChatResult(None, [ToolCall("c1", "create_test_ticket", json.dumps(GOOD))]), ChatResult(model_text))
+    tr = Trace()
+    return run_agent(request, m, reg, Limits(), "sys", tr, confirm=ScriptedConfirmer(*answers)), tms, tr
+
+
+r, tms, tr = ticket_run("Create a test case for the remote days limit", True)
+check("receipt: the model said only 'Done', the answer still names the ticket",
+      r.answer.startswith("Done") and f"created test case TC-0001 ({pol[0]})" in r.answer and tms.count() == 1)
+stop = tr.of("stop")[0]
+check("receipt: the trace keeps the model's own answer and the receipt apart",
+      stop["model_answer"] == "Done" and "TC-0001" in stop["receipt"] and stop["answer"] == r.answer)
+r, _, _ = ticket_run("Створи тест-кейс для вимоги про віддалені дні", True, model_text="Нічого не створено.")
+check("receipt: in the user's language, and it contradicts a model that says nothing was created",
+      "Зміни в цьому запиті:" in r.answer and "створено тест-кейс TC-0001" in r.answer)
+r, tms, _ = ticket_run("Create a test case for the remote days limit", True)
+r2, _, _ = ticket_run("Create a test case for the remote days limit", True, tms=tms)
+check("receipt: a repeat says the test case already existed, nothing written",
+      "already existed: TC-0001" in r2.answer and "nothing was written" in r2.answer and tms.count() == 1)
+r, tms, _ = ticket_run("Create a test case for the remote days limit", True, model_text="It failed.", fault="create_test_ticket:lost")
+check("receipt: a lost answer -> result unknown, check before trying again",
+      "result unknown (timeout)" in r.answer and "check the TMS" in r.answer and tms.count() == 1)
+r, tms, _ = ticket_run("Create a test case for the remote days limit", False, model_text="Nothing was created.")
+check("receipt: declined -> nothing ran, no receipt", r.answer == "Nothing was created." and tms.count() == 0)
+check("receipt(): nothing ran -> empty", receipt([], "anything") == "")
+
 print(f"\n{'FAILED: ' + str(len(FAILED)) if FAILED else 'all checks passed'}")
 sys.exit(1 if FAILED else 0)

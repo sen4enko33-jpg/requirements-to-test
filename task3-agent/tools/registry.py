@@ -10,6 +10,8 @@ the tool result, so the model can fix the call or tell the user, and the agent k
                                         or dropped a field): not retried, the field is named in the error and the trace
   forbidden, not_found                  a decision of the service (403 / 404, e.g. the MCP TMS): not retried, the
                                         message of the service goes to the model as it is
+  not_requested                         a change the user's message did not ask for (tools/ticket_tool.py): not run,
+                                        nobody is asked to confirm it
   tool_error                            any other exception (not retried)
 """
 from __future__ import annotations
@@ -77,7 +79,7 @@ class Tool:
     side_effect: bool = False              # changes something outside the conversation (needs a human confirmation)
     version: str = ""                      # version of the description (prompts/tools/<name>.yaml), written to the trace
     output_model: type[BaseModel] | None = None   # schema of the answer; checked before the answer reaches the model
-    precheck: Callable[[BaseModel], None] | None = None   # checks against the data (raises ToolInputError) before anything
+    precheck: Callable[[BaseModel], None] | None = None   # checks before anything (raises ToolInputError or ToolRefused)
                                                           # runs - and before a person is asked to confirm the call
 
     def schema(self) -> dict:
@@ -173,6 +175,8 @@ class ToolRegistry:
                 tool.precheck(args)
             except ToolInputError as e:
                 return None, ToolOutcome(False, f"ERROR: invalid_args: {e}", "invalid_args", args.model_dump())
+            except ToolRefused as e:
+                return None, ToolOutcome(False, f"ERROR: {e.kind}: {e}", e.kind, args.model_dump())
         return args.model_dump(), None
 
     def execute(self, name: str, raw_args: str, timeout_s: float, time_left_s: float | None = None) -> ToolOutcome:
@@ -201,6 +205,8 @@ class ToolRegistry:
                 tool.precheck(args)
             except ToolInputError as e:
                 return fail("invalid_args", str(e), args_dict)
+            except ToolRefused as e:
+                return fail(e.kind, str(e), args_dict)
         if timeout_s <= 0:
             return fail("timeout", "no time left for this request", args_dict)
 
