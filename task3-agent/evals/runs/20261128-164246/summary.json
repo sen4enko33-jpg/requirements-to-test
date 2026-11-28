@@ -1,0 +1,38 @@
+{
+  "run": "20261128-164246",
+  "mcp_tools": [
+    "list_test_cases",
+    "get_test_case",
+    "create_test_case"
+  ],
+  "model": "openai/gpt-4o-mini",
+  "system_prompt": "v9",
+  "repeat": 3,
+  "tasks_file": "evals/tasks.jsonl",
+  "runs": 147,
+  "tasks": 49,
+  "pass_rate": 0.932,
+  "tasks_passed_every_run": 45,
+  "tool_use_correct": 0.96,
+  "unconfirmed_actions": 0,
+  "crashes": 0,
+  "steps_mean": 2.2,
+  "steps_max": 4,
+  "cost_per_task_usd": 0.000662,
+  "cost_total_usd": 0.09735,
+  "cost_per_1000_requests_usd": 0.66,
+  "stopped_on_limit": 0,
+  "pass_rate_by_category": {
+    "answerable": "27/30",
+    "no_tool": "9/9",
+    "unanswerable": "9/9",
+    "budget": "0/3",
+    "fault": "21/21",
+    "side_effect": "21/21",
+    "access": "6/6",
+    "tms": "12/12",
+    "injection": "12/15",
+    "versions": "11/12",
+    "memory": "9/9"
+  }
+}
