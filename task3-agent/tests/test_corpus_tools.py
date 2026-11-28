@@ -60,7 +60,7 @@ reg, _ = tools_with([])
 names = [s["function"]["name"] for s in reg.schemas()]
 check("three tools: search_corpus, get_passage, list_documents", names == ["search_corpus", "get_passage", "list_documents"])
 check("descriptions come from prompts/tools/*.yaml with a version",
-      all(t.version in ("v1", "v2") and "Do NOT" in t.description for t in reg.tools.values()))
+      all(t.version in ("v1", "v2", "v3") and "Do NOT" in t.description for t in reg.tools.values()))
 check("all corpus tools are read-only and safe to repeat", all(t.safe and not t.side_effect for t in reg.tools.values()))
 check("search schema: query required, k limited to 10",
       reg.schemas()[0]["function"]["parameters"]["required"] == ["query"]
@@ -78,6 +78,22 @@ check("search: results carry ref, document, section, page and score",
 check("search: two policy versions are marked NEWEST / OLDER",
       data["results"][0]["version_mark"] == "NEWEST VERSION" and data["results"][1]["version_mark"] == "OLDER VERSION"
       and data["results"][2]["version_mark"] is None)
+check("search: both versions found -> no newer_version hint, no note",
+      all(r["newer_version"] is None for r in data["results"]) and data.get("note") is None)
+
+# --- a filter hides the newer version (step 3.2: a03 searched the CURRENT core hours with year=2023)
+reg23, _ = tools_with([(pol23[2], 6.0), (pol[2], 5.0)])
+d23 = json.loads(call(reg23, "search_corpus", {"query": "core hours", "year": 2023}).content)
+check("year filter: only the 2023 passage, marked OLDER VERSION, newer_version names the 2026 policy",
+      [r["ref"] for r in d23["results"]] == [pol23[2]] and d23["results"][0]["version_mark"] == "OLDER VERSION"
+      and d23["results"][0]["newer_version"] == "remote_work_policy")
+check("year filter: the note says a newer version exists and was hidden by the filters",
+      "newer version remote_work_policy (effective 2026-01-15)" in d23["note"] and "because of the filters" in d23["note"])
+d26 = json.loads(call(reg23, "search_corpus", {"query": "core hours", "year": 2026}).content)
+check("the newest version alone: no hint", d26["results"][0]["newer_version"] is None and d26.get("note") is None)
+dk = json.loads(call(tools_with([(ids[0], 5.0)])[0], "search_corpus", {"query": "anything"}).content)
+check("a document with one version: no hint", dk["results"][0]["newer_version"] is None)
+
 long_res = data["results"][2]
 check(f"search: long text cut to {TEXT_CHARS} chars and marked truncated",
       len(long_res["text"]) == TEXT_CHARS and long_res["truncated"] is True and data["results"][0]["truncated"] is False)
@@ -158,7 +174,7 @@ check("loop: search result reaches the model and the answer cites its ref",
 check("loop: the search call is recorded", r.tool_calls[0]["name"] == "search_corpus")
 t = Trace()
 run_agent("q", Scripted(ChatResult("hi")), reg, Limits(), "sys", t)
-check("trace: tool versions at the start", t.of("start")[0]["tool_versions"] == {"search_corpus": "v2", "get_passage": "v1", "list_documents": "v2"})
+check("trace: tool versions at the start", t.of("start")[0]["tool_versions"] == {"search_corpus": "v3", "get_passage": "v1", "list_documents": "v2"})
 
 print(f"\n{'FAILED: ' + str(len(FAILED)) if FAILED else 'all checks passed'}")
 sys.exit(1 if FAILED else 0)

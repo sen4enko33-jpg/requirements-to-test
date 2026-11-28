@@ -3,6 +3,15 @@
 Versions of the system prompt are `prompts/system_<version>.md` (the one in use is `system_prompt` of `config.yaml`).
 Tool descriptions are `prompts/tools/<name>.yaml` with a `version` field; their changes are listed here too.
 
+## search_corpus v3 (step 3.2, two versions of one rule)
+- New field `newer_version` and a `note` when a result belongs to an older version of a document whose newer version is
+  not among the results (for example hidden by a `year` filter); the hit is marked OLDER VERSION. The description says
+  to use `year` only when the user names a year or an old version.
+- Why: task a03 ("What are the core hours in the current remote work policy?") failed in every run since step 1.5: the
+  model searched with year=2023 (it took 2023 for the present year), only the 2023 policy came back, nothing was marked,
+  and 11:00-15:00 was given as the current rule. The check is in code (tools/corpus_tools.newer_versions), not in the
+  prompt.
+
 ## system_v9 (step 3.1)
 - v7 + not_requested in rule 6 + a short rule 10 (3 lines instead of 7; the intro of v7 without the wiki sentence).
 - Why: the full eval of v8 (20261128-155455, 42 x 3) broke a02 ("Чи можна працювати через публічний Wi-Fi без VPN?"):

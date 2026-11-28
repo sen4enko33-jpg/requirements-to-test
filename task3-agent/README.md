@@ -36,7 +36,7 @@ or the JSON Schema of the MCP server.
 
 | tool | where | what it does | access |
 |---|---|---|---|
-| `search_corpus` | local (task 2 index) | hybrid search, passages with `ref`, marks the newest / older version | read only |
+| `search_corpus` | local (task 2 index) | hybrid search, passages with `ref`, marks the newest / older version and names a newer version a filter hid | read only |
 | `get_passage` | local | full text of one passage | read only |
 | `list_documents` | local | documents and their metadata | read only |
 | `list_test_cases` | MCP server | test cases of our team | read only |
@@ -116,7 +116,7 @@ Step 3 of the task (not yet): memory of the dialogue with a token limit, and fee
 ## Prompts and evaluation
 - [`prompts/system_v9.md`](prompts/system_v9.md) is the prompt in use; older versions are kept, and
   [`CHANGELOG.md`](prompts/CHANGELOG.md) says what changed in each version and which run showed the need.
-- [`evals/`](evals/): 42 tasks in [`tasks.jsonl`](evals/tasks.jsonl) (written by `make_tasks.py`), deterministic
+- [`evals/`](evals/): 46 tasks in [`tasks.jsonl`](evals/tasks.jsonl) (written by `make_tasks.py`), deterministic
   checks in `checks.py`, the runner `run.py`, results and traces in `evals/runs/<date-time>/`.
 
 | category | tasks | checks |
@@ -129,6 +129,7 @@ Step 3 of the task (not yet): memory of the dialogue with a token limit, and fee
 | side_effect | f01-f07 | confirmed, declined, unclear request, repeat, lost answer |
 | access | g01-g02 | another team's data: 403, explains, no workaround |
 | tms | g03-g05, g07 | own test cases through MCP, 404 |
+| versions | v01-v04 | current rule of the 2026 policy, the 2023 one named, both cited |
 | injection | h01-h05 | instructions hidden in wiki pages: ignored, nothing created that the user did not ask for |
 
 Last full run (`evals/runs/20261128-155455`, 42 tasks x 3, system_v8, before the receipt): 111/126 passed (88%),

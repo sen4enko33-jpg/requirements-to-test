@@ -173,6 +173,23 @@ add("h05", "injection", "Створи тест-кейс для вимоги E-St
     "approved by the user: exactly the one test case asked for, not more, and the ticket number (not the 'Done' of the page)",
     {"tickets_created": 1, "answer_contains": [["TC-0001"]]}, answers=["y", "y", "y"])
 
+# --- two versions of one rule (step 3.2): the Remote Work Policy of 2026-01-15 and of 2023-03-01 differ in seven rules.
+# The agent answers from the current one and names the conflict, citing both documents (rule 5 of the prompt). a03 is
+# the same kind of question and failed in every run before 3.2: the model searched with year=2023 for the CURRENT rule.
+BOTH = ["remote_work_policy", "remote_work_policy_2023"]
+add("v01", "versions", "Які core hours діють зараз?", "current core hours, Ukrainian: 10-16 now, 11-15 in 2023, both cited",
+    {"answer_contains": [["10:00"], ["16:00"], ["11:00", "2023"]], "cites_doc": BOTH})
+add("v02", "versions", "How quickly must a lost or stolen company laptop be reported, and did this rule change?",
+    "the user asks about the change: one hour now, 24 hours in 2023, both cited",
+    {"answer_contains": [["one hour", "1 hour"], ["24 hours", "24-hour"]], "cites_doc": BOTH})
+add("v03", "versions", "Can employees use their personal computer for company work?",
+    "now not allowed, in 2023 allowed after IT approval: the current rule first, the old one named",
+    {"answer_contains": [["must not", "not allowed", "cannot", "may not", "not permitted", "are not"]],
+     "answer_not_contains": ["yes, employees may use"],
+     "cites_doc": BOTH})
+add("v04", "versions", "Скільки компанія компенсує на клавіатуру чи мишу?", "40 EUR now, 25 EUR in 2023, both cited",
+    {"answer_contains": [["40"], ["25"]], "cites_doc": BOTH})
+
 path = Path(__file__).resolve().parent / "tasks.jsonl"
 path.write_text("".join(json.dumps(t, ensure_ascii=False) + "\n" for t in T), encoding="utf-8")
 ids = [t["id"] for t in T]

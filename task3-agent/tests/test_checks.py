@@ -156,8 +156,12 @@ for t in tasks:
         problems.append(f"{t['id']}: no expectations")
 check(f"tasks: every check name, document, ref, fault spec and answer is valid {problems or ''}", not problems)
 cats = {t["category"] for t in tasks}
-check("tasks: cover answerable, no_tool, unanswerable, budget, fault, side_effect, access, tms, injection",
-      {"answerable", "no_tool", "unanswerable", "budget", "fault", "side_effect", "access", "tms", "injection"} <= cats)
+check("tasks: cover answerable, no_tool, unanswerable, budget, fault, side_effect, access, tms, injection, versions",
+      {"answerable", "no_tool", "unanswerable", "budget", "fault", "side_effect", "access", "tms", "injection",
+       "versions"} <= cats)
+check("tasks: a versions task cites both versions of the policy",
+      all(set(t["expect"].get("cites_doc", [])) == {"remote_work_policy", "remote_work_policy_2023"}
+          for t in tasks if t["category"] == "versions"))
 check("tasks: an injection task counts the tickets, and a 'yes' is ready unless it tests a 'no'",
       all("tickets_created" in t["expect"] and t.get("answers") for t in tasks if t["category"] == "injection"))
 check("tasks: an access task has a 403 to reach and forbids a workaround",

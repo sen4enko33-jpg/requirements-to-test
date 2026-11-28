@@ -51,6 +51,7 @@ class PassageMeta(BaseModel):
 
 class SearchHit(PassageMeta):
     version_mark: Optional[str] = None
+    newer_version: Optional[str] = None     # doc_id of a newer version of this document that is not among the results
     score: float
     text: str
     truncated: bool
@@ -86,6 +87,28 @@ class ListOutput(BaseModel):
     documents: list[DocumentRow]
 
 
+def _title_key(title: str | None) -> str:
+    return " ".join((title or "").lower().split())
+
+
+def newer_versions(corpus: Corpus, doc_ids: set[str]) -> dict[str, dict]:
+    """doc_id -> the newest other version of it in the corpus (same title, later date) when that version is not one of
+    `doc_ids`. In task a03 the model searched the CURRENT core hours with year=2023 (it took 2023 for the present year):
+    the filter hid the 2026 policy, nothing was marked, and the old rule came back as the current one."""
+    out = {}
+    for d in doc_ids:
+        doc = corpus.documents.get(d)
+        if not doc or not doc.get("date"):
+            continue
+        later = [o for o in corpus.documents.values() if o["doc_id"] != d and _title_key(o.get("title")) == _title_key(doc.get("title"))
+                 and o.get("date") and str(o["date"]) > str(doc["date"])]
+        if later:
+            newest = max(later, key=lambda o: str(o["date"]))
+            if newest["doc_id"] not in doc_ids:
+                out[d] = newest
+    return out
+
+
 def _meta(c: dict) -> dict:
     return {"ref": c["chunk_id"], "doc_id": c["doc_id"], "title": c["title"], "section": c["section"], "date": c.get("date"),
             "year": c.get("year"), "version": c.get("version"), "page": page_label(c) or None}
@@ -107,10 +130,18 @@ def make_corpus_tools(corpus: Corpus | None = None, floor: float | None = "defau
         hits = corpus.retriever.search(a.query, a.k, "hybrid_rerank", filters)
         relevant = [h for h in hits if score_floor is None or h["score"] >= score_floor]
         marks = version_marks(relevant)
-        results = [{**_meta(h), "version_mark": marks.get(h["doc_id"]), "score": round(h["score"], 2),
-                    "text": h["text"][:TEXT_CHARS], "truncated": len(h["text"]) > TEXT_CHARS} for h in relevant]
+        newer = newer_versions(corpus, {h["doc_id"] for h in relevant})
+        results = [{**_meta(h), "version_mark": marks.get(h["doc_id"]) or ("OLDER VERSION" if h["doc_id"] in newer else None),
+                    "newer_version": newer[h["doc_id"]]["doc_id"] if h["doc_id"] in newer else None,
+                    "score": round(h["score"], 2), "text": h["text"][:TEXT_CHARS], "truncated": len(h["text"]) > TEXT_CHARS}
+                   for h in relevant]
         session.saw(r["ref"] for r in results)
         out = {"query": a.query, "filters": filters or {}, "results": results}
+        if newer:
+            out["note"] = "; ".join(
+                f"{d} is an OLDER VERSION: a newer version {n['doc_id']} (effective {n['date']}) exists and was not returned"
+                + (" because of the filters" if filters else "") for d, n in newer.items()) + (
+                ". Unless the user asked for the old version, search the newer one (doc_id) and answer from it.")
         if not results:
             out["note"] = ("nothing relevant found" + (f" ({len(hits)} weak hits dropped)" if hits else "")
                            + "; rephrase at most once, otherwise say the documents do not cover the question")

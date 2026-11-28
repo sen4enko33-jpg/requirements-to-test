@@ -1,5 +1,5 @@
 name: search_corpus
-version: v2
+version: v3
 description: |
   Searches the document collection (40 software requirements specifications of the PURE dataset and the company
   Remote Work Policy in two versions, 2023 and 2026) and returns the most relevant passages.
@@ -8,7 +8,10 @@ description: |
   Arguments: `query` - a short search query IN ENGLISH with the key terms of the question (the documents are in
   English: always translate the question; a query in another alphabet is rejected); optional `year` or `doc_id` to search one version or one document only; `k` - how
   many passages (default 5).
-  Returns {"results": [{"ref", "doc_id", "title", "section", "date", "year", "version", "page", "version_mark", "score",
-  "text", "truncated"}], "note"}. Cite a passage by its `ref`. `version_mark` is NEWEST VERSION / OLDER VERSION when two
-  versions of one document were found. An empty `results` with a note means nothing relevant was found: rephrase at most
-  once, then say the documents do not cover the question.
+  Returns {"results": [{"ref", "doc_id", "title", "section", "date", "year", "version", "page", "version_mark",
+  "newer_version", "score", "text", "truncated"}], "note"}. Cite a passage by its `ref`. `version_mark` is NEWEST VERSION /
+  OLDER VERSION when two versions of one document were found; `newer_version` names a newer version that the results do
+  not include (for example because of a `year` filter), and the `note` says so.
+  Use `year` only when the user names a year or an old version: "current", "now" or no year means the newest version.
+  An empty `results` with a note means nothing relevant was found: rephrase at most once, then say the documents do not
+  cover the question.
