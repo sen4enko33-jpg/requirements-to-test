@@ -10,14 +10,15 @@ a TMS (test management system) through its own MCP server.
                                        -> a person confirms every write first
 
 ## Run
-Python 3.10+.
+Python 3.10+. Model: `openai/gpt-4o-mini` through OpenRouter (set in `config.yaml`; it must support tool calling);
+about **$0.66 per 1000 requests** (mean of the final evaluation run, 2.2 model calls per request).
 
     cd task3-agent
     python3.11 -m venv .venv
     .venv/bin/pip install -r requirements.txt -r ../task2-rag/requirements.txt
     cp ../.env.example ../.env            # OPENROUTER_API_KEY=... (only in .env, never in git)
     cd ../task2-rag && ../task3-agent/.venv/bin/python -m rag.retrieval.build && cd -   # search index of task 2, once
-    .venv/bin/python main.py "How many days a week can employees work remotely?"
+    .venv/bin/python main.py "How many days a week can employees work remotely?"   # or from the root: make run3
 
 `main.py` starts the MCP server, runs the agent and prints the answer, the stop reason, cost and the trace file.
 
@@ -28,7 +29,7 @@ Python 3.10+.
     python main.py "..." --max-steps 3 --max-cost 0.005
 
 Tests without a model: `for t in tests/test_*.py; do .venv/bin/python $t | tail -1; done` (419 checks).
-Evaluation on the model: `python -m evals.run --repeat 3` (about $0.07).
+Evaluation on the model: `python -m evals.run --repeat 3` (49 scenarios x 3, about $0.10).
 
 ## Tools
 Every tool does one thing. Descriptions are versioned files in [`prompts/tools/`](prompts/tools/); schemas are Pydantic

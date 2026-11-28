@@ -27,7 +27,8 @@ One command per part, from its folder (needs `OPENROUTER_API_KEY` in `.env` for 
     cd task2-rag && pip install -r requirements.txt && python main.py          # or: python main.py "your question"
     cd task3-agent && pip install -r requirements.txt -r ../task2-rag/requirements.txt && python main.py "your question"
 
-From the repository root `make run` runs both parts (`make run1`, `make run2` one of them, `make test` all tests).
+From the repository root `make run` runs all three parts (`make run1`, `make run2`, `make run3` one of them;
+`make run3 Q="your question"` asks the agent of task 3 anything; `make test` all tests).
 
 Tests (no network, no API key): in `task1-extraction/` run `python tests/test_repair.py`, `python tests/test_limits.py`,
 `python tests/test_prompt_defs.py`; in `task2-rag/` and `task3-agent/` run every `tests/test_*.py`.
