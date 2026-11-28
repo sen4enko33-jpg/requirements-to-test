@@ -13,6 +13,7 @@ from dataclasses import dataclass, field
 from tools.registry import ToolOutcome, ToolRegistry
 
 from .confirm import Confirmer, deny_all
+from .memory import with_corrections
 from .limits import ANSWERED, LIMIT_REASONS, MODEL_ERROR, Budget, Limits
 from .llm import ChatModel
 from .trace import Trace
@@ -113,7 +114,8 @@ def run_agent(question: str, model: ChatModel, tools: ToolRegistry, limits: Limi
     declined = False                        # after one "no" no further side effect runs in this request
     budget = Budget(limits, clock) if clock else Budget(limits)
     system = f"{system_prompt}\n\n{memory_block}" if memory_block else system_prompt
-    messages = [{"role": "system", "content": system}, *(history or []), {"role": "user", "content": question}]
+    user_text = with_corrections(question, memory or [])     # a /fix of the same question goes next to it
+    messages = [{"role": "system", "content": system}, *(history or []), {"role": "user", "content": user_text}]
     schemas = tools.schemas()
     calls: list[dict] = []
     changes: list[dict] = []                # side-effect tools that ran (for the receipt)
@@ -121,7 +123,7 @@ def run_agent(question: str, model: ChatModel, tools: ToolRegistry, limits: Limi
     last_text: str | None = None
     trace.log("start", question=question, model=getattr(model, "name", "?"), tools=[s["function"]["name"] for s in schemas],
               tool_versions={t.name: t.version for t in tools.tools.values() if t.version}, limits=vars(limits),
-              memory=memory or [])
+              memory=memory or [], user_message=user_text if user_text != question else None)
 
     def finish(reason: str, answer: str) -> AgentResult:
         complete = reason == ANSWERED

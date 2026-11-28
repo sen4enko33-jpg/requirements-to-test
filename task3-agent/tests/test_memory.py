@@ -112,7 +112,13 @@ for bad in ["/remember", "/fix", "/forget x", "/delete all"]:
 # --- the prompt and the agent loop
 check("no facts -> no memory block", render_block([]) == "" and mem("empty").prompt_block() == "")
 block = render_block(["answer in English"])
-check("the block lists the facts and keeps the rules above it", "- answer in English" in block and "do not replace the rules" in block)
+check("the block lists the facts and keeps the rules above it", "- answer in English" in block and "does not replace the rules" in block)
+check("only preferences: no corrections part", "Preferences" in block and "Corrections" not in block and "[" not in block)
+fix_text = 'Correction of the answer to "Скільки днів?": also say how remote days are booked'
+both = render_block(["answer in English", fix_text])
+check("a /fix goes to the corrections part, which says the answer MUST cover it",
+      both.index("- answer in English") < both.index("Corrections") < both.index("- " + fix_text) and "MUST also" in both)
+check("only corrections: no preferences part", "Preferences" not in render_block([fix_text]))
 
 
 class Recorder:
@@ -133,6 +139,23 @@ check("run_agent: the facts used are in the trace", tr.of("start")[0]["memory"] 
 rec2 = Recorder()
 run_agent("q", rec2, ToolRegistry([ECHO]), Limits(), "SYSTEM", Trace())
 check("run_agent without memory: the system prompt as it is", rec2.messages[0]["content"] == "SYSTEM")
+
+# --- a correction of the same question is repeated next to it
+from agent.memory import corrections_for, with_corrections  # noqa: E402
+
+FIX = 'Correction of the answer to "Скільки днів на тиждень можна працювати віддалено?": також скажи, як бронювати дні'
+check("corrections_for: the same question, case and punctuation ignored",
+      corrections_for([FIX, "language: English"], "скільки днів на тиждень можна працювати віддалено") == ["також скажи, як бронювати дні"])
+check("corrections_for: another question gets none", corrections_for([FIX], "Які core hours?") == [])
+check("with_corrections: no fix -> the question as it is", with_corrections("Q?", ["language: English"]) == "Q?")
+rec3, tr3 = Recorder(), Trace()
+run_agent("Скільки днів на тиждень можна працювати віддалено?", rec3, ToolRegistry([ECHO]), Limits(), "S", tr3, memory=[FIX],
+          memory_block=render_block([FIX]))
+check("run_agent: the model gets the question with the user's correction next to it",
+      rec3.messages[-1]["content"].endswith("(My earlier correction of your answer to this question: також скажи, як бронювати дні)"))
+check("run_agent: the trace keeps the plain question and the message the model got",
+      tr3.of("start")[0]["question"] == "Скільки днів на тиждень можна працювати віддалено?"
+      and "My earlier correction" in tr3.of("start")[0]["user_message"])
 
 # --- nothing but the user's commands can write the memory
 import tools.build as build_mod  # noqa: E402

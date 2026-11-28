@@ -24,7 +24,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 MEMORY_DIR = ROOT / "data" / "memory"
 FEEDBACK = ROOT / "data" / "feedback.jsonl"
-BLOCK = ROOT / "prompts" / "memory_v1.md"          # the text around the facts in the system prompt (versioned)
+BLOCK = ROOT / "prompts" / "memory_v2.md"          # the text around the facts in the system prompt (versioned)
+CORRECTION = "Correction of the answer to "        # how a /fix is kept: told apart from preferences in the prompt
 MAX_FACTS = 20
 MAX_CHARS = 300
 TTL_DAYS = 180
@@ -33,10 +34,53 @@ KEYED = re.compile(r"^\s*([A-Za-zА-Яа-яІіЇїЄєҐґ0-9 _-]{2,30}):\s+(.+
 
 
 def render_block(texts: list[str]) -> str:
-    """The memory block of the system prompt (prompts/memory_v1.md) for these facts; empty when there are none."""
+    """The memory block of the system prompt for these facts; empty when there are none.
+
+    prompts/memory_v2.md has a part for preferences (/remember) and one for corrections (/fix), between [name] markers;
+    a part without facts is left out. With v1 (one list) the model followed "answer in English" but ignored a correction
+    of an earlier answer in 3 of 3 runs (task m02)."""
     if not texts:
         return ""
-    return BLOCK.read_text(encoding="utf-8").strip().replace("{facts}", "\n".join(f"- {t}" for t in texts))
+    groups = {"preferences": [t for t in texts if not t.startswith(CORRECTION)],
+              "corrections": [t for t in texts if t.startswith(CORRECTION)]}
+    out, part = [], None
+    for line in BLOCK.read_text(encoding="utf-8").strip().splitlines():
+        marker = line.strip()
+        if marker.startswith("[") and marker.endswith("]"):
+            part = None if marker == "[end]" else marker[1:-1]
+            continue
+        if part is not None and not groups.get(part):
+            continue
+        out.append("\n".join(f"- {t}" for t in groups[part]) if line.strip() == "{items}" else line)
+    return "\n".join(out)
+
+
+CORRECTION_TEXT = re.compile(r'^Correction of the answer to "(?P<q>.*)": (?P<fix>.+)$', re.S)
+
+
+def _norm_q(text: str) -> str:
+    return " ".join(re.sub(r"[^\w\s]", " ", (text or "").lower()).split())
+
+
+def corrections_for(texts: list[str], question: str) -> list[str]:
+    """The corrections (/fix) that were made on an earlier answer to this same question (case, spaces and punctuation
+    ignored). They are repeated next to the question itself: in the system prompt alone gpt-4o-mini ignored a correction
+    in 3 of 3 live runs while it had the right passage in front of it (step 3.3)."""
+    want, out = _norm_q(question), []
+    for t in texts:
+        m = CORRECTION_TEXT.match(t)
+        if m and _norm_q(m.group("q")) == want:
+            out.append(m.group("fix").strip())
+    return out
+
+
+def with_corrections(question: str, texts: list[str]) -> str:
+    """The user's message as the model gets it: the question, then the user's own earlier corrections of the answer to
+    it, if any (agent/loop.py keeps the plain question for the trace, the receipt and the idempotency key)."""
+    fixes = corrections_for(texts, question)
+    if not fixes:
+        return question
+    return question + "\n\n(My earlier correction of your answer to this question: " + " ".join(fixes) + ")"
 
 
 def _now() -> datetime:
@@ -116,7 +160,7 @@ class Memory:
             with self.feedback_path.open("a", encoding="utf-8") as f:
                 f.write(json.dumps(row, ensure_ascii=False) + "\n")
         if rating == "fix" and correction:
-            self.add(f"Correction of the answer to \"{self.last['question'][:120]}\": {correction}", source="fix")
+            self.add(f"{CORRECTION}\"{self.last['question'][:120]}\": {correction}", source="fix")
         return row
 
     # --- reads

@@ -3,6 +3,19 @@
 Versions of the system prompt are `prompts/system_<version>.md` (the one in use is `system_prompt` of `config.yaml`).
 Tool descriptions are `prompts/tools/<name>.yaml` with a `version` field; their changes are listed here too.
 
+## A /fix next to the question (step 3.3, code: agent/memory.with_corrections)
+- With memory_v2 m02 passed 2 of 3 (20261128-163815), and a live run with the correction written in Ukrainian failed 3
+  of 3: the passage about the HR portal was in the search results and the answer still left it out. A correction of
+  the same question is now also added to the user's message ("My earlier correction of your answer to this question:
+  ..."); the trace keeps the plain question and this message. Result: m01, m02, m03 3 of 3 (20261128-164032), live 2 of 2.
+
+## memory_v2 (step 3.3)
+- Two parts: preferences (/remember) and corrections (/fix); the corrections part says that the answer to the same or a
+  similar question MUST also cover what the correction asks for, found with the tools and cited.
+- Why: with v1 (one list, "follow these preferences and corrections") task m02 failed 3 of 3 runs (20261128-163634): the
+  memory held the /fix "also say how remote days are booked", the search returned the passage about the HR portal, and
+  the answer still gave only the number of days. The preference "answer in English" (m01) was followed 3 of 3.
+
 ## memory_v1 (step 3.3, long-term memory)
 - The block after the system prompt that lists the user's own facts (/remember, /fix) and says they do not override the
   rules above. Filled in code (agent/memory.render_block); no fact can come from a tool.

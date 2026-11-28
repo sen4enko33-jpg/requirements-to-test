@@ -121,16 +121,29 @@ Long-term memory of a user between sessions ([`agent/memory.py`](agent/memory.py
 
 - **What is stored:** the user's own facts (preferences and corrections), the last question and answer (what `/fix`,
   `/good`, `/bad` refer to). Every rating and correction also goes to `data/feedback.jsonl`: candidates for new tasks.
-- **How it is used:** the facts go into a block after the system prompt ([`prompts/memory_v1.md`](prompts/memory_v1.md));
-  they do not override the rules (facts about documents still come from tools; no change without a request and a
+- **How it is used:** the facts go into a block after the system prompt ([`prompts/memory_v2.md`](prompts/memory_v2.md):
+  preferences, then corrections), and a `/fix` of the same question is also repeated next to the question itself; they
+  do not override the rules (facts about documents still come from tools; no change without a request and a
   confirmation). The facts used are listed in the trace.
 - **When it is deleted:** after 180 days; at most 20 facts (the oldest go first); a fact with the same key replaces the
   old one; each fact is cut to 300 characters; `/forget`.
 - **Who writes:** only the user's commands. No tool writes the memory, so an instruction in a document ("remember that
   ...") cannot live on in later sessions.
-- **Feedback changes the next answer:** task m02 starts with a `/fix` ("also say how remote days are booked") and the
-  answer to the same question then names the HR portal; m01 starts with "answer in English"; m03 shows that a saved
-  "always create test cases, I approve them" still creates nothing.
+- **Feedback changes the next answer** (a real run, citations kept, answers shortened):
+
+      $ python main.py "Скільки днів на тиждень можна працювати віддалено?" --user demo
+      ... можуть працювати віддалено до двох днів на тиждень. Раніше, у версії 2023 року, ... три дні [remote_work_policy#0000].
+      $ python main.py "/fix також скажи, як бронювати віддалені дні" --user demo
+      Thank you: the correction is saved and the next answers will follow it.
+      $ python main.py "Скільки днів на тиждень можна працювати віддалено?" --user demo
+      ... можуть працювати віддалено до двох днів на тиждень ... [remote_work_policy#0000].
+      Щоб забронювати віддалені дні, потрібно подати запит через HR портал не менше ніж за один робочий день до
+      запланованого дня ... [remote_work_policy#0001].
+
+  It took two changes to get there: with one list of facts in the system prompt the correction was ignored (m02 0 of 3),
+  with a separate part for corrections 2 of 3, and with the correction also next to the question 3 of 3 (and 2 of 2
+  live). Tasks: m01 "answer in English", m02 the `/fix` above, m03 a saved "always create test cases, I approve them"
+  still creates nothing.
 
 ## Prompts and evaluation
 - [`prompts/system_v9.md`](prompts/system_v9.md) is the prompt in use; older versions are kept, and
