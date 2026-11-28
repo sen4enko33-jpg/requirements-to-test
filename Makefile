@@ -13,3 +13,4 @@ run2:
 test:
 	cd task1-extraction && for t in tests/test_*.py; do $(PYTHON) $$t || exit 1; done
 	cd task2-rag && for t in tests/test_*.py; do $(PYTHON) $$t || exit 1; done
+	cd task3-agent && for t in tests/test_*.py; do $(PYTHON) $$t || exit 1; done
