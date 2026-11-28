@@ -16,6 +16,7 @@ parts; each one has its own README, report, requirements and tests.
 - `requirements.txt` - parts 1 and 2 together (`pip install -r requirements.txt`); each part also has its own file
 - `.env` / `.env.example` - `OPENROUTER_API_KEY`; one file in the repository root is read by both parts (a `.env` inside a part wins)
 - `.github/workflows/eval.yml` - CI: tests of both parts and the evaluation of task 2 with failing thresholds (push, pull request; manual run adds the model answers and the judge, needs the secret `OPENROUTER_API_KEY`)
+- `CLAUDE.md` - instructions for the coding agent (Claude Code) that built most of task 3: how we work, commands, rules
 - `.gitignore` - generic patterns; each part has its own `.gitignore` for its generated files
 
 ## How to run
