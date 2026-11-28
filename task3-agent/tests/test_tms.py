@@ -1,4 +1,4 @@
-"""Checks of the test-case tracker and its idempotency (no network): python tests/test_tracker.py"""
+"""Checks of the TMS and its idempotency (no network): python tests/test_tms.py"""
 import sys
 import tempfile
 import threading
@@ -6,7 +6,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from tools.tracker import Tracker, idempotency_key
+from tools.tms import Tms, idempotency_key
 
 FAILED = []
 
@@ -22,7 +22,7 @@ ARGS = dict(doc_id="remote_work_policy", requirement_ref="remote_work_policy#000
             expected="The third day is rejected: at most two remote days per week.")
 
 # --- create and read back
-t = Tracker(":memory:")
+t = Tms(":memory:")
 tc, created = t.create(**ARGS, run_id="run-1")
 check("create: a new test case is created", created and t.count() == 1)
 check("create: readable ticket id TC-0001 and all fields stored",
@@ -51,7 +51,7 @@ check("team: the default team is stored", tc["team"] == "hr-policy-qa")
 pay, _ = t.create(**{**ARGS, "title": "Card is checked for fraud", "requirement_ref": "2007_e_store#0010"}, team="payments-qa")
 check("team: another team is stored on its row", pay["team"] == "payments-qa")
 
-# --- a tracker.db of step 1.4 (no team column) is upgraded in place
+# --- a tms.db of step 1.4 (no team column) is upgraded in place
 import sqlite3
 with tempfile.TemporaryDirectory() as d:
     old = Path(d) / "old.db"
@@ -61,17 +61,17 @@ with tempfile.TemporaryDirectory() as d:
                 "created_at TEXT NOT NULL, run_id TEXT)")
     con.execute("INSERT INTO test_cases VALUES (1, 'k', 'd', 'd#0001', 't', '[]', 'e', 'now', NULL)")
     con.commit(); con.close()
-    up = Tracker(old)
+    up = Tms(old)
     check("upgrade: the old row keeps its data and gets the default team", up.get(1)["team"] == "hr-policy-qa" and up.count() == 1)
     up.close()
 
 # --- on disk: survives a restart (a repeated request in a new process)
 with tempfile.TemporaryDirectory() as d:
-    path = Path(d) / "sub" / "tracker.db"
-    t1 = Tracker(path)
+    path = Path(d) / "sub" / "tms.db"
+    t1 = Tms(path)
     first, _ = t1.create(**ARGS)
     t1.close()
-    t2 = Tracker(path)
+    t2 = Tms(path)
     second, created_again = t2.create(**ARGS)
     check("on disk: the folder is created and a repeat after a restart is not a duplicate",
           path.exists() and not created_again and second["id"] == first["id"] and t2.count() == 1)
@@ -81,7 +81,7 @@ with tempfile.TemporaryDirectory() as d:
     barrier = threading.Barrier(8)
 
     def worker():
-        tr = Tracker(path)
+        tr = Tms(path)
         barrier.wait()
         results.append(tr.create(**{**ARGS, "title": "Concurrent case"})[1])
         tr.close()

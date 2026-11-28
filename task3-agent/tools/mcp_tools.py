@@ -1,6 +1,6 @@
 """The agent as an MCP client (step 2.2): the tools of an MCP server become ordinary tools of the agent's registry.
 
-    with McpConnection(stdio_params(cfg["mcp"]["tracker"], db=...)) as conn:
+    with McpConnection(stdio_params(cfg["mcp"]["tms"], db=...)) as conn:
         tools = mcp_tools(conn)          # -> [Tool, ...] for ToolRegistry
 
 What comes from the server and what stays in the agent:
@@ -54,10 +54,10 @@ class McpError(RuntimeError):
 
 def stdio_params(cfg: dict, db: str | Path | None = None) -> StdioServerParameters:
     """The command that starts a server of this repository (config.yaml, section mcp) with the agent's own interpreter.
-    db: the tracker file the agent uses, so that the server reads the same rows."""
+    db: the TMS file the agent uses, so that the server reads the same rows."""
     env = {**os.environ, **{k: str(v) for k, v in (cfg.get("env") or {}).items()}}   # PATH, HOME, ... + the server's own
     if db is not None:
-        env["TRACKER_DB"] = str(db)
+        env["TMS_DB"] = str(db)
     return StdioServerParameters(command=sys.executable, args=["-m", cfg["module"]], env=env, cwd=str(ROOT))
 
 
@@ -245,9 +245,9 @@ def mcp_tools(conn: McpConnection, hidden: tuple[str, ...] | list[str] = ()) -> 
     return [make_mcp_tool(conn, spec) for spec in conn.tools if spec.name not in hidden]
 
 
-class McpTrackerStore:
-    """Where create_test_ticket writes (step 2.3): the tracker MCP server, through its tool create_test_case. It has the
-    signature of Tracker.create, so the ticket tool does not care whether it writes to a local file (tests) or to the server.
+class McpTmsStore:
+    """Where create_test_ticket writes (step 2.3): the TMS MCP server, through its tool create_test_case. It has the
+    signature of Tms.create, so the ticket tool does not care whether it writes to a local file (tests) or to the server.
     conn None (the server did not start): every write is unavailable - the agent never writes past the server."""
 
     TOOL = "create_test_case"
@@ -258,12 +258,12 @@ class McpTrackerStore:
     def create(self, doc_id: str, requirement_ref: str, title: str, steps: list[str], expected: str,
                run_id: str | None = None, key: str | None = None) -> tuple[dict, bool]:
         if self.conn is None or self.conn.closed:
-            raise ToolUnavailable(503, "the tracker MCP server is not running; no test case can be created")
+            raise ToolUnavailable(503, "the TMS MCP server is not running; no test case can be created")
         if self.TOOL not in {t.name for t in self.conn.tools}:
-            raise ToolRefused("forbidden", f"FORBIDDEN (403): the tracker MCP server offers no {self.TOOL} to this "
+            raise ToolRefused("forbidden", f"FORBIDDEN (403): the TMS MCP server offers no {self.TOOL} to this "
                                            "connection (it is connected as a reader); nothing was created")
         if not key:
-            raise ValueError("an idempotency key is required for a write through the tracker server")
+            raise ValueError("an idempotency key is required for a write through the TMS server")
         args = {"doc_id": doc_id, "requirement_ref": requirement_ref, "title": title, "steps": steps,
                 "expected": expected, "idempotency_key": key}
         if run_id:

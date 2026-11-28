@@ -6,15 +6,15 @@
 
 The search over the corpus uses the Chroma index of task 2: build it once in ../task2-rag with python -m rag.retrieval.build.
 
-Test cases: "Create a test case for <requirement>" files one in data/tracker.db after you confirm it in the terminal (y/N).
+Test cases: "Create a test case for <requirement>" files one in data/tms.db after you confirm it in the terminal (y/N).
 Without a terminal the change is declined; --answers y,n gives the answers in advance (logged as by=script in the trace).
 
 Fault injection (tools/faults.py): FAULTS=search_corpus:503 python main.py "..." (also timeout, 429, schema, *n).
 
-The test cases already in the tracker are read through the MCP server mcp_server/tracker_server.py: main.py starts it as a
+The test cases already in the TMS are read through the MCP server mcp_server/tms_server.py: main.py starts it as a
 subprocess for the request (config.yaml, section mcp) and its tools list_test_cases / get_test_case join the agent's tools.
 New test cases are written by the same server (create_test_case, after your confirmation). Its log goes to
-traces/mcp_tracker.log. If it does not start, the agent runs without these tools and cannot create test cases.
+traces/mcp_tms.log. If it does not start, the agent runs without these tools and cannot create test cases.
 
 Needs OPENROUTER_API_KEY in .env (repository root or this folder). Every run writes its trace to traces/<run_id>.jsonl."""
 from __future__ import annotations
@@ -37,9 +37,9 @@ from agent.loop import run_agent  # noqa: E402
 from agent.trace import Trace  # noqa: E402
 from tools.build import build_registry  # noqa: E402
 from tools.corpus import Corpus  # noqa: E402
-from tools.mcp_tools import McpTrackerStore, mcp_tools, open_server  # noqa: E402
+from tools.mcp_tools import McpTmsStore, mcp_tools, open_server  # noqa: E402
 from tools.session import Session  # noqa: E402
-from tools.tracker import Tracker  # noqa: E402
+from tools.tms import Tms  # noqa: E402
 
 
 def load_config() -> dict:
@@ -77,12 +77,12 @@ def main() -> int:
     session = Session(run_id=trace.run_id, request=a.question)
     corpus = Corpus()
     corpus.warm_up()          # load the search models now, not inside the first tool call (its timeout is short)
-    tracker = Tracker()
-    conn = open_server(cfg, "tracker", db=tracker.path)       # the server reads the same file the agent writes
+    tms = Tms()
+    conn = open_server(cfg, "tms", db=tms.path)       # the server reads the same file the agent writes
     try:
-        tools = build_registry(cfg, corpus, tracker, session, os.getenv("FAULTS"),
-                               extra_tools=mcp_tools(conn, cfg["mcp"]["tracker"].get("hidden", ())) if conn else [],
-                               ticket_store=McpTrackerStore(conn))        # test cases are written by the server
+        tools = build_registry(cfg, corpus, tms, session, os.getenv("FAULTS"),
+                               extra_tools=mcp_tools(conn, cfg["mcp"]["tms"].get("hidden", ())) if conn else [],
+                               ticket_store=McpTmsStore(conn))        # test cases are written by the server
         result = run_agent(a.question, make_model(cfg, key), tools, limits,
                            load_system_prompt(cfg["system_prompt"]), trace, confirm=confirm)
     finally:

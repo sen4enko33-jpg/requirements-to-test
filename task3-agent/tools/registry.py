@@ -8,7 +8,7 @@ the tool result, so the model can fix the call or tell the user, and the agent k
                                         (read-only) tools; after the last attempt the model is told the service is down
   bad_output                            the tool answered in another format than its output schema (an API that renamed
                                         or dropped a field): not retried, the field is named in the error and the trace
-  forbidden, not_found                  a decision of the service (403 / 404, e.g. the MCP tracker): not retried, the
+  forbidden, not_found                  a decision of the service (403 / 404, e.g. the MCP TMS): not retried, the
                                         message of the service goes to the model as it is
   tool_error                            any other exception (not retried)
 """

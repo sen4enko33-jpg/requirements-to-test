@@ -1,9 +1,9 @@
-"""MCP server of the test-case tracker (step 2): reading (2.1) and, for the role writer, creating test cases (2.3).
+"""MCP server of the TMS (step 2): reading (2.1) and, for the role writer, creating test cases (2.3).
 
-    TRACKER_TEAM=hr-policy-qa TRACKER_ROLE=reader python -m mcp_server.tracker_server     # stdio transport
+    TMS_TEAM=hr-policy-qa TMS_ROLE=reader python -m mcp_server.tms_server     # stdio transport
 
 Who calls it: the agent of this repository (it starts the server as a subprocess, see tools/mcp_tools.py), and any other
-MCP client - Claude Desktop, an IDE, an agent of another team - with the same command and its own TRACKER_TEAM.
+MCP client - Claude Desktop, an IDE, an agent of another team - with the same command and its own TMS_TEAM.
 
 Restrictions, enforced here and not left to the client or the model:
   - one table only (test_cases) and only fixed, parameterised queries: no SQL, shell or file path comes from a caller;
@@ -33,12 +33,12 @@ from mcp.server.mcpserver.exceptions import ToolError
 from pydantic import BaseModel, Field
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from tools.tracker import Tracker  # noqa: E402  - the same table and the same INSERT ... ON CONFLICT DO NOTHING
+from tools.tms import Tms  # noqa: E402  - the same table and the same INSERT ... ON CONFLICT DO NOTHING
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_DB = ROOT / "data" / "tracker.db"
+DEFAULT_DB = ROOT / "data" / "tms.db"
 ACCESS = Path(__file__).resolve().parent / "access.yaml"
-log = logging.getLogger("tracker-mcp")
+log = logging.getLogger("tms-mcp")
 
 DOC_ID = r"^[A-Za-z0-9_.-]{1,80}$"
 REF = r"^[A-Za-z0-9_.-]{1,80}#\d{4}$"
@@ -46,8 +46,8 @@ TICKET = r"^TC-\d{4,6}$"
 TEAM = r"^[a-z0-9-]{2,40}$"
 COLUMNS = "id, doc_id, requirement_ref, title, steps, expected, created_at, team"   # an explicit list, not all columns: a new column stays private
 
-VERSION = "1.2"          # 1.0: the tools of 2.1; 1.1: answers with an output schema (the client checks them);
-                         # 1.2: create_test_case for the role writer
+VERSION = "1.3"          # 1.0: the tools of 2.1; 1.1: answers with an output schema (the client checks them);
+                         # 1.2: create_test_case for the role writer; 1.3: renamed test-case-tracker -> tms
 KEY = r"^[A-Za-z0-9_.:-]{8,80}$"
 
 
@@ -91,9 +91,9 @@ def load_access(path: Path = ACCESS) -> dict:
 
 def check_identity(team: str, role: str, access: dict) -> None:
     if team not in access:
-        raise SystemExit(f"tracker MCP server: unknown team {team!r}; known teams are in {ACCESS.name}")
+        raise SystemExit(f"TMS MCP server: unknown team {team!r}; known teams are in {ACCESS.name}")
     if role not in access[team]["roles"]:
-        raise SystemExit(f"tracker MCP server: team {team!r} may not connect as {role!r} (allowed: {access[team]['roles']})")
+        raise SystemExit(f"TMS MCP server: team {team!r} may not connect as {role!r} (allowed: {access[team]['roles']})")
 
 
 def _ticket(row_id: int) -> str:
@@ -107,14 +107,14 @@ def make_server(db_path: str | Path, team: str, role: str = "reader", access: di
 
     def connect() -> sqlite3.Connection:
         if not db_path.exists():
-            raise ToolError("UNAVAILABLE (503): the tracker database does not exist yet; no test cases can be read")
+            raise ToolError("UNAVAILABLE (503): the TMS database does not exist yet; no test cases can be read")
         con = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)       # read-only at the file level
         con.execute("PRAGMA query_only = ON")                              # ... and at the connection level
         con.row_factory = sqlite3.Row
         return con
 
     server = MCPServer(
-        "test-case-tracker",
+        "tms",
         version=VERSION,
         instructions=(f"Test cases of software requirements. You are connected as team {team} ({role}); you see only the "
                       "test cases of your team. Access to another team's test case is denied with FORBIDDEN (403)."),
@@ -181,16 +181,16 @@ def make_server(db_path: str | Path, team: str, role: str = "reader", access: di
         idempotency_key: Annotated[str, Field(pattern=KEY, description="The same key = the same test case: a repeated call returns the existing one.")],
         run_id: Annotated[Optional[str], Field(None, max_length=80, description="Id of the client's request, kept for the audit.")] = None,
     ) -> CreatedTestCase:
-        """Creates a test case of your team in the tracker. Idempotent: a call with an idempotency_key that was used
+        """Creates a test case of your team in the TMS. Idempotent: a call with an idempotency_key that was used
         before returns the existing test case with created=false and writes nothing."""
         if requirement_ref.split("#")[0] != doc_id:
             raise ToolError(f"validation error: requirement_ref {requirement_ref} does not belong to document {doc_id}")
-        tracker = Tracker(db_path)
+        tms = Tms(db_path)
         try:
-            tc, created = tracker.create(doc_id, requirement_ref, title, steps, expected, run_id=run_id,
+            tc, created = tms.create(doc_id, requirement_ref, title, steps, expected, run_id=run_id,
                                          key=idempotency_key, team=team)
         finally:
-            tracker.close()
+            tms.close()
         if tc["team"] != team:
             log.info("DENY create_test_case team=%s key already used by another team", team)
             raise ToolError("CONFLICT (409): this idempotency key is already used; choose another key. Nothing was written.")
@@ -203,11 +203,11 @@ def make_server(db_path: str | Path, team: str, role: str = "reader", access: di
 
 def main() -> None:
     logging.basicConfig(level=logging.INFO, stream=sys.stderr, format="%(asctime)s %(name)s %(message)s")  # stdout is the protocol
-    team = os.environ.get("TRACKER_TEAM", "")
-    role = os.environ.get("TRACKER_ROLE", "reader")
-    db = os.environ.get("TRACKER_DB", str(DEFAULT_DB))
+    team = os.environ.get("TMS_TEAM", "")
+    role = os.environ.get("TMS_ROLE", "reader")
+    db = os.environ.get("TMS_DB", str(DEFAULT_DB))
     server = make_server(db, team, role)
-    log.info("tracker MCP server: team=%s role=%s db=%s", team, role, db)
+    log.info("TMS MCP server: team=%s role=%s db=%s", team, role, db)
     server.run("stdio")
 
 

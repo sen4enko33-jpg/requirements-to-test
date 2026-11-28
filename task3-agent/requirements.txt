@@ -6,5 +6,5 @@ python-dotenv==1.2.4
 tenacity==9.2.1
 openai==3.46.0
 
-# MCP server of the tracker (step 2)
+# MCP server of the TMS, the test management system (step 2)
 mcp==2.3.0

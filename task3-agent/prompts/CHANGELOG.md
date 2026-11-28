@@ -3,6 +3,21 @@
 Versions of the system prompt are `prompts/system_<version>.md` (the one in use is `system_prompt` of `config.yaml`).
 Tool descriptions are `prompts/tools/<name>.yaml` with a `version` field; their changes are listed here too.
 
+## create_test_ticket v2 (step 2.4)
+- "test-case tracker" -> "TMS (test management system)": the store of the test cases was renamed everywhere (database
+  data/tms.db, server mcp_server/tms_server.py, MCP server name tms), the description uses the same word. No change in
+  what the tool does.
+
+## system_v7 (step 2.4, the TMS MCP server)
+- The intro names the TMS (test management system) and its tools (list_test_cases, get_test_case of the MCP server), and
+  new rule 9 says when to use them. With v6, "Які тест-кейси вже є в трекері?" (task g07; reworded "... в TMS?" when the
+  tracker was renamed TMS) failed 3 of 3 runs: the agent called no tool and asked back
+  "which test cases are you interested in? name a document or a requirement", because v6 knew only the corpus tools and
+  rule 8 (ask when the requirement is unclear) was the closest rule. With a document named (g04) v6 already listed them.
+- Rule 6 gets forbidden (a decision of the server: no workaround, explain) and not_found (say so, invent nothing). v6
+  already behaved so in g01, g02, g05 (18 of 18 runs) thanks to the text of the server's error; the rule makes it not
+  depend on that text.
+
 ## system_v6 (step 1.5, after the first evaluation run)
 - Rule 1: general questions (arithmetic and the like) are answered without tools. In the first run (task b03) v5 refused
   "17 x 3" ("this is an arithmetic question, I cannot answer it"), reading rule 2 (facts only from tools) as a ban on

@@ -1,4 +1,4 @@
-"""Demo rows of OTHER teams in the tracker, so that the access rules have something to deny:
+"""Demo rows of OTHER teams in the TMS, so that the access rules have something to deny:
     python -m mcp_server.seed [--db PATH]
 
 The rows are fictional test cases of the team payments-qa for the E-Store requirements. Running it again adds nothing
@@ -11,7 +11,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from tools.tracker import DEFAULT_DB, Tracker  # noqa: E402
+from tools.tms import DEFAULT_DB, Tms  # noqa: E402
 
 SEED = [
     {"team": "payments-qa", "doc_id": "2007_e_store", "requirement_ref": "2007_e_store#0008",
@@ -25,10 +25,10 @@ SEED = [
 ]
 
 
-def seed(tracker: Tracker) -> int:
+def seed(tms: Tms) -> int:
     added = 0
     for row in SEED:
-        _, created = tracker.create(row["doc_id"], row["requirement_ref"], row["title"], row["steps"], row["expected"],
+        _, created = tms.create(row["doc_id"], row["requirement_ref"], row["title"], row["steps"], row["expected"],
                                     run_id="seed", key=f"seed:{row['team']}:{row['requirement_ref']}", team=row["team"])
         added += created
     return added
@@ -38,7 +38,7 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--db", default=str(DEFAULT_DB))
     a = ap.parse_args()
-    t = Tracker(a.db)
+    t = Tms(a.db)
     print(f"{seed(t)} seed rows added, {t.count()} rows in {a.db}")
 
 

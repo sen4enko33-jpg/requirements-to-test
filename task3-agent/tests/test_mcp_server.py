@@ -1,4 +1,4 @@
-"""Checks of the tracker MCP server through a real MCP client, in-process and over stdio (no network, no model):
+"""Checks of the TMS MCP server through a real MCP client, in-process and over stdio (no network, no model):
 python tests/test_mcp_server.py"""
 import asyncio
 import json
@@ -15,8 +15,8 @@ sys.path.insert(0, str(ROOT))
 from mcp import Client, StdioServerParameters
 
 from mcp_server.seed import seed
-from mcp_server.tracker_server import make_server
-from tools.tracker import Tracker
+from mcp_server.tms_server import make_server
+from tools.tms import Tms
 
 FAILED = []
 
@@ -28,8 +28,8 @@ def check(name, cond):
 
 
 tmp = tempfile.TemporaryDirectory()
-DB = Path(tmp.name) / "tracker.db"
-tr = Tracker(DB)
+DB = Path(tmp.name) / "tms.db"
+tr = Tms(DB)
 OWN = dict(doc_id="remote_work_policy", requirement_ref="remote_work_policy#0000", title="Remote days limit",
            steps=["Request a third remote day"], expected="Rejected: at most two days")
 own, _ = tr.create(**OWN, key="own-1")                                          # TC-0001, hr-policy-qa
@@ -113,7 +113,7 @@ async def main():
     check("validation: the table is still there", sqlite3.connect(DB).execute("SELECT COUNT(*) FROM test_cases").fetchone()[0] == 4)
 
     # --- read-only: the connection cannot write even if a query tried
-    import mcp_server.tracker_server as ts
+    import mcp_server.tms_server as ts
     con = sqlite3.connect(f"file:{DB}?mode=ro", uri=True)
     try:
         con.execute("DELETE FROM test_cases")
@@ -180,20 +180,20 @@ async def main():
         check("auditors cannot connect as writer", False)
     except SystemExit:
         check("auditors cannot connect as writer", True)
-    fresh = Path(tmp.name) / "fresh" / "tracker.db"
+    fresh = Path(tmp.name) / "fresh" / "tms.db"
     err, out = await call(make_server(fresh, "hr-policy-qa", "writer"), "create_test_case", NEW)
     check("writer: the first write creates the database", not err and fresh.exists())
 
     # --- the real entry point over stdio (as the agent and other MCP clients start it)
-    env = {**os.environ, "TRACKER_TEAM": "hr-policy-qa", "TRACKER_ROLE": "reader", "TRACKER_DB": str(DB)}
-    params = StdioServerParameters(command=sys.executable, args=["-m", "mcp_server.tracker_server"], env=env, cwd=str(ROOT))
+    env = {**os.environ, "TMS_TEAM": "hr-policy-qa", "TMS_ROLE": "reader", "TMS_DB": str(DB)}
+    params = StdioServerParameters(command=sys.executable, args=["-m", "mcp_server.tms_server"], env=env, cwd=str(ROOT))
     async with Client(params) as c:
         names = sorted(t.name for t in (await c.list_tools()).tools)
         r = await c.call_tool("get_test_case", {"ticket": "TC-0003"})
     check("stdio: the server starts as a subprocess and lists its tools", names == ["get_test_case", "list_test_cases"])
     check("stdio: the 403 arrives over the protocol", r.is_error and "FORBIDDEN (403)" in text(r))
-    bad = subprocess.run([sys.executable, "-m", "mcp_server.tracker_server"], cwd=ROOT, capture_output=True, text=True,
-                         env={**env, "TRACKER_TEAM": "intruders"}, timeout=60, stdin=subprocess.DEVNULL)
+    bad = subprocess.run([sys.executable, "-m", "mcp_server.tms_server"], cwd=ROOT, capture_output=True, text=True,
+                         env={**env, "TMS_TEAM": "intruders"}, timeout=60, stdin=subprocess.DEVNULL)
     check("stdio: an unknown team stops the server with a message", bad.returncode != 0 and "unknown team" in bad.stderr)
 
 

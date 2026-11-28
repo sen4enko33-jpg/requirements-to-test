@@ -1,7 +1,7 @@
-"""create_test_ticket: the one tool with a side effect. It writes a test case to the tracker (tools/tracker.py).
+"""create_test_ticket: the one tool with a side effect. It writes a test case to the TMS (tools/tms.py).
 
-Where it writes (step 2.3): through the tracker MCP server (tools/mcp_tools.McpTrackerStore -> create_test_case), which
-decides the team of the row and keeps the idempotency; a local Tracker with the same create() is used in the tests.
+Where it writes (step 2.3): through the TMS MCP server (tools/mcp_tools.McpTmsStore -> create_test_case), which
+decides the team of the row and keeps the idempotency; a local Tms with the same create() is used in the tests.
 
 It is marked side_effect=True and safe=False: the registry never retries it, and (sub-step 1.4.3) the agent loop runs it
 only after a human confirmed the call in code. Protection against guessing: every argument is required, and the requirement
@@ -15,7 +15,7 @@ from .corpus import Corpus
 from .corpus_tools import REF_PATTERN
 from .registry import Tool, ToolInputError
 from .session import Session
-from .tracker import Tracker, idempotency_key
+from .tms import Tms, idempotency_key
 
 
 class TicketArgs(BaseModel):
@@ -42,8 +42,8 @@ class TicketOutput(BaseModel):
     title: str
 
 
-def make_ticket_tool(tracker: Tracker, corpus: Corpus, session: Session) -> Tool:
-    """tracker: anything with Tracker.create's signature (a Tracker, or McpTrackerStore for the MCP server)."""
+def make_ticket_tool(tms: Tms, corpus: Corpus, session: Session) -> Tool:
+    """tms: anything with Tms.create's signature (a Tms, or McpTmsStore for the MCP server)."""
     def precheck(a: TicketArgs) -> None:
         """Runs before the person is asked: nobody should be asked to approve a test case for an invented requirement."""
         if a.requirement_ref not in corpus.chunks:
@@ -58,7 +58,7 @@ def make_ticket_tool(tracker: Tracker, corpus: Corpus, session: Session) -> Tool
         # another title on every run ("Test Maximum Remote Work Days", then "Maximum Remote Work Days Test Case"), so a
         # title-based key let a repeated request create a duplicate in the real runs of step 1.4.4.
         key = idempotency_key("request", a.requirement_ref, session.request) if session.request else None
-        tc, created = tracker.create(chunk["doc_id"], a.requirement_ref, a.title, a.steps, a.expected, session.run_id, key)
+        tc, created = tms.create(chunk["doc_id"], a.requirement_ref, a.title, a.steps, a.expected, session.run_id, key)
         return {"ticket": tc["ticket"], "created": created, "duplicate": not created, "doc_id": tc["doc_id"],
                 "requirement_ref": tc["requirement_ref"], "title": tc["title"]}
 

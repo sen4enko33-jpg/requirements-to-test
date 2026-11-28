@@ -21,16 +21,16 @@ from agent.llm import ChatResult, ToolCall
 from agent.loop import run_agent
 from agent.trace import Trace
 from mcp_server.seed import seed
-from mcp_server.tracker_server import make_server
+from mcp_server.tms_server import make_server
 from tools import faults
 from tools.echo import ECHO
 from tools.corpus import Corpus
 from tools.corpus_tools import make_corpus_tools
-from tools.mcp_tools import McpConnection, McpError, McpTrackerStore, mcp_tools, open_server, stdio_params
+from tools.mcp_tools import McpConnection, McpError, McpTmsStore, mcp_tools, open_server, stdio_params
 from tools.session import Session
 from tools.ticket_tool import make_ticket_tool
 from tools.registry import RetryPolicy, ToolRegistry
-from tools.tracker import Tracker
+from tools.tms import Tms
 
 FAILED = []
 
@@ -62,12 +62,12 @@ def calls(*specs):
                       cost_usd=0.001)
 
 tmp = tempfile.TemporaryDirectory()
-DB = Path(tmp.name) / "tracker.db"
-tr = Tracker(DB)
+DB = Path(tmp.name) / "tms.db"
+tr = Tms(DB)
 tr.create("remote_work_policy", "remote_work_policy#0000", "Remote days limit", ["Request a third remote day"],
           "Rejected: at most two days", key="own-1")                       # TC-0001, our team
 seed(tr)                                                                     # TC-0002, TC-0003 of payments-qa
-CFG = {"module": "mcp_server.tracker_server", "env": {"TRACKER_TEAM": "hr-policy-qa", "TRACKER_ROLE": "reader"}}
+CFG = {"module": "mcp_server.tms_server", "env": {"TMS_TEAM": "hr-policy-qa", "TMS_ROLE": "reader"}}
 LIM = Limits(max_steps=5, max_tokens_total=100000, max_cost_usd=1.0, request_timeout_s=60, tool_timeout_s=10)
 pauses = []
 
@@ -86,7 +86,7 @@ with McpConnection(make_server(DB, "hr-policy-qa", "reader")) as conn:
     check("read-only on the server -> safe, no side effect (no confirmation, retried)",
           all(t.safe and not t.side_effect for t in reg.tools.values()))
     check("server name and version in the tool version (written to the trace)",
-          reg.tools["get_test_case"].version == "mcp:test-case-tracker@1.2")
+          reg.tools["get_test_case"].version == "mcp:tms@1.3")
     sch = {s["function"]["name"]: s["function"] for s in reg.schemas()}
     check("the model gets the server's argument schema (pattern, maximum)",
           sch["get_test_case"]["parameters"]["properties"]["ticket"]["pattern"].startswith("^TC-")
@@ -183,10 +183,10 @@ with McpConnection(make_server(DB, "hr-policy-qa", "reader")) as conn:
     check("agent trace: 403 and success of the MCP calls", [e["error_kind"] for e in tev] == ["forbidden", None])
     start = tr_.of("start")[0]
     check("agent trace: the start lists the MCP tools and their version",
-          start["tool_versions"].get("get_test_case") == "mcp:test-case-tracker@1.2")
+          start["tool_versions"].get("get_test_case") == "mcp:tms@1.3")
     check("agent: answered after the two calls", r.complete and len(r.tool_calls) == 2)
 
-# --- writing through the server (2.3): create_test_ticket -> McpTrackerStore -> create_test_case
+# --- writing through the server (2.3): create_test_ticket -> McpTmsStore -> create_test_case
 corpus = Corpus()
 pol = [c for c in corpus.chunks if c.startswith("remote_work_policy#")]
 
@@ -205,7 +205,7 @@ TICKET = json.dumps({"requirement_ref": pol[0], "title": "Remote days limit afte
 def ticket_registry(conn, request="Create a test case for the remote days limit", spec=None):
     session = Session(run_id="run-mcp", request=request)
     reg = ToolRegistry(make_corpus_tools(corpus, floor=None, session=session) +
-                       [make_ticket_tool(McpTrackerStore(conn), corpus, session)] +
+                       [make_ticket_tool(McpTmsStore(conn), corpus, session)] +
                        (mcp_tools(conn, hidden=("create_test_case",)) if conn else []),
                        RetryPolicy(max_attempts=3, backoff_s=0.01), sleep=pauses.append)
     if spec:
@@ -250,22 +250,22 @@ check("... still 5 rows", sqlite3.connect(DB).execute("SELECT COUNT(*) FROM test
 
 # --- over stdio, as main.py starts it; a server that cannot start
 log = Path(tmp.name) / "mcp.log"
-conn = open_server({"mcp": {"tracker": {**CFG, "log": str(log)}}}, "tracker", db=DB, quiet=True)
+conn = open_server({"mcp": {"tms": {**CFG, "log": str(log)}}}, "tms", db=DB, quiet=True)
 check("stdio: open_server starts the subprocess", conn is not None and sorted(t.name for t in conn.tools) == ["get_test_case", "list_test_cases"])
 o = registry(conn).execute("get_test_case", '{"ticket": "TC-0003"}', 10)
 check("stdio: 403 over the protocol", o.error_kind == "forbidden")
 conn.close()
 check("stdio: the server's log goes to the log file, not to the agent's output", "DENY get_test_case" in log.read_text())
-bad = open_server({"mcp": {"tracker": {**CFG, "env": {"TRACKER_TEAM": "intruders"}, "log": str(log)}}}, "tracker", db=DB,
+bad = open_server({"mcp": {"tms": {**CFG, "env": {"TMS_TEAM": "intruders"}, "log": str(log)}}}, "tms", db=DB,
                   quiet=True)
 check("stdio: a server that refuses to start -> None (the agent runs without it)", bad is None)
 check("stdio: ... and the reason is in its log", "unknown team" in log.read_text())
 try:
-    McpConnection(stdio_params({**CFG, "env": {"TRACKER_TEAM": "intruders"}}, DB), errlog=log.open("a")).open()
+    McpConnection(stdio_params({**CFG, "env": {"TMS_TEAM": "intruders"}}, DB), errlog=log.open("a")).open()
     check("McpConnection.open raises McpError for a server that does not start", False)
 except McpError:
     check("McpConnection.open raises McpError for a server that does not start", True)
-check("no mcp section -> no connection", open_server({}, "tracker") is None)
+check("no mcp section -> no connection", open_server({}, "tms") is None)
 
 tr.close()
 tmp.cleanup()

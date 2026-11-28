@@ -1,4 +1,4 @@
-"""A small test-case tracker in SQLite: the "outside world" that the agent can change (step 1.4).
+"""A small TMS (test management system: where the test cases live) in SQLite: the "outside world" that the agent can change (step 1.4).
 
 Idempotency: every test case has an idempotency key. The caller passes it (the agent derives it from the user's request
 and the requirement, see tools/ticket_tool.py); without one the key is a hash of (document, requirement ref, title) after
@@ -15,7 +15,7 @@ import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
 
-DEFAULT_DB = Path(os.environ.get("TRACKER_DB", Path(__file__).resolve().parents[1] / "data" / "tracker.db"))
+DEFAULT_DB = Path(os.environ.get("TMS_DB", Path(__file__).resolve().parents[1] / "data" / "tms.db"))
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS test_cases (
@@ -44,7 +44,7 @@ def idempotency_key(*parts: str) -> str:
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:32]
 
 
-class Tracker:
+class Tms:
     def __init__(self, path: str | Path | None = None):
         """path: SQLite file (created with its folder); ":memory:" for tests."""
         self.path = str(path or DEFAULT_DB)
@@ -55,7 +55,7 @@ class Tracker:
         self._db.row_factory = sqlite3.Row
         self._db.execute(SCHEMA)
         cols = {r["name"] for r in self._db.execute("PRAGMA table_info(test_cases)")}
-        if "team" not in cols:          # a tracker.db of step 1.4 (before teams): every old row belongs to the default team
+        if "team" not in cols:          # a tms.db of step 1.4 (before teams): every old row belongs to the default team
             self._db.execute(f"ALTER TABLE test_cases ADD COLUMN team TEXT NOT NULL DEFAULT '{DEFAULT_TEAM}'")
 
     @staticmethod
@@ -90,7 +90,7 @@ class Tracker:
         return self._db.execute("SELECT COUNT(*) FROM test_cases").fetchone()[0]
 
     def clear(self) -> None:
-        """Delete every row (the evaluation runner gives every task an empty tracker in the same file)."""
+        """Delete every row (the evaluation runner gives every task an empty TMS in the same file)."""
         self._db.execute("DELETE FROM test_cases")
 
     def close(self) -> None:

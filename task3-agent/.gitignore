@@ -1,4 +1,4 @@
 # traces of local runs (the traces of the evaluation runs are kept in evals/, from a later sub-step)
 /traces/
-# the test-case tracker of the agent (SQLite, created on first use)
+# the TMS (test management system) of the agent: data/tms.db (SQLite, created on first use)
 data/
