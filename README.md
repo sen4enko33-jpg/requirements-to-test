@@ -7,7 +7,7 @@ parts; each one has its own README, report, requirements and tests.
 |---|---|---|---|
 | [`task1-extraction/`](task1-extraction/) | Homework 1: a language model extracts structured requirements from the text of a requirements document; comparison of models and prompts on a labelled set | [README](task1-extraction/README.md) | [REPORT](task1-extraction/REPORT.md) |
 | [`task2-rag/`](task2-rag/) | Homework 2: RAG over 42 requirements documents - ingestion, chunking, Chroma + BM25 + reranking, answers with citations, evaluation | [README](task2-rag/README.md) | [REPORT](task2-rag/REPORT.md) |
-| [`task3-agent/`](task3-agent/) | Homework 3: the RAG of task 2 as an agent - tool calling with limits, fault handling, human confirmation of changes, its own MCP server of a TMS (test management system) with access rules, evaluation on 37 tasks | [README](task3-agent/README.md) | [REPORT](task3-agent/REPORT.md) |
+| [`task3-agent/`](task3-agent/) | Homework 3: the RAG of task 2 as an agent - tool calling with limits, fault handling, human confirmation of changes, its own MCP server of a TMS (test management system) with access rules, evaluation on 49 test scenarios | [README](task3-agent/README.md) | [REPORT](task3-agent/REPORT.md) |
 
 ## What lies where
 - `task1-extraction/` - the extraction pipeline (`main.py`, `src/`), prompts, data splits, results of all experiments, `tests/`, `config.yaml`
