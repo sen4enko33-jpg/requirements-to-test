@@ -156,8 +156,8 @@ for t in tasks:
         problems.append(f"{t['id']}: no expectations")
 check(f"tasks: every check name, document, ref, fault spec and answer is valid {problems or ''}", not problems)
 cats = {t["category"] for t in tasks}
-check("tasks: cover answerable, no_tool, unanswerable, budget, fault, side_effect, access, tms, injection, versions",
-      {"answerable", "no_tool", "unanswerable", "budget", "fault", "side_effect", "access", "tms", "injection",
+check("tasks: cover answerable, no_tool, unanswerable, budget, fault, writes, access, tms, injection, versions",
+      {"answerable", "no_tool", "unanswerable", "budget", "fault", "writes", "access", "tms", "injection",
        "versions", "memory"} <= cats)
 check("tasks: a versions task cites both versions of the policy",
       all(set(t["expect"].get("cites_doc", [])) == {"remote_work_policy", "remote_work_policy_2023"}

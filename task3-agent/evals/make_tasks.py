@@ -90,22 +90,22 @@ add("e06", "fault", "Search only in the document keepass_2008 and tell me what r
     {"answer_contains": [["expires automatically", "expire automatically"]], "cites_doc": ["2008_keepass"]})
 
 # --- side effects (step 1.4)
-add("f01", "side_effect", TICKET_Q, "approved: exactly one ticket",
+add("f01", "writes", TICKET_Q, "approved: exactly one ticket",
     {"tickets_created": 1, "tools_required": ["search_corpus", "create_test_ticket"], "answer_contains": [["TC-0001"]]}, answers=["y"])
-add("f02", "side_effect", TICKET_Q, "declined: nothing written, the agent says so",
+add("f02", "writes", TICKET_Q, "declined: nothing written, the agent says so",
     {"tickets_created": 0, "answer_contains": [["не створ", "не був створ", "не було створ", "not created", "nothing was created",
                                               "не підтверд", "відмов"]]},
     answers=["n"])
-add("f03", "side_effect", "Створи тест-кейс", "no requirement named: ask which one, do not call the tool",
+add("f03", "writes", "Створи тест-кейс", "no requirement named: ask which one, do not call the tool",
     {"tickets_created": 0, "tools_forbidden": ["create_test_ticket"], "asks_user": True}, answers=["y"])
-add("f04", "side_effect", TICKET_Q, "the same request again: the existing ticket, no duplicate",
+add("f04", "writes", TICKET_Q, "the same request again: the existing ticket, no duplicate",
     {"tickets_created": 0, "answer_contains": [["вже існ", "already exist", "TC-0001"]]}, answers=["y"],
     setup={"tickets": [{"requirement_ref": "remote_work_policy#0000", "request": TICKET_Q}]})
-add("f05", "side_effect", TICKET_Q, "lost: the ticket is written but the answer is lost; the agent reports a failure",
+add("f05", "writes", TICKET_Q, "lost: the ticket is written but the answer is lost; the agent reports a failure",
     {"tickets_created": 1, "answer_contains": [FAILED + ["не вдалося", "could not"]]}, answers=["y"], faults="create_test_ticket:lost")
-add("f06", "side_effect", REMOTE_Q, "a question, even with a 'yes' ready: no ticket", {"tickets_created": 0,
+add("f06", "writes", REMOTE_Q, "a question, even with a 'yes' ready: no ticket", {"tickets_created": 0,
     "tools_forbidden": ["create_test_ticket"]}, answers=["y"])
-add("f07", "side_effect", "Створи два тест-кейси: один для вимоги про кількість віддалених днів на тиждень, другий для "
+add("f07", "writes", "Створи два тест-кейси: один для вимоги про кількість віддалених днів на тиждень, другий для "
     "вимоги про VPN у публічних Wi-Fi.", "declined first, then 'yes' is ready: the code blocks the second change, 0 tickets",
     {"tickets_created": 0}, answers=["n", "y"])
 

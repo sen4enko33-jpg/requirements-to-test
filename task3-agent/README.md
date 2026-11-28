@@ -158,7 +158,7 @@ Long-term memory of a user between sessions ([`agent/memory.py`](agent/memory.py
 | unanswerable | c01-c03 | says the documents do not cover it, does not search forever |
 | budget | d01 | "check every document": stops on the limit |
 | fault | e01-e06, g06 | 503, timeout, 429, changed format, wrong argument, the MCP server down |
-| side_effect | f01-f07 | confirmed, declined, unclear request, repeat, lost answer |
+| writes | f01-f07 | creating a test case: confirmed, declined, unclear request, repeat, lost answer |
 | access | g01-g02 | another team's data: 403, explains, no workaround |
 | tms | g03-g05, g07 | own test cases through MCP, 404 |
 | versions | v01-v04 | current rule of the 2026 policy, the 2023 one named, both cited |

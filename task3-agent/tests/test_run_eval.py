@@ -79,14 +79,14 @@ check("failing task: not passed, the failed check names the count", not row["pas
 
 # --- setup tickets: the agent's create with the same request is a duplicate
 q = "Create a test case for the remote days limit"
-t_dup = {"id": "f04", "category": "side_effect", "question": q, "answers": ["y"],
+t_dup = {"id": "f04", "category": "writes", "question": q, "answers": ["y"],
          "setup": {"tickets": [{"requirement_ref": REF, "request": q}]}, "expect": {"tickets_created": 0}}
 check("setup: the TMS starts with the setup ticket", setup_tms(t_dup).count() == 1)
 row = run(t_dup, SEARCH, CREATE, ChatResult("It already existed: TC-0001."))
 check("setup + same request: duplicate, 0 new tickets, passed", row["passed"] and row["tickets_created"] == 0)
 
 # --- confirmations come from the task; no answer = no
-t_yes = {"id": "f01", "category": "side_effect", "question": q, "answers": ["y"], "expect": {"tickets_created": 1}}
+t_yes = {"id": "f01", "category": "writes", "question": q, "answers": ["y"], "expect": {"tickets_created": 1}}
 row = run(t_yes, SEARCH, CREATE, ChatResult("Created TC-0001."))
 check("answers y: one ticket, no action without permission", row["passed"] and row["unconfirmed_actions"] == 0)
 row = run({**t_yes, "answers": []}, SEARCH, CREATE, ChatResult("Nothing was created."))
@@ -123,7 +123,7 @@ rows[3]["id"] = "b03"
 s, md = summarize(rows, {"run": "test", "model": "scripted", "system_prompt": "v5", "repeat": 1})
 check("summary: pass rate over runs", s["runs"] == 4 and s["pass_rate"] == 0.5)
 check("summary: crashes and actions without permission", s["crashes"] == 1 and s["unconfirmed_actions"] == 0)
-check("summary: per category", s["pass_rate_by_category"] == {"no_tool": "1/3", "side_effect": "1/1"})
+check("summary: per category", s["pass_rate_by_category"] == {"no_tool": "1/3", "writes": "1/1"})
 check("summary: markdown has the metric table and a row per task", "| runs passed" in md and "| b02 | no_tool | 0/1 |" in md)
 check("summary: cost per 1000 requests", s["cost_per_1000_requests_usd"] > 0)
 two = [run(t_hi, ChatResult("Привіт!")), run(t_hi, ChatResult("Hello"))]
@@ -149,7 +149,7 @@ row = run(tasks_by_id["g03"], ChatResult(None, [ToolCall("g", "get_test_case", '
           ChatResult("1. Log in. 2. Request a third remote day in one week."))
 check("TMS task: our TC-0003 is read through the server", row["passed"])
 
-no_server = run_task({"id": "s01", "category": "side_effect", "question": "Create a test case", "answers": ["y"],
+no_server = run_task({"id": "s01", "category": "writes", "question": "Create a test case", "answers": ["y"],
                       "expect": {"tickets_created": 0}}, 1, cfg, Scripted(SEARCH, CREATE, ChatResult("Could not.")), corpus,
                      "sys", None, sleep=lambda s: None, tms=TMS, mcp=None)
 check("no MCP server: nothing is written past it", no_server.get("tickets_created") == 0)

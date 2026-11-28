@@ -2,7 +2,7 @@
 
   python -m evals.run                      # every task once
   python -m evals.run --repeat 3           # three runs per task (to see what is stable)
-  python -m evals.run --only a01,f04       # some tasks;  --category fault,side_effect  some groups
+  python -m evals.run --only a01,f04       # some tasks;  --category fault,writes  some groups
 
 Every task runs with its own empty TMS (plus the tickets of its `setup`), its own FAULTS, its own confirmations
 (`answers`, the rest is "no") and its own limits. The TMS is one file of the run (tms.db, cleared for every task,
