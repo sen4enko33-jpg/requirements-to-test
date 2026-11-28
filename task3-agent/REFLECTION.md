@@ -63,7 +63,7 @@
   **врахувала**. Це видно лише на моделі, тож поведінку не можна вважати готовою без хоча б короткого запуску. Слабка
   модель краще виконує те, що стоїть поруч із питанням, ніж правило на початку довгого промпту.
 
-## 5. Документи, зрозумілі мені, а не агенту (кроки 2.4-3.4, [`0e9bb7c`](https://github.com/sen4enko33-jpg/requirements-to-test/commit/0e9bb7c), [`998dcb8`](https://github.com/sen4enko33-jpg/requirements-to-test/commit/998dcb8), [`4303ded`](https://github.com/sen4enko33-jpg/requirements-to-test/commit/4303ded))
+## 5. Документи, зрозумілі агенту, але не мені (кроки 2.4-3.4, [`0e9bb7c`](https://github.com/sen4enko33-jpg/requirements-to-test/commit/0e9bb7c), [`998dcb8`](https://github.com/sen4enko33-jpg/requirements-to-test/commit/998dcb8), [`4303ded`](https://github.com/sen4enko33-jpg/requirements-to-test/commit/4303ded))
 - **Що просив:** README з поясненням, навіщо окремий MCP-сервер, і звіт з метриками, розбором провалів і таблицею
   збоїв.
 - **Що вийшло добре:** зміст повний, з посиланнями на прогони. Перед комітом агент звіряв цифри у звіті з записами
