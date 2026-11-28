@@ -2,6 +2,7 @@
 with the same validation, retries, faults, limits and trace as the local tools (no network, no model):
 python tests/test_mcp_tools.py"""
 import json
+import sqlite3
 import sys
 import tempfile
 import time
@@ -23,7 +24,11 @@ from mcp_server.seed import seed
 from mcp_server.tracker_server import make_server
 from tools import faults
 from tools.echo import ECHO
-from tools.mcp_tools import McpConnection, McpError, mcp_tools, open_server, stdio_params
+from tools.corpus import Corpus
+from tools.corpus_tools import make_corpus_tools
+from tools.mcp_tools import McpConnection, McpError, McpTrackerStore, mcp_tools, open_server, stdio_params
+from tools.session import Session
+from tools.ticket_tool import make_ticket_tool
 from tools.registry import RetryPolicy, ToolRegistry
 from tools.tracker import Tracker
 
@@ -81,7 +86,7 @@ with McpConnection(make_server(DB, "hr-policy-qa", "reader")) as conn:
     check("read-only on the server -> safe, no side effect (no confirmation, retried)",
           all(t.safe and not t.side_effect for t in reg.tools.values()))
     check("server name and version in the tool version (written to the trace)",
-          reg.tools["get_test_case"].version == "mcp:test-case-tracker@1.1")
+          reg.tools["get_test_case"].version == "mcp:test-case-tracker@1.2")
     sch = {s["function"]["name"]: s["function"] for s in reg.schemas()}
     check("the model gets the server's argument schema (pattern, maximum)",
           sch["get_test_case"]["parameters"]["properties"]["ticket"]["pattern"].startswith("^TC-")
@@ -178,8 +183,70 @@ with McpConnection(make_server(DB, "hr-policy-qa", "reader")) as conn:
     check("agent trace: 403 and success of the MCP calls", [e["error_kind"] for e in tev] == ["forbidden", None])
     start = tr_.of("start")[0]
     check("agent trace: the start lists the MCP tools and their version",
-          start["tool_versions"].get("get_test_case") == "mcp:test-case-tracker@1.1")
+          start["tool_versions"].get("get_test_case") == "mcp:test-case-tracker@1.2")
     check("agent: answered after the two calls", r.complete and len(r.tool_calls) == 2)
+
+# --- writing through the server (2.3): create_test_ticket -> McpTrackerStore -> create_test_case
+corpus = Corpus()
+pol = [c for c in corpus.chunks if c.startswith("remote_work_policy#")]
+
+
+class FakeRetriever:
+    def search(self, query, k, mode, filters):
+        return [{**corpus.chunks[pol[0]], "score": 5.0}]
+
+
+corpus._retriever = FakeRetriever()
+TICKET = json.dumps({"requirement_ref": pol[0], "title": "Remote days limit after probation",
+                     "steps": ["Log in as an employee after probation", "Request a third remote day"],
+                     "expected": "The request is rejected: at most two remote days per week."})
+
+
+def ticket_registry(conn, request="Create a test case for the remote days limit", spec=None):
+    session = Session(run_id="run-mcp", request=request)
+    reg = ToolRegistry(make_corpus_tools(corpus, floor=None, session=session) +
+                       [make_ticket_tool(McpTrackerStore(conn), corpus, session)] +
+                       (mcp_tools(conn, hidden=("create_test_case",)) if conn else []),
+                       RetryPolicy(max_attempts=3, backoff_s=0.01), sleep=pauses.append)
+    if spec:
+        faults.apply(reg, spec)
+    reg.execute("search_corpus", '{"query": "remote days"}', 5)        # the agent has read the requirement
+    return reg
+
+
+with McpConnection(make_server(DB, "hr-policy-qa", "writer")) as conn:
+    reg = ticket_registry(conn)
+    check("hidden: the model is not offered create_test_case of the server",
+          "create_test_case" not in reg.tools and "create_test_ticket" in reg.tools and "get_test_case" in reg.tools)
+    check("create_test_ticket stays a side effect (confirmation in the loop, not retried)",
+          reg.tools["create_test_ticket"].side_effect and not reg.tools["create_test_ticket"].safe)
+    o = reg.execute("create_test_ticket", TICKET, 10)
+    d = json.loads(o.content) if o.ok else {}
+    check("create_test_ticket writes through the server", o.ok and d.get("created") and d["ticket"] == "TC-0004")
+    row = sqlite3.connect(DB).execute("SELECT team, run_id FROM test_cases WHERE id = 4").fetchone()
+    check("the row: our team (set by the server) and the run id of the agent", row == ("hr-policy-qa", "run-mcp"))
+    o = ticket_registry(conn).execute("create_test_ticket", TICKET, 10)
+    check("the same request again -> duplicate, no new row (idempotency on the server)",
+          o.ok and json.loads(o.content)["duplicate"] and json.loads(o.content)["ticket"] == "TC-0004")
+    o = reg.execute("get_test_case", '{"ticket": "TC-0004"}', 10)
+    check("the new test case is readable through get_test_case", o.ok and json.loads(o.content)["steps"][1] == "Request a third remote day")
+    o = ticket_registry(conn, request="file it, connection breaks", spec="create_test_ticket:lost*1").execute(
+        "create_test_ticket", TICKET, 10)
+    check("FAULTS lost: written on the server, the agent sees a timeout, not retried", o.error_kind == "timeout" and o.attempts == 1)
+    o = ticket_registry(conn, request="file it, connection breaks").execute("create_test_ticket", TICKET, 10)
+    check("... the repeated request finds it: duplicate, not a second row", o.ok and json.loads(o.content)["duplicate"])
+    reg_bad = ticket_registry(conn)
+    o = reg_bad.execute("create_test_ticket", TICKET.replace(pol[0], "remote_work_policy#0099"), 10)
+    check("an unknown ref is still stopped in the agent, before the server", o.error_kind == "invalid_args" and o.attempts == 0)
+n_rows = sqlite3.connect(DB).execute("SELECT COUNT(*) FROM test_cases").fetchone()[0]
+check("writes: 2 rows added in all (TC-0004, TC-0005), no duplicates", n_rows == 5)
+
+with McpConnection(make_server(DB, "hr-policy-qa", "reader")) as conn:
+    o = ticket_registry(conn, request="as a reader").execute("create_test_ticket", TICKET, 10)
+    check("a reader connection -> forbidden, nothing written", o.error_kind == "forbidden" and "nothing was created" in o.content)
+o = ticket_registry(None, request="no server").execute("create_test_ticket", TICKET, 10)
+check("no server -> unavailable, nothing written past the server", o.error_kind == "unavailable" and "not running" in o.content)
+check("... still 5 rows", sqlite3.connect(DB).execute("SELECT COUNT(*) FROM test_cases").fetchone()[0] == 5)
 
 # --- over stdio, as main.py starts it; a server that cannot start
 log = Path(tmp.name) / "mcp.log"

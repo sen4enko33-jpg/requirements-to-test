@@ -31,7 +31,8 @@ tool_retry:
 mcp:
   tracker:
     module: mcp_server.tracker_server  # python -m <module>
-    env: {TRACKER_TEAM: hr-policy-qa, TRACKER_ROLE: reader}   # who the agent is for the server (mcp_server/access.yaml)
+    env: {TRACKER_TEAM: hr-policy-qa, TRACKER_ROLE: writer}   # who the agent is for the server (mcp_server/access.yaml)
+    hidden: [create_test_case]         # not offered to the model: it writes only through create_test_ticket (checks + a person)
     start_timeout_s: 30                # the server did not start -> the agent runs without its tools and says so
     call_timeout_s: 15                 # one tools/call (the tool_timeout_s of the request can only shorten it)
     log: traces/mcp_tracker.log        # stderr of the server (its ALLOW / DENY lines), not mixed into the answer

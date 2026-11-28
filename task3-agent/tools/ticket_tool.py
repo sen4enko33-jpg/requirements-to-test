@@ -1,5 +1,8 @@
 """create_test_ticket: the one tool with a side effect. It writes a test case to the tracker (tools/tracker.py).
 
+Where it writes (step 2.3): through the tracker MCP server (tools/mcp_tools.McpTrackerStore -> create_test_case), which
+decides the team of the row and keeps the idempotency; a local Tracker with the same create() is used in the tests.
+
 It is marked side_effect=True and safe=False: the registry never retries it, and (sub-step 1.4.3) the agent loop runs it
 only after a human confirmed the call in code. Protection against guessing: every argument is required, and the requirement
 must be a passage the agent read in this conversation (Session.seen_refs)."""
@@ -40,6 +43,7 @@ class TicketOutput(BaseModel):
 
 
 def make_ticket_tool(tracker: Tracker, corpus: Corpus, session: Session) -> Tool:
+    """tracker: anything with Tracker.create's signature (a Tracker, or McpTrackerStore for the MCP server)."""
     def precheck(a: TicketArgs) -> None:
         """Runs before the person is asked: nobody should be asked to approve a test case for an invented requirement."""
         if a.requirement_ref not in corpus.chunks:

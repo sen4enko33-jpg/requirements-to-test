@@ -38,7 +38,7 @@ from agent.trace import Trace  # noqa: E402
 from evals.checks import run_checks, tool_names, unconfirmed_side_effects  # noqa: E402
 from tools.build import build_registry  # noqa: E402
 from tools.corpus import Corpus  # noqa: E402
-from tools.mcp_tools import mcp_tools, open_server  # noqa: E402
+from tools.mcp_tools import McpTrackerStore, mcp_tools, open_server  # noqa: E402
 from tools.session import Session  # noqa: E402
 from tools.tracker import Tracker, idempotency_key  # noqa: E402
 
@@ -83,7 +83,8 @@ def run_task(task: dict, rep: int, cfg: dict, model, corpus: Corpus, system_prom
     t0 = time.perf_counter()
     try:
         tools = build_registry(cfg, corpus, tracker, session, task.get("faults"), sleep=sleep, quiet=True,
-                               extra_tools=mcp_tools(mcp) if mcp else [])
+                               extra_tools=mcp_tools(mcp, cfg["mcp"]["tracker"].get("hidden", ())) if mcp else [],
+                               ticket_store=McpTrackerStore(mcp))     # no server -> writes are unavailable
         r = run_agent(task["question"], model, tools, limits, system_prompt, trace, confirm=confirm)
     except Exception as e:                                 # a bug of the harness or the agent: recorded, the run goes on
         row.update(passed=False, error=f"{type(e).__name__}: {e}", traceback=traceback.format_exc(),

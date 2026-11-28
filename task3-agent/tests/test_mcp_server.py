@@ -136,6 +136,54 @@ async def main():
         except SystemExit as e:
             check(f"identity: {team}/{role} refused", team in str(e))
 
+    # --- writing (2.3): only a writer connection has create_test_case
+    NEW = dict(doc_id="remote_work_policy", requirement_ref="remote_work_policy#0003", title="Security on public Wi-Fi",
+               steps=["Connect to a public Wi-Fi", "Open the VPN"], expected="Work only through the VPN",
+               idempotency_key="test-key-0001", run_id="run-w")
+    async with Client(srv) as c:
+        r = await c.call_tool("create_test_case", NEW)
+    check("reader: create_test_case is not offered and cannot be called", r.is_error and "test_case" in text(r))
+    w = make_server(DB, "hr-policy-qa", "writer")
+    async with Client(w) as c:
+        wt = {t.name: t for t in (await c.list_tools()).tools}
+    check("writer: create_test_case is listed, not read-only, idempotent",
+          "create_test_case" in wt and not wt["create_test_case"].annotations.read_only_hint
+          and wt["create_test_case"].annotations.idempotent_hint)
+    check("writer: the team is not an argument", "team" not in wt["create_test_case"].input_schema["properties"])
+    err, out = await call(w, "create_test_case", NEW)
+    d = json.loads(out)
+    check("writer: creates a test case of its own team", not err and d["created"] and d["team"] == "hr-policy-qa"
+          and d["ticket"] == "TC-0005")
+    err, out = await call(w, "create_test_case", {**NEW, "title": "Another title, same request"})
+    d2 = json.loads(out)
+    check("writer: the same idempotency key -> the existing test case, created=false", not err and not d2["created"]
+          and d2["ticket"] == "TC-0005" and d2["title"] == NEW["title"])
+    err, out = await call(srv, "list_test_cases", {})
+    check("the reader sees the new row (one row, no duplicate)", json.loads(out)["total"] == 3)
+    pay_w = make_server(DB, "payments-qa", "writer")
+    err, out = await call(pay_w, "create_test_case", NEW)
+    check("another team with our key -> CONFLICT (409), nothing revealed", err and "CONFLICT (409)" in out
+          and "TC-0005" not in out and "hr-policy-qa" not in out)
+    for args, why in [({**NEW, "requirement_ref": "2007_e_store#0001", "idempotency_key": "test-key-0002"}, "a ref of another document"),
+                      ({**NEW, "steps": [], "idempotency_key": "test-key-0003"}, "no steps"),
+                      ({**NEW, "idempotency_key": "short"}, "a short key"),
+                      ({**NEW, "idempotency_key": "x'; DROP TABLE test_cases;--"}, "SQL in the key"),
+                      ({**NEW, "team": "payments-qa", "idempotency_key": "test-key-0004"}, "a team argument")]:
+        err, out = await call(w, "create_test_case", args)
+        ok = err and "validation error" in out if why != "a team argument" else (
+            not err and json.loads(out)["team"] == "hr-policy-qa")
+        check(f"writer: {why} is rejected" if why != "a team argument" else "writer: a team argument is ignored, the row is ours", ok)
+    n = sqlite3.connect(DB).execute("SELECT COUNT(*) FROM test_cases").fetchone()[0]
+    check("writes: exactly the two valid rows were added", n == 6)
+    try:
+        make_server(DB, "auditors", "writer")
+        check("auditors cannot connect as writer", False)
+    except SystemExit:
+        check("auditors cannot connect as writer", True)
+    fresh = Path(tmp.name) / "fresh" / "tracker.db"
+    err, out = await call(make_server(fresh, "hr-policy-qa", "writer"), "create_test_case", NEW)
+    check("writer: the first write creates the database", not err and fresh.exists())
+
     # --- the real entry point over stdio (as the agent and other MCP clients start it)
     env = {**os.environ, "TRACKER_TEAM": "hr-policy-qa", "TRACKER_ROLE": "reader", "TRACKER_DB": str(DB)}
     params = StdioServerParameters(command=sys.executable, args=["-m", "mcp_server.tracker_server"], env=env, cwd=str(ROOT))

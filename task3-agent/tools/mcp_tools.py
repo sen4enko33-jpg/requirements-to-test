@@ -14,6 +14,7 @@ What comes from the server and what stays in the agent:
 Errors of the server -> "ERROR: <kind>:" for the model (tools/registry.py):
   FORBIDDEN (403)      -> forbidden    a permission decision of the server; never retried
   NOT_FOUND (404)      -> not_found    the object does not exist; never retried
+  CONFLICT (409)       -> conflict     the idempotency key of a write belongs to another team; never retried
   UNAVAILABLE (503)    -> unavailable  retried for safe tools, as a 503 of any service
   validation error     -> invalid_args the server rejected the arguments (normally caught before, by the schema here)
   the server process died, the call did not answer in time -> unavailable / timeout
@@ -44,7 +45,7 @@ from .registry import Tool, ToolInputError, ToolRefused, ToolUnavailable
 
 ROOT = Path(__file__).resolve().parents[1]
 PREFIX = re.compile(r"^Error executing tool [\w-]+: ")     # added by the mcp library in front of the server's message
-KINDS = [("FORBIDDEN (403)", "forbidden"), ("NOT_FOUND (404)", "not_found")]
+KINDS = [("FORBIDDEN (403)", "forbidden"), ("NOT_FOUND (404)", "not_found"), ("CONFLICT (409)", "conflict")]
 
 
 class McpError(RuntimeError):
@@ -199,6 +200,29 @@ def _schema_model(tool_name: str, schema: dict, what: str) -> type[BaseModel]:
     return FromServer
 
 
+def call(conn: McpConnection, name: str, arguments: dict):
+    """tools/call -> the answer (structured content, or the text parsed as JSON, or the text). An error of the server is
+    raised as the exception the registry turns into "ERROR: <kind>:" (see the module docstring)."""
+    result = conn.call_tool(name, arguments)
+    if result.is_error:
+        msg = PREFIX.sub("", _text(result)) or "the server reported an error without a message"
+        for marker, kind in KINDS:
+            if marker in msg:
+                raise ToolRefused(kind, msg)
+        if "UNAVAILABLE (503)" in msg:
+            raise ToolUnavailable(503, msg)
+        if "validation error" in msg.lower():
+            raise ToolInputError(msg)
+        raise RuntimeError(msg)
+    if result.structured_content is not None:
+        return result.structured_content
+    text = _text(result)
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        return text
+
+
 def make_mcp_tool(conn: McpConnection, spec) -> Tool:
     """One tool of the server as a Tool of the agent."""
     ann = spec.annotations
@@ -207,33 +231,45 @@ def make_mcp_tool(conn: McpConnection, spec) -> Tool:
     output_model = _schema_model(spec.name, spec.output_schema, "answer") if spec.output_schema else None
 
     def fn(args: BaseModel):
-        arguments = {k: v for k, v in args.model_dump().items() if v is not None}
-        result = conn.call_tool(spec.name, arguments)
-        if result.is_error:
-            msg = PREFIX.sub("", _text(result)) or "the server reported an error without a message"
-            for marker, kind in KINDS:
-                if marker in msg:
-                    raise ToolRefused(kind, msg)
-            if "UNAVAILABLE (503)" in msg:
-                raise ToolUnavailable(503, msg)
-            if "validation error" in msg.lower():
-                raise ToolInputError(msg)
-            raise RuntimeError(msg)
-        if result.structured_content is not None:
-            return result.structured_content
-        text = _text(result)
-        try:
-            return json.loads(text)
-        except json.JSONDecodeError:
-            return text
+        return call(conn, spec.name, {k: v for k, v in args.model_dump().items() if v is not None})
 
     return Tool(spec.name, inspect.cleandoc(spec.description or spec.name), args_model, fn,
                 safe=read_only, side_effect=not read_only, version=f"mcp:{conn.name}@{conn.version or '?'}",
                 output_model=output_model)
 
 
-def mcp_tools(conn: McpConnection) -> list[Tool]:
-    return [make_mcp_tool(conn, spec) for spec in conn.tools]
+def mcp_tools(conn: McpConnection, hidden: tuple[str, ...] | list[str] = ()) -> list[Tool]:
+    """The server's tools for the model. hidden: tools the model must not call directly (config.yaml, mcp.<server>.hidden):
+    create_test_case is reached only through create_test_ticket, which first checks the requirement against what the agent
+    read and asks a person (tools/ticket_tool.py, agent/loop.py)."""
+    return [make_mcp_tool(conn, spec) for spec in conn.tools if spec.name not in hidden]
+
+
+class McpTrackerStore:
+    """Where create_test_ticket writes (step 2.3): the tracker MCP server, through its tool create_test_case. It has the
+    signature of Tracker.create, so the ticket tool does not care whether it writes to a local file (tests) or to the server.
+    conn None (the server did not start): every write is unavailable - the agent never writes past the server."""
+
+    TOOL = "create_test_case"
+
+    def __init__(self, conn: McpConnection | None):
+        self.conn = conn
+
+    def create(self, doc_id: str, requirement_ref: str, title: str, steps: list[str], expected: str,
+               run_id: str | None = None, key: str | None = None) -> tuple[dict, bool]:
+        if self.conn is None or self.conn.closed:
+            raise ToolUnavailable(503, "the tracker MCP server is not running; no test case can be created")
+        if self.TOOL not in {t.name for t in self.conn.tools}:
+            raise ToolRefused("forbidden", f"FORBIDDEN (403): the tracker MCP server offers no {self.TOOL} to this "
+                                           "connection (it is connected as a reader); nothing was created")
+        if not key:
+            raise ValueError("an idempotency key is required for a write through the tracker server")
+        args = {"doc_id": doc_id, "requirement_ref": requirement_ref, "title": title, "steps": steps,
+                "expected": expected, "idempotency_key": key}
+        if run_id:
+            args["run_id"] = run_id[:80]
+        tc = call(self.conn, self.TOOL, args)
+        return tc, bool(tc["created"])
 
 
 def open_server(cfg: dict, name: str, db: str | Path | None = None, quiet: bool = False) -> McpConnection | None:

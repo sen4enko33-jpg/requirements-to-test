@@ -13,11 +13,14 @@ from .tracker import Tracker
 
 
 def build_registry(cfg: dict, corpus: Corpus, tracker: Tracker, session: Session, fault_spec: str | None = None,
-                   sleep=None, quiet: bool = False, extra_tools: list[Tool] | None = None) -> ToolRegistry:
+                   sleep=None, quiet: bool = False, extra_tools: list[Tool] | None = None,
+                   ticket_store=None) -> ToolRegistry:
     """The tools for one request. corpus: loaded once and shared (warm_up() it first); tracker, session: per request;
     fault_spec: FAULTS (tools/faults.py), counted per request, applied to the extra tools too; sleep: replaces the backoff
-    pauses in tests; extra_tools: the tools of the MCP servers (tools/mcp_tools.py)."""
-    tools = make_corpus_tools(corpus, session=session) + [make_ticket_tool(tracker, corpus, session)] + list(extra_tools or [])
+    pauses in tests; extra_tools: the tools of the MCP servers (tools/mcp_tools.py); ticket_store: where create_test_ticket
+    writes (McpTrackerStore: the MCP server), default the tracker itself."""
+    store = ticket_store if ticket_store is not None else tracker
+    tools = make_corpus_tools(corpus, session=session) + [make_ticket_tool(store, corpus, session)] + list(extra_tools or [])
     kw = {"sleep": sleep} if sleep is not None else {}
     registry = ToolRegistry(tools, RetryPolicy.from_config(cfg.get("tool_retry")), **kw)
     if fault_spec:

@@ -10,7 +10,10 @@ import yaml
 
 from agent.llm import ChatResult, ToolCall
 from evals.run import ROOT, run_task, setup_tracker, summarize
+from mcp_server.tracker_server import make_server
 from tools.corpus import Corpus
+from tools.mcp_tools import McpConnection
+from tools.tracker import Tracker
 
 FAILED = []
 
@@ -48,8 +51,15 @@ class Scripted:
         return r
 
 
+# as evals/run.py main(): one tracker file for the run and the MCP server (in-process here) that writes to it
+TMP = tempfile.TemporaryDirectory()
+TRACKER = Tracker(Path(TMP.name) / "tracker.db")
+MCP = McpConnection(make_server(TRACKER.path, "hr-policy-qa", "writer")).open()
+
+
 def run(task, *results, trace_dir=None):
-    return run_task(task, 1, cfg, Scripted(*results), corpus, "sys", trace_dir, sleep=lambda s: None)
+    return run_task(task, 1, cfg, Scripted(*results), corpus, "sys", trace_dir, sleep=lambda s: None,
+                    tracker=TRACKER, mcp=MCP)
 
 
 SEARCH = ChatResult(None, [ToolCall("s", "search_corpus", '{"query": "remote work days"}')], 100, 10, 0.0001)
@@ -119,6 +129,14 @@ check("summary: cost per 1000 requests", s["cost_per_1000_requests_usd"] > 0)
 two = [run(t_hi, ChatResult("Привіт!")), run(t_hi, ChatResult("Hello"))]
 _, md2 = summarize(two, {"run": "t", "model": "m", "system_prompt": "v5", "repeat": 2})
 check("summary: a task that passes only sometimes is marked unstable", "1/2 (unstable)" in md2)
+
+no_server = run_task({"id": "s01", "category": "side_effect", "question": "Create a test case", "answers": ["y"],
+                      "expect": {"tickets_created": 0}}, 1, cfg, Scripted(SEARCH, CREATE, ChatResult("Could not.")), corpus,
+                     "sys", None, sleep=lambda s: None, tracker=TRACKER, mcp=None)
+check("no MCP server: nothing is written past it", no_server.get("tickets_created") == 0)
+MCP.close()
+TRACKER.close()
+TMP.cleanup()
 
 print(f"\n{'FAILED: ' + str(len(FAILED)) if FAILED else 'all checks passed'}")
 sys.exit(1 if FAILED else 0)

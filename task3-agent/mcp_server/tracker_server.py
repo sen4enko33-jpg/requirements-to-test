@@ -1,4 +1,4 @@
-"""MCP server of the test-case tracker (step 2). Read-only in sub-step 2.1; writing comes in 2.3.
+"""MCP server of the test-case tracker (step 2): reading (2.1) and, for the role writer, creating test cases (2.3).
 
     TRACKER_TEAM=hr-policy-qa TRACKER_ROLE=reader python -m mcp_server.tracker_server     # stdio transport
 
@@ -7,7 +7,11 @@ MCP client - Claude Desktop, an IDE, an agent of another team - with the same co
 
 Restrictions, enforced here and not left to the client or the model:
   - one table only (test_cases) and only fixed, parameterised queries: no SQL, shell or file path comes from a caller;
-  - the database is opened read-only (SQLite mode=ro + PRAGMA query_only), so even a bug here cannot write;
+  - reads open the database read-only (SQLite mode=ro + PRAGMA query_only), so even a bug in a read cannot write;
+  - the only write is one fixed INSERT of create_test_case, and only a writer connection has that tool at all (a reader
+    does not even see it in tools/list); the team of a new row is the team of the connection, never an argument;
+  - create_test_case is idempotent: the client sends an idempotency key, the same key returns the existing row
+    (created=false) instead of a duplicate; a key that belongs to another team is a CONFLICT (409) that reveals nothing;
   - every argument is checked by its schema (patterns for doc_id, ref, ticket, team; limits on numbers);
   - a client sees only the rows of its own team; a row or a team filter of another team is FORBIDDEN (403);
   - the team and role must be listed in mcp_server/access.yaml, otherwise the server does not start.
@@ -28,6 +32,9 @@ from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
 from pydantic import BaseModel, Field
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from tools.tracker import Tracker  # noqa: E402  - the same table and the same INSERT ... ON CONFLICT DO NOTHING
+
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_DB = ROOT / "data" / "tracker.db"
 ACCESS = Path(__file__).resolve().parent / "access.yaml"
@@ -39,7 +46,9 @@ TICKET = r"^TC-\d{4,6}$"
 TEAM = r"^[a-z0-9-]{2,40}$"
 COLUMNS = "id, doc_id, requirement_ref, title, steps, expected, created_at, team"   # an explicit list, not all columns: a new column stays private
 
-VERSION = "1.1"          # 1.0: the tools of 2.1; 1.1: answers with an output schema (the client checks them)
+VERSION = "1.2"          # 1.0: the tools of 2.1; 1.1: answers with an output schema (the client checks them);
+                         # 1.2: create_test_case for the role writer
+KEY = r"^[A-Za-z0-9_.:-]{8,80}$"
 
 
 class TestCaseSummary(BaseModel):
@@ -60,6 +69,15 @@ class TestCase(TestCaseSummary):
     team: str
     steps: list[str]
     expected: str
+
+
+class CreatedTestCase(BaseModel):
+    ticket: str
+    created: bool                    # False: a test case with this idempotency key existed, nothing was written
+    team: str
+    doc_id: str
+    requirement_ref: str
+    title: str
 
 
 FORBIDDEN = ("FORBIDDEN (403): {what} belongs to another team; team {team} has no access to it. This is a permission "
@@ -147,6 +165,38 @@ def make_server(db_path: str | Path, team: str, role: str = "reader", access: di
         log.info("ALLOW get_test_case team=%s %s", team, ticket)
         return TestCase(ticket=_ticket(r["id"]), team=r["team"], doc_id=r["doc_id"], requirement_ref=r["requirement_ref"],
                         title=r["title"], steps=json.loads(r["steps"]), expected=r["expected"], created_at=r["created_at"])
+
+    if role != "writer":
+        return server
+
+    write = mt.ToolAnnotations(readOnlyHint=False, destructiveHint=False, idempotentHint=True, openWorldHint=False)
+
+    @server.tool(annotations=write)
+    def create_test_case(
+        doc_id: Annotated[str, Field(pattern=DOC_ID, description="Document of the requirement.")],
+        requirement_ref: Annotated[str, Field(pattern=REF, description="The passage with the requirement, e.g. remote_work_policy#0000; must belong to doc_id.")],
+        title: Annotated[str, Field(min_length=5, max_length=120, description="Short name of the test case.")],
+        steps: Annotated[list[Annotated[str, Field(min_length=3, max_length=300)]], Field(min_length=1, max_length=10, description="Actions of the tester, in order.")],
+        expected: Annotated[str, Field(min_length=5, max_length=500, description="Expected result.")],
+        idempotency_key: Annotated[str, Field(pattern=KEY, description="The same key = the same test case: a repeated call returns the existing one.")],
+        run_id: Annotated[Optional[str], Field(None, max_length=80, description="Id of the client's request, kept for the audit.")] = None,
+    ) -> CreatedTestCase:
+        """Creates a test case of your team in the tracker. Idempotent: a call with an idempotency_key that was used
+        before returns the existing test case with created=false and writes nothing."""
+        if requirement_ref.split("#")[0] != doc_id:
+            raise ToolError(f"validation error: requirement_ref {requirement_ref} does not belong to document {doc_id}")
+        tracker = Tracker(db_path)
+        try:
+            tc, created = tracker.create(doc_id, requirement_ref, title, steps, expected, run_id=run_id,
+                                         key=idempotency_key, team=team)
+        finally:
+            tracker.close()
+        if tc["team"] != team:
+            log.info("DENY create_test_case team=%s key already used by another team", team)
+            raise ToolError("CONFLICT (409): this idempotency key is already used; choose another key. Nothing was written.")
+        log.info("%s create_test_case team=%s %s %s", "CREATE" if created else "DUPLICATE", team, tc["ticket"], requirement_ref)
+        return CreatedTestCase(ticket=tc["ticket"], created=created, team=team, doc_id=tc["doc_id"],
+                               requirement_ref=tc["requirement_ref"], title=tc["title"])
 
     return server
 
