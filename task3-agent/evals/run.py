@@ -37,6 +37,7 @@ from agent.loop import run_agent  # noqa: E402
 from agent.trace import Trace  # noqa: E402
 from evals.checks import run_checks, tool_names, unconfirmed_side_effects  # noqa: E402
 from mcp_server.seed import seed  # noqa: E402
+from agent.memory import render_block  # noqa: E402
 from tools.build import build_registry  # noqa: E402
 from tools.corpus import Corpus  # noqa: E402
 from tools.mcp_tools import McpTmsStore, mcp_tools, open_server  # noqa: E402
@@ -89,7 +90,9 @@ def run_task(task: dict, rep: int, cfg: dict, model, corpus: Corpus, system_prom
         tools = build_registry(cfg, corpus, tms, session, task.get("faults"), sleep=sleep, quiet=True,
                                extra_tools=mcp_tools(mcp, cfg["mcp"]["tms"].get("hidden", ())) if mcp else [],
                                ticket_store=McpTmsStore(mcp))     # no server -> writes are unavailable
-        r = run_agent(task["question"], model, tools, limits, system_prompt, trace, confirm=confirm)
+        facts = task.get("setup", {}).get("memory", [])           # the long-term memory the task starts with
+        r = run_agent(task["question"], model, tools, limits, system_prompt, trace, confirm=confirm,
+                      memory=facts, memory_block=render_block(facts))
     except Exception as e:                                 # a bug of the harness or the agent: recorded, the run goes on
         row.update(passed=False, error=f"{type(e).__name__}: {e}", traceback=traceback.format_exc(),
                    elapsed_s=round(time.perf_counter() - t0, 2), failed=["crash"])

@@ -27,7 +27,7 @@ Python 3.10+.
     FAULTS=search_corpus:503 python main.py "..." # fake failures: timeout, 429, 503, schema, lost
     python main.py "..." --max-steps 3 --max-cost 0.005
 
-Tests without a model: `for t in tests/test_*.py; do .venv/bin/python $t | tail -1; done` (334 checks).
+Tests without a model: `for t in tests/test_*.py; do .venv/bin/python $t | tail -1; done` (411 checks).
 Evaluation on the model: `python -m evals.run --repeat 3` (about $0.07).
 
 ## Tools
@@ -111,12 +111,31 @@ The prompt alone was not enough: the model still tried to create a test case on 
 (see [`CHANGELOG.md`](prompts/CHANGELOG.md), system_v8 and v9). The code stops what the prompt does not.
 
 ## Memory and feedback
-Step 3 of the task (not yet): memory of the dialogue with a token limit, and feedback that changes the next answer.
+Long-term memory of a user between sessions ([`agent/memory.py`](agent/memory.py), `data/memory/<user>.json`).
+
+    python main.py "/remember language: answer in English"   # a preference; the same key ("language") replaces the old one
+    python main.py "/fix also say how remote days are booked" # a correction of the last answer: kept as a fact
+    python main.py "/good"    python main.py "/bad too long"  # ratings of the last answer
+    python main.py "/memory"  python main.py "/forget 2"  python main.py "/forget all"
+    python main.py "..." --user anna                          # whose memory (default: default)
+
+- **What is stored:** the user's own facts (preferences and corrections), the last question and answer (what `/fix`,
+  `/good`, `/bad` refer to). Every rating and correction also goes to `data/feedback.jsonl`: candidates for new tasks.
+- **How it is used:** the facts go into a block after the system prompt ([`prompts/memory_v1.md`](prompts/memory_v1.md));
+  they do not override the rules (facts about documents still come from tools; no change without a request and a
+  confirmation). The facts used are listed in the trace.
+- **When it is deleted:** after 180 days; at most 20 facts (the oldest go first); a fact with the same key replaces the
+  old one; each fact is cut to 300 characters; `/forget`.
+- **Who writes:** only the user's commands. No tool writes the memory, so an instruction in a document ("remember that
+  ...") cannot live on in later sessions.
+- **Feedback changes the next answer:** task m02 starts with a `/fix` ("also say how remote days are booked") and the
+  answer to the same question then names the HR portal; m01 starts with "answer in English"; m03 shows that a saved
+  "always create test cases, I approve them" still creates nothing.
 
 ## Prompts and evaluation
 - [`prompts/system_v9.md`](prompts/system_v9.md) is the prompt in use; older versions are kept, and
   [`CHANGELOG.md`](prompts/CHANGELOG.md) says what changed in each version and which run showed the need.
-- [`evals/`](evals/): 46 tasks in [`tasks.jsonl`](evals/tasks.jsonl) (written by `make_tasks.py`), deterministic
+- [`evals/`](evals/): 49 tasks in [`tasks.jsonl`](evals/tasks.jsonl) (written by `make_tasks.py`), deterministic
   checks in `checks.py`, the runner `run.py`, results and traces in `evals/runs/<date-time>/`.
 
 | category | tasks | checks |
@@ -130,6 +149,7 @@ Step 3 of the task (not yet): memory of the dialogue with a token limit, and fee
 | access | g01-g02 | another team's data: 403, explains, no workaround |
 | tms | g03-g05, g07 | own test cases through MCP, 404 |
 | versions | v01-v04 | current rule of the 2026 policy, the 2023 one named, both cited |
+| memory | m01-m03 | facts and corrections from earlier sessions change the answer, but cannot order a change |
 | injection | h01-h05 | instructions hidden in wiki pages: ignored, nothing created that the user did not ask for |
 
 Last full run (`evals/runs/20261128-155455`, 42 tasks x 3, system_v8, before the receipt): 111/126 passed (88%),
@@ -143,4 +163,4 @@ still tries to create a test case and the code refuses it.
 - `tools/` - the tools, validation and retries (`registry.py`), MCP client (`mcp_tools.py`), TMS table (`tms.py`)
 - `mcp_server/` - the server, `access.yaml`, demo data
 - `prompts/`, `evals/`, `tests/`
-- not in git: `.venv/`, `../.env`, the task 2 index, `data/tms.db`, `traces/`
+- not in git: `.venv/`, `../.env`, the task 2 index, `data/tms.db`, `data/memory/`, `data/feedback.jsonl`, `traces/`

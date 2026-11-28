@@ -16,6 +16,11 @@ subprocess for the request (config.yaml, section mcp) and its tools list_test_ca
 New test cases are written by the same server (create_test_case, after your confirmation). Its log goes to
 traces/mcp_tms.log. If it does not start, the agent runs without these tools and cannot create test cases.
 
+Memory of the user between sessions (agent/memory.py, data/memory/<user>.json), written only by these commands:
+  python main.py "/remember language: answer in English"     python main.py "/memory"     python main.py "/forget 2"
+  python main.py "/fix the current core hours are 10-16"     python main.py "/good"       python main.py "/bad too long"
+--user NAME picks whose memory (default: default).
+
 Needs OPENROUTER_API_KEY in .env (repository root or this folder). Every run writes its trace to traces/<run_id>.jsonl."""
 from __future__ import annotations
 
@@ -34,6 +39,7 @@ from agent.confirm import CliConfirmer, ScriptedConfirmer  # noqa: E402
 from agent.limits import Limits  # noqa: E402
 from agent.llm import make_model  # noqa: E402
 from agent.loop import run_agent  # noqa: E402
+from agent.memory import Memory, handle_command  # noqa: E402
 from agent.trace import Trace  # noqa: E402
 from tools.build import build_registry  # noqa: E402
 from tools.corpus import Corpus  # noqa: E402
@@ -52,11 +58,22 @@ def load_system_prompt(version: str) -> str:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("question", help="the question to the agent")
+    ap.add_argument("question", help="the question to the agent, or a memory command (/remember, /fix, /memory, ...)")
+    ap.add_argument("--user", default="default", help="whose long-term memory to use (data/memory/<user>.json)")
     ap.add_argument("--max-steps", type=int, help="override limits.max_steps of config.yaml")
     ap.add_argument("--max-cost", type=float, help="override limits.max_cost_usd of config.yaml")
     ap.add_argument("--answers", help="confirmations given in advance, in order, e.g. y or y,n (default: ask in the terminal)")
     a = ap.parse_args()
+
+    memory = Memory(a.user)
+    try:
+        reply = handle_command(memory, a.question)          # a command of the user: no model, no tools
+    except ValueError as e:
+        print(f"[memory] {e}")
+        return 2
+    if reply is not None:
+        print(reply)
+        return 0
 
     load_dotenv(ROOT / ".env"); load_dotenv(ROOT.parent / ".env")
     cfg = load_config()
@@ -84,15 +101,18 @@ def main() -> int:
                                extra_tools=mcp_tools(conn, cfg["mcp"]["tms"].get("hidden", ())) if conn else [],
                                ticket_store=McpTmsStore(conn))        # test cases are written by the server
         result = run_agent(a.question, make_model(cfg, key), tools, limits,
-                           load_system_prompt(cfg["system_prompt"]), trace, confirm=confirm)
+                           load_system_prompt(cfg["system_prompt"]), trace, confirm=confirm,
+                           memory=[f["text"] for f in memory.facts], memory_block=memory.prompt_block())
     finally:
         if conn:
             conn.close()
+    memory.remember_answer(a.question, result.answer, result.run_id)     # what /fix, /good and /bad will refer to
+    memory.save()
     print(result.answer)
     u = result.usage
     print(f"\n[stop: {result.stop_reason} | steps {u['steps']} | tokens {u['tokens_in']}+{u['tokens_out']} | "
           f"${u['cost_usd']:.5f} | {u['elapsed_s']:.1f} s | tools: {[c['name'] for c in result.tool_calls] or '-'}]")
-    print(f"[trace: {result.trace_path}]")
+    print(f"[trace: {result.trace_path}]" + (f" [memory: {len(memory.facts)} fact(s) of {a.user}]" if memory.facts else ""))
     return 0 if result.complete else 2
 
 

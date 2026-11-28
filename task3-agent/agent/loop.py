@@ -103,21 +103,25 @@ ALREADY_DECLINED = ("ERROR: not_confirmed: the user already declined a change in
 
 def run_agent(question: str, model: ChatModel, tools: ToolRegistry, limits: Limits, system_prompt: str,
               trace: Trace | None = None, history: list[dict] | None = None, clock=None,
-              confirm: Confirmer | None = None) -> AgentResult:
-    """history: earlier messages of the conversation (memory comes in a later step); clock: replaces time.monotonic in tests;
-    confirm: asked before every tool with side_effect=True runs (default: decline, see agent/confirm.py)."""
+              confirm: Confirmer | None = None, memory: list[str] | None = None, memory_block: str = "") -> AgentResult:
+    """history: earlier messages of the conversation; clock: replaces time.monotonic in tests;
+    confirm: asked before every tool with side_effect=True runs (default: decline, see agent/confirm.py);
+    memory, memory_block: the long-term facts of the user and their text for the system prompt (agent/memory.py),
+    added after the system prompt and written to the trace."""
     trace = trace or Trace()
     confirm = confirm or deny_all
     declined = False                        # after one "no" no further side effect runs in this request
     budget = Budget(limits, clock) if clock else Budget(limits)
-    messages = [{"role": "system", "content": system_prompt}, *(history or []), {"role": "user", "content": question}]
+    system = f"{system_prompt}\n\n{memory_block}" if memory_block else system_prompt
+    messages = [{"role": "system", "content": system}, *(history or []), {"role": "user", "content": question}]
     schemas = tools.schemas()
     calls: list[dict] = []
     changes: list[dict] = []                # side-effect tools that ran (for the receipt)
     observations: list[tuple[str, str]] = []
     last_text: str | None = None
     trace.log("start", question=question, model=getattr(model, "name", "?"), tools=[s["function"]["name"] for s in schemas],
-              tool_versions={t.name: t.version for t in tools.tools.values() if t.version}, limits=vars(limits))
+              tool_versions={t.name: t.version for t in tools.tools.values() if t.version}, limits=vars(limits),
+              memory=memory or [])
 
     def finish(reason: str, answer: str) -> AgentResult:
         complete = reason == ANSWERED

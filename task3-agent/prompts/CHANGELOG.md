@@ -3,6 +3,10 @@
 Versions of the system prompt are `prompts/system_<version>.md` (the one in use is `system_prompt` of `config.yaml`).
 Tool descriptions are `prompts/tools/<name>.yaml` with a `version` field; their changes are listed here too.
 
+## memory_v1 (step 3.3, long-term memory)
+- The block after the system prompt that lists the user's own facts (/remember, /fix) and says they do not override the
+  rules above. Filled in code (agent/memory.render_block); no fact can come from a tool.
+
 ## search_corpus v3 (step 3.2, two versions of one rule)
 - New field `newer_version` and a `note` when a result belongs to an older version of a document whose newer version is
   not among the results (for example hidden by a `year` filter); the hit is marked OLDER VERSION. The description says
